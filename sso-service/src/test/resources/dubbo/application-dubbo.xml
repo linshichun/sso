@@ -9,7 +9,7 @@
 
     <dubbo:application name="scolia-sso-api" />
 
-    <dubbo:registry protocol="zookeeper" address="127.0.0.1:2181" />
+    <dubbo:registry protocol="zookeeper" address="192.168.1.106:2181" />
 
     <dubbo:reference
             interface="win.scolia.sso.api.service.AccountService"

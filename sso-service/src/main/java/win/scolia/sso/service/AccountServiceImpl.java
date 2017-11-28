@@ -1,18 +1,19 @@
 package win.scolia.sso.service;
 
+import com.alibaba.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import win.scolia.sso.api.pojo.User;
 import win.scolia.sso.api.service.AccountService;
 import win.scolia.sso.mapper.AccountMapper;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
  * Created by scolia on 2017/11/27
  */
-@Service("accountService")
+@Component
+@Service
 public class AccountServiceImpl implements AccountService {
 
     @Autowired

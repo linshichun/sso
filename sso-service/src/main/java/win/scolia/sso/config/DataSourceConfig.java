@@ -13,7 +13,7 @@ import org.springframework.context.annotation.PropertySource;
  * 配置数据源
  */
 @Configuration
-@PropertySource(value= {"classpath:jdbc.properties"})
+@PropertySource("classpath:jdbc.properties")
 public class DataSourceConfig {
 
     @Value("${jdbc.driverClassName}")

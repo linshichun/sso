@@ -12,7 +12,7 @@ public interface AccountService {
     /**
      * 注册
      * @param user 要注册的用户对象
-     * @return 返回用户id
+     * @return 返回用户id, 返回-1表示注册失败
      */
     Integer register(User user);
 

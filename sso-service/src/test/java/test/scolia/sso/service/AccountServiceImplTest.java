@@ -25,7 +25,6 @@ public class AccountServiceImplTest {
         User user = new User();
         user.setUsername("scolia");
         user.setPassword("123456");
-        user.setSalt("123");
         accountService.register(user);
     }
 

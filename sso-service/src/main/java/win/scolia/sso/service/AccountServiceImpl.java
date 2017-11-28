@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import win.scolia.sso.api.pojo.User;
 import win.scolia.sso.api.service.AccountService;
 import win.scolia.sso.mapper.AccountMapper;
+import win.scolia.sso.utils.EncryptUtil;
 
 import java.util.List;
 
@@ -19,9 +20,22 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private AccountMapper accountMapper;
 
+    @Autowired
+    private EncryptUtil encryptUtil;
+
     @Override
     public Integer register(User user) {
-        return accountMapper.insertUser(user);
+        try {
+            String selfSalt = encryptUtil.getRandomSalt();
+            user.setSalt(selfSalt);
+            String rowPassword = user.getPassword();
+            String encryptedPassword = encryptUtil.getEncryptedPassword(rowPassword, user.getSalt());
+            user.setPassword(encryptedPassword);
+            return accountMapper.insertUser(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     @Override

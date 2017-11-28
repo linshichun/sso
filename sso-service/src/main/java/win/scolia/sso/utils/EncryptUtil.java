@@ -1,12 +1,10 @@
 package win.scolia.sso.utils;
 
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
-import java.security.MessageDigest;
 import java.util.UUID;
 
 /**
@@ -35,14 +33,8 @@ public class EncryptUtil {
      * @return 加密后的密码
      */
     public String getEncryptedPassword(String rowPassword, String selfSalt) {
-        MessageDigest md5 = DigestUtils.getMd5Digest();
-        md5.update(rowPassword.getBytes());
-        md5.update(systemSalt.getBytes());
-        String temp = Hex.encodeHexString(md5.digest());
-        MessageDigest sha = DigestUtils.getSha256Digest();
-        sha.update(selfSalt.getBytes());
-        sha.update(temp.getBytes());
-        return  Hex.encodeHexString(sha.digest());
+        String temp = DigestUtils.md5Hex(rowPassword + systemSalt);
+        return  DigestUtils.sha256Hex(temp + selfSalt);
     }
 
 }

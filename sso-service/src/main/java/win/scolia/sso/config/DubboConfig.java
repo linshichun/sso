@@ -65,6 +65,7 @@ public class DubboConfig {
     }
 
     @Bean
+    @SuppressWarnings("deprecation")
     public AnnotationBean annotationBean() {
         AnnotationBean annotationBean = new AnnotationBean();
         annotationBean.setPackage(providerPackage);

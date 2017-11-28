@@ -20,9 +20,9 @@ public interface AccountService {
      * 登录
      * @param username 要登录的用户名
      * @param password 要登录的密码
-     * @return bool, 表示是否登录成功
+     * @return 登录成功时返回token, 失败时返回null
      */
-    boolean login(String username, String password);
+    String login(String username, String password);
 
     /**
      * 登出

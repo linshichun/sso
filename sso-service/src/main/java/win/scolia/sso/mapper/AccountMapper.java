@@ -16,9 +16,9 @@ public interface AccountMapper {
     Integer insertUser(@Param("user") User user);
 
     /**
-     * 根据用户名查询用户信息
+     * 根据用户名用户的密码
      * @param username 要查询的用户名
-     * @return 返回查询得到的用户对象
+     * @return 返回查询得到的用户密码
      */
-    User selectUserByUsername(@Param("username") String username);
+    User selectPasswordAndSaltByUsername(@Param("username") String username);
 }

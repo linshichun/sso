@@ -10,5 +10,10 @@
         VALUES (#{user.username}, #{user.password}, #{user.salt}, NOW())
     </insert>
 
+    <select id="selectPasswordAndSaltByUsername" parameterType="string"
+            resultType="win.scolia.sso.api.pojo.User">
+        SELECT password, salt FROM users WHERE username = #{username}
+    </select>
+
 
 </mapper>

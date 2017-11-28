@@ -28,4 +28,13 @@ public class AccountServiceImplTest {
         accountService.register(user);
     }
 
+    @Test
+    public void login() throws Exception {
+        User user = new User();
+        user.setUsername("scolia");
+        user.setPassword("123456");
+        String token = accountService.login(user.getUsername(), user.getPassword());
+        System.out.println("=============" + token);
+    }
+
 }

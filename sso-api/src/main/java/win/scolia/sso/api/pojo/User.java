@@ -1,5 +1,7 @@
 package win.scolia.sso.api.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -14,8 +16,10 @@ public class User implements Serializable {
 
     private String username;
 
+    @JsonIgnore
     private String password;
 
+    @JsonIgnore
     private String salt;
 
     private Date createTime;

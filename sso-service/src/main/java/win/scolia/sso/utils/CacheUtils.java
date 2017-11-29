@@ -9,6 +9,9 @@ import redis.clients.jedis.JedisPool;
 import win.scolia.sso.api.pojo.User;
 import win.scolia.sso.api.pojo.UserCustom;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * Created by scolia on 2017/11/29
  */
@@ -23,13 +26,17 @@ public class CacheUtils {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    public UserCustom getUser(String username) {
-        try {
-            Jedis jedis = jedisPool.getResource();
-            String Key = tokenUtils.getKey(username);
-            String json = jedis.get(Key);
+    /**
+     * 根据token, 去redis获取用户对象
+     * @param token 用户的token
+     * @return 成功时返回用户对象, 失败时返回null
+     */
+    public UserCustom getUser(String token) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            String key = tokenUtils.getKey(token);
+            String json = jedis.get(key);
             if (json != null) {
-                jedis.expire(Key, tokenUtils.getExpireTime());
+                jedis.expire(key, tokenUtils.getExpireTime());
                 return MAPPER.readValue(json, UserCustom.class);
             }
             return null;
@@ -40,23 +47,22 @@ public class CacheUtils {
     }
 
     public void cacheUser(User user, String token) {
-        String key = tokenUtils.getKey(user.getUsername());
+        String key = tokenUtils.getKey(token);
         UserCustom userCustom = new UserCustom();
         BeanUtils.copyProperties(user, userCustom);
         userCustom.setCacheKey(key);
         userCustom.setToken(token);
-        cacheUser(userCustom);
+        cacheUser(userCustom, false);
     }
 
-    public void cacheUser(UserCustom userCustom) {
-        Jedis jedis = jedisPool.getResource();
-        String key = userCustom.getCacheKey();
-        // 如何要缓存的用户已经存在, 则延迟其生存时间
-        if (jedis.exists(key)) {
-            jedis.expire(key, tokenUtils.getExpireTime());
-            return;
-        }
-        try {
+    private void cacheUser(UserCustom userCustom, boolean reset) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            String key = userCustom.getCacheKey();
+            // 如果不强制重新设置, 且用户已经缓存, 就刷新其生存时间
+            if (!reset && jedis.exists(key)) {
+                jedis.expire(key, tokenUtils.getExpireTime());
+                return;
+            }
             String json = MAPPER.writeValueAsString(userCustom);
             jedis.set(key, json);
             jedis.expire(key, tokenUtils.getExpireTime());
@@ -65,4 +71,46 @@ public class CacheUtils {
         }
     }
 
+    public void delCacheUser(String token) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            String key = tokenUtils.getKey(token);
+            jedis.del(key);
+        }
+    }
+
+    public List<String> getRoles(String token) {
+        UserCustom userCustom = getUser(token);
+        if (userCustom != null) {
+            return userCustom.getRoles();
+        }
+        return null;
+    }
+
+    /**
+     * 缓存用户的角色信息, 这里会覆盖原来的缓存, 请确保userCustom中有原先的信息
+     * @param userCustom 原先的用户对象
+     * @param roles 用户的角色列表
+     */
+    public void cacheUserRoles(UserCustom userCustom, List<String> roles) {
+        userCustom.setRoles(roles);
+        cacheUser(userCustom, true);
+    }
+
+    public Set<String> getPermissions(String token) {
+        UserCustom userCustom = getUser(token);
+        if (userCustom != null) {
+            return userCustom.getPermissions();
+        }
+        return null;
+    }
+
+    /**
+     * 缓存用户的权限信息, 这里会覆盖原来的缓存, 请确保userCustom中有原先的信息
+     * @param userCustom 原先的用户对象
+     * @param permissions 用户的权限列表
+     */
+    public void cacheUserPermissions(UserCustom userCustom, Set<String> permissions) {
+        userCustom.setPermissions(permissions);
+        cacheUser(userCustom, true);
+    }
 }

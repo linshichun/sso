@@ -3,6 +3,7 @@ package win.scolia.sso.api.service;
 import win.scolia.sso.api.pojo.User;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by scolia on 2017/11/27
@@ -25,23 +26,29 @@ public interface AccountService {
     String login(String username, String password);
 
     /**
-     * 登出
-     * @param username 要登出的用户名
-     * @return bool, 表示是否登出成功
+     * 根据token登录
+     * @param token token
+     * @return 返回对应的用户名, 失败返回null
      */
-    boolean logout(String username);
+    String login(String token);
+
+    /**
+     * 登出
+     * @param token 要登出的用户的token
+     */
+    void logout(String token);
 
     /**
      * 获取用户的角色
-     * @param username 用户名
+     * @param token 用户token
      * @return 返回用户的角色列表
      */
-    List<String> getRoles(String username);
+    List<String> getRoles(String token);
 
     /**
      * 获取角色的权限
-     * @param roleName 角色名
+     * @param token 用户token
      * @return 返回权限列表
      */
-    List<String> getPermissions(String roleName);
+    Set<String> getPermissions(String token);
 }

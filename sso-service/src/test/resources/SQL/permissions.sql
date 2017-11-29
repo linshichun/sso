@@ -1,0 +1,7 @@
+CREATE TABLE permissions (
+  permission_id   INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  permission_name VARCHAR(255) NOT NULL UNIQUE
+
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8;

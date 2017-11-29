@@ -35,6 +35,22 @@ public class AccountServiceImplTest {
         user.setPassword("123456");
         String token = accountService.login(user.getUsername(), user.getPassword());
         System.out.println("=============" + token);
+        String username = accountService.login(token);
+        System.out.println("========" + username);
+    }
+
+    @Test
+    public void getRoles() throws Exception {
+        String token = "3a036401f0dc887e01f936b204417153";
+        String username = accountService.login(token);
+        System.out.println("========" + username);
+        System.out.println("========" + accountService.getRoles(token));
+    }
+
+    @Test
+    public void getPermissions() throws Exception {
+        String token = "3a036401f0dc887e01f936b204417153";
+        System.out.println("========" + accountService.getPermissions(token));
     }
 
 }

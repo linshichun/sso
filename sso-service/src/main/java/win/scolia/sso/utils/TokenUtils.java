@@ -16,7 +16,7 @@ public class TokenUtils {
     private String tokenSalt;
 
     @Value("${token.prefix}")
-    private String tokenPrefix;
+    private String keyPrefix;
 
     @Value("${token.expire}")
     private Integer expireTime;
@@ -25,8 +25,8 @@ public class TokenUtils {
         return expireTime;
     }
 
-    public String getKey(String username) {
-        return String.format("%s_%s", tokenPrefix.toUpperCase(), username.toUpperCase());
+    public String getKey(String key) {
+        return String.format("%s_%s", keyPrefix.toUpperCase(), key.toUpperCase());
     }
     public String getToken(String username) {
         return DigestUtils.md5Hex(username + tokenSalt + Long.toString(System.currentTimeMillis()));

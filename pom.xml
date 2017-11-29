@@ -21,6 +21,7 @@
         <zookeeper.version>3.4.11</zookeeper.version>
         <zkclient.version>0.1</zkclient.version>
         <common.codec.version>1.11</common.codec.version>
+        <jackson.version>2.9.2</jackson.version>
     </properties>
 
     <dependencyManagement>
@@ -90,6 +91,22 @@
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
                 <version>${common.codec.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
 
         </dependencies>

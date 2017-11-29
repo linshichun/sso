@@ -3,11 +3,11 @@ package win.scolia.sso.service;
 import com.alibaba.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 import win.scolia.sso.api.pojo.User;
+import win.scolia.sso.api.pojo.UserCustom;
 import win.scolia.sso.api.service.AccountService;
 import win.scolia.sso.mapper.AccountMapper;
+import win.scolia.sso.utils.CacheUtils;
 import win.scolia.sso.utils.EncryptUtil;
 import win.scolia.sso.utils.TokenUtils;
 
@@ -28,10 +28,10 @@ public class AccountServiceImpl implements AccountService {
     private EncryptUtil encryptUtil;
 
     @Autowired
-    private TokenUtils tokenUtils;
+    private CacheUtils cacheUtils;
 
     @Autowired
-    private JedisPool jedisPool;
+    private TokenUtils tokenUtils;
 
     @Override
     public Integer register(User user) {
@@ -50,15 +50,27 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public String login(String username, String password) {
-        User user = accountMapper.selectPasswordAndSaltByUsername(username);
-        String tempPassword = encryptUtil.getEncryptedPassword(password, user.getSalt());
-        if (tempPassword.equals(user.getPassword())) {
-            String tokenKey = tokenUtils.getTokenKey(username);
-            String token = tokenUtils.getToken(username);
-            Jedis jedis = jedisPool.getResource();
-            jedis.set(tokenKey, token);
-            jedis.expire(tokenKey, tokenUtils.getExpireTime());
-            return token;
+        Boolean isCache = true;
+        User user = cacheUtils.getUser(username);
+        if (user == null) { // 缓存未命中
+            user = accountMapper.selectPasswordAndSaltByUsername(username);
+            isCache = false;
+        }
+        // 有此用户
+        if (user != null) {
+            String tempPassword = encryptUtil.getEncryptedPassword(password, user.getSalt());
+            if (tempPassword.equals(user.getPassword())) {
+                String token;
+                if (isCache) {
+                    UserCustom userCustom = (UserCustom) user;
+                    token = userCustom.getToken();
+                    cacheUtils.cacheUser(userCustom);
+                } else {
+                    token = tokenUtils.getToken(username);
+                    cacheUtils.cacheUser(user, token);
+                }
+                return token;
+            }
         }
         return null;
     }

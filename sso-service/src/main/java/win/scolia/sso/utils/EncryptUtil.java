@@ -12,7 +12,7 @@ import java.util.UUID;
  * 实现加密的工具类
  */
 @Component
-@PropertySource("classpath:encrypt.properties")
+@PropertySource("classpath:sso.properties")
 public class EncryptUtil {
 
     @Value("${encrypt.salt}")

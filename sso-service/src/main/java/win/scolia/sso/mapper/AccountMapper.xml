@@ -12,7 +12,7 @@
 
     <select id="selectPasswordAndSaltByUsername" parameterType="string"
             resultType="win.scolia.sso.api.pojo.User">
-        SELECT password, salt FROM users WHERE username = #{username}
+        SELECT username, password, salt FROM users WHERE username = #{username}
     </select>
 
 

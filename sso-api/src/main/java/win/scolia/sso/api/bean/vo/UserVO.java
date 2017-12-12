@@ -1,16 +1,20 @@
 package win.scolia.sso.api.bean.vo;
 
-import java.io.Serializable;
+import javax.validation.constraints.NotNull;
 
 /**
  * 用户的传输对象
  */
-public class UserVO implements Serializable{
+public class UserVO {
 
-    private static final long serialVersionUID = -7331594504420320333L;
+    // 注册组
+    public interface register {}
 
+
+    @NotNull(message = "用户名不能为空", groups = {register.class})
     private String userName;
 
+    @NotNull(message = "密码不能为空", groups = {register.class})
     private String password;
 
     public UserVO() {
@@ -45,3 +49,6 @@ public class UserVO implements Serializable{
                 '}';
     }
 }
+
+
+

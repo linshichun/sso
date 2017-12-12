@@ -28,14 +28,14 @@
 
         <spring.version>4.3.12.RELEASE</spring.version>
         <spring.boot.starter.version>1.5.9.RELEASE</spring.boot.starter.version>
+        <spring.data.redis.version>2.0.2.RELEASE</spring.data.redis.version>
         <mybatis.spring.boot.starter.version>1.3.1</mybatis.spring.boot.starter.version>
         <mysql.connector.version>5.1.45</mysql.connector.version>
         <druid.version>1.1.6</druid.version>
         <common.codec.version>1.11</common.codec.version>
         <commons.lang3.version>3.7</commons.lang3.version>
         <jackson.version>2.9.2</jackson.version>
-        <spring.boot.devtools.version>1.5.1.RELEASE</spring.boot.devtools.version>
-        <servlet.api.version>3.1.0</servlet.api.version>
+        <validator.version>6.0.5.Final</validator.version>
     </properties>
 
     <dependencyManagement>
@@ -45,6 +45,12 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
                 <version>${spring.boot.starter.version}</version>
+            </dependency>
+            <!-- Spring redis -->
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-redis</artifactId>
+                <version>${spring.data.redis.version}</version>
             </dependency>
             <!-- mybatis相关 -->
             <dependency>
@@ -91,7 +97,12 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons.lang3.version}</version>
             </dependency>
-
+            <!-- 数据校验 -->
+            <dependency>
+                <groupId>org.hibernate.validator</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${validator.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

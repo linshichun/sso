@@ -2,7 +2,7 @@ package win.scolia.sso.service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import win.scolia.sso.api.bean.entity.User;
 import win.scolia.sso.api.bean.vo.UserVO;
 import win.scolia.sso.api.server.AccountService;
@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Created by scolia on 2017/11/27
  */
-@Component
+@Service
 public class AccountServiceImpl implements AccountService {
 
     @Autowired

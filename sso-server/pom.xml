@@ -17,10 +17,20 @@
             <artifactId>sso-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-        <!-- spring start -->
+        <!-- spring web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- 数据校验 -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+        </dependency>
+        <!-- Spring redis -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-redis</artifactId>
         </dependency>
         <!-- mybatis相关 -->
         <dependency>
@@ -65,6 +75,7 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>

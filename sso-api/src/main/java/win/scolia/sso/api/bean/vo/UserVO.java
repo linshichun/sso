@@ -10,11 +10,13 @@ public class UserVO {
     // 注册组
     public interface register {}
 
+    // 登录组
+    public interface login {}
 
-    @NotNull(message = "用户名不能为空", groups = {register.class})
+    @NotNull(message = "用户名不能为空", groups = {register.class, login.class})
     private String userName;
 
-    @NotNull(message = "密码不能为空", groups = {register.class})
+    @NotNull(message = "密码不能为空", groups = {register.class, login.class})
     private String password;
 
     public UserVO() {

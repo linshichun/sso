@@ -2,7 +2,6 @@ package win.scolia.sso.api.server;
 
 import win.scolia.sso.api.bean.vo.UserVO;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -13,7 +12,7 @@ public interface AccountService {
     /**
      * 注册
      * @param userVO 要注册的用户对象
-     * @return 返回用户id, 返回-1表示注册失败
+     * @return 返回用户id, 返回null表示注册失败
      */
     Long register(UserVO userVO);
 
@@ -44,11 +43,25 @@ public interface AccountService {
     void logout(String token);
 
     /**
+     * 获取用户名获取角色
+     * @param userVO 角色信息
+     * @return 返回用户的角色列表
+     */
+    Set<String> getRoles(UserVO userVO);
+
+    /**
      * 获取用户的角色
      * @param token 用户token
      * @return 返回用户的角色列表
      */
-    List<String> getRoles(String token);
+    Set<String> getRoles(String token);
+
+    /**
+     * 获取用户名获取权限
+     * @param userVO 角色信息
+     * @return 返回权限列表
+     */
+    Set<String> getPermissions(UserVO userVO);
 
     /**
      * 获取角色的权限

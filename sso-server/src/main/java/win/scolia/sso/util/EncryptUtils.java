@@ -11,7 +11,7 @@ import java.util.UUID;
  * 实现加密的工具类
  */
 @Component
-public class EncryptUtil {
+public class EncryptUtils {
 
     @Value("${sso.encrypt.salt}")
     private String systemSalt;

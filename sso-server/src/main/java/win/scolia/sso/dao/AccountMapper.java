@@ -4,7 +4,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import win.scolia.sso.api.bean.entity.User;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Created by scolia on 2017/11/27
@@ -31,12 +31,12 @@ public interface AccountMapper {
      * @param username 用户名
      * @return 返回角色列表
      */
-    List<String> selectRolesByUserName(@Param("username") String username);
+    Set<String> selectRolesByUserName(@Param("username") String username);
 
     /**
      * 根据角色名获取角色的权限
      * @param roleName 角色名称
      * @return 返回权限列表
      */
-    List<String> selectPermissionsByRoleName(@Param("roleName") String roleName);
+    Set<String> selectPermissionsByRoleName(@Param("roleName") String roleName);
 }

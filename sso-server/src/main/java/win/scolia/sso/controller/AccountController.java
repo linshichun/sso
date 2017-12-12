@@ -8,18 +8,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import win.scolia.sso.api.bean.vo.MessageVO;
 import win.scolia.sso.api.bean.vo.UserVO;
 import win.scolia.sso.api.server.AccountService;
-
-import java.util.List;
+import win.scolia.sso.util.MessageUtils;
 
 @Controller
-@RequestMapping(value = "/account")
+@RequestMapping(value = "account")
 public class AccountController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountController.class);
@@ -32,17 +31,13 @@ public class AccountController {
      *
      * @param userVO        用户的信息
      * @param bindingResult 数据校验的结果
-     * @return
+     * @return 返回状态码和详细信息
      */
-    @PostMapping
+    @PutMapping("register")
     public ResponseEntity<MessageVO> register(@Validated(UserVO.register.class) UserVO userVO,
                                               BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            MessageVO messageVO = new MessageVO();
-            List<String> messages = messageVO.getMessages();
-            for (ObjectError error : bindingResult.getAllErrors()) {
-                messages.add(error.getDefaultMessage());
-            }
+            MessageVO messageVO = MessageUtils.makeValidMessage(bindingResult);
             return ResponseEntity.badRequest().body(messageVO);
         }
         try {
@@ -53,10 +48,38 @@ public class AccountController {
             return ResponseEntity.ok().build();
         } catch (DuplicateKeyException e) {
             MessageVO messageVO = new MessageVO();
-            messageVO.getMessages().add("该用户名已被占用");
+            MessageUtils.putMessage(messageVO,"error","该用户已被占用");
             return ResponseEntity.badRequest().body(messageVO);
         } catch (Exception e) {
             LOGGER.error("User register error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * 使用用户名和密码登录
+     *
+     * @param userVO 用户信息
+     * @param bindingResult 数据校验的结果
+     * @return 返回状态码和详细信息
+     */
+    @PostMapping("login")
+    public ResponseEntity<MessageVO> login(@Validated(UserVO.login.class) UserVO userVO,
+                                           BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            MessageVO messageVO = MessageUtils.makeValidMessage(bindingResult);
+            return ResponseEntity.badRequest().body(messageVO);
+        }
+        try {
+            String token = accountService.login(userVO);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Login user: {}", userVO);
+            }
+            MessageVO messageVO = new MessageVO();
+            MessageUtils.putMessage(messageVO, "token", token);
+            return ResponseEntity.ok().body(messageVO);
+        } catch (Exception e) {
+            LOGGER.error("User login error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

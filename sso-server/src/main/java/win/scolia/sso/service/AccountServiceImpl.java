@@ -2,16 +2,16 @@ package win.scolia.sso.service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import win.scolia.sso.api.bean.entity.User;
 import win.scolia.sso.api.bean.vo.UserVO;
 import win.scolia.sso.api.server.AccountService;
 import win.scolia.sso.dao.AccountMapper;
-import win.scolia.sso.util.EncryptUtil;
+import win.scolia.sso.util.EncryptUtils;
+import win.scolia.sso.util.TokenUtils;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by scolia on 2017/11/27
@@ -20,16 +20,16 @@ import java.util.Set;
 public class AccountServiceImpl implements AccountService {
 
     @Autowired
-    private EncryptUtil encryptUtil;
+    private EncryptUtils encryptUtil;
 
     @Autowired
     private AccountMapper accountMapper;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @Override
     public Long register(UserVO userVO) {
-        if(StringUtils.isEmpty(userVO.getUserName()) || StringUtils.isEmpty(userVO.getPassword())){
-            throw new IllegalArgumentException("用户名和密码不能为空");
-        }
         User user = new User();
         user.setUsername(userVO.getUserName());
         user.setSalt(encryptUtil.getRandomSalt());
@@ -42,6 +42,11 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public String login(UserVO userVO) {
+        User user = accountMapper.selectPasswordAndSaltByUsername(userVO.getUserName());
+        String tempPassword = encryptUtil.getEncryptedPassword(userVO.getPassword(), user.getSalt());
+        if (StringUtils.equals(user.getPassword(), tempPassword)) {
+            return TokenUtils.getToken(userVO.getUserName());
+        }
         return null;
     }
 
@@ -61,8 +66,25 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<String> getRoles(String token) {
+    public Set<String> getRoles(UserVO userVO) {
+        String userName = userVO.getUserName();
+        return accountMapper.selectRolesByUserName(userName);
+    }
+
+    @Override
+    public Set<String> getRoles(String token) {
         return null;
+    }
+
+    @Override
+    public Set<String> getPermissions(UserVO userVO) {
+        Set<String> roles = accountMapper.selectRolesByUserName(userVO.getUserName());
+        Set<String> permissions = new HashSet<>();
+        for (String role : roles) {
+            Set<String> permission = accountMapper.selectPermissionsByRoleName(role);
+            permissions.addAll(permission);
+        }
+        return permissions;
     }
 
     @Override

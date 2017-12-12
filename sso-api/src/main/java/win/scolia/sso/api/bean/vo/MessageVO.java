@@ -1,28 +1,36 @@
 package win.scolia.sso.api.bean.vo;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 响应信息的VO
  */
 public class MessageVO {
 
-    private List<String> messages;
+    private Map<String, Object> messages;
 
     public MessageVO() {
-        messages = new ArrayList<>();
+        this.messages = new HashMap<>();
     }
 
-    public MessageVO(List<String> messages) {
+    public MessageVO(Map<String, Object> messages) {
         this.messages = messages;
     }
 
-    public List<String> getMessages() {
+    public Map<String, Object> getMessages() {
         return messages;
     }
 
-    public void setMessages(List<String> messages) {
+    public void setMessages(Map<String, Object> messages) {
         this.messages = messages;
     }
+
+    @Override
+    public String toString() {
+        return "MessageVO{" +
+                "messages=" + messages +
+                '}';
+    }
+
 }

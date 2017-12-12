@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="win.scolia.sso.dao.AccountMapper">
+
+    <insert id="insertUser" parameterType="win.scolia.sso.api.bean.entity.User"
+            useGeneratedKeys="true" keyColumn="user_id"
+            keyProperty="user.userId">
+        INSERT INTO user (username, password, salt, create_time, last_modified)
+        VALUES (#{user.username}, #{user.password}, #{user.salt}, #{user.createTime}, #{user.lastModified})
+    </insert>
+
+    <select id="selectPasswordAndSaltByUsername" parameterType="string"
+            resultType="win.scolia.sso.api.bean.entity.User">
+        SELECT
+            user_id,
+            username,
+            password,
+            salt
+        FROM user
+        WHERE username = #{username}
+    </select>
+
+    <select id="selectRolesByUserName" parameterType="string" resultType="string">
+        SELECT role_name
+        FROM role
+            JOIN user_role
+                ON role.role_id = user_role.role_id
+            JOIN user
+                ON user_role.user_id = user.user_id
+        WHERE user.username = #{username}
+    </select>
+
+    <select id="selectPermissionsByRoleName" parameterType="string" resultType="string">
+        SELECT permission
+        FROM permission
+            JOIN role_permission
+                ON permission.permission_id =
+                   role_permission.permission_id
+            JOIN role
+                ON role_permission.role_id = role.role_id
+        WHERE role.role_name = #{roleName}
+    </select>
+
+</mapper>

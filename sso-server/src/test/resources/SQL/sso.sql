@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS `sso`.`user` ;
 
 CREATE TABLE IF NOT EXISTS `sso`.`user` (
   `user_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-  `username` VARCHAR(45) NOT NULL COMMENT '用户名',
+  `userName` VARCHAR(45) NOT NULL COMMENT '用户名',
   `password` VARCHAR(255) NOT NULL COMMENT '密码',
   `salt` VARCHAR(45) NOT NULL COMMENT '私有盐',
   `create_time` DATETIME NOT NULL COMMENT '创建时间',

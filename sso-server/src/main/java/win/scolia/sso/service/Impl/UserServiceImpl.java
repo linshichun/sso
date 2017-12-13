@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import win.scolia.sso.api.bean.entity.User;
+import win.scolia.sso.dao.PermissionMapper;
+import win.scolia.sso.dao.RoleMapper;
 import win.scolia.sso.dao.UserMapper;
 import win.scolia.sso.exception.DuplicateUserException;
 import win.scolia.sso.service.UserService;
@@ -16,6 +18,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private RoleMapper roleMapper;
+
+    @Autowired
+    private PermissionMapper permissionMapper;
 
     @Autowired
     private CacheUtils cacheUtils;
@@ -49,7 +57,7 @@ public class UserServiceImpl implements UserService {
     public Set<String> getRolesByUserName(String username) {
         Set<String> roles = cacheUtils.getRolesOrPermissions(username, CacheUtils.CacheType.ROLE);
         if (roles == null) {
-            roles = userMapper.selectRolesByUserName(username);
+            roles = roleMapper.selectRolesByUserName(username);
             if (!roles.isEmpty()) {
                 cacheUtils.cacheRolesOrPermissions(username, roles, CacheUtils.CacheType.ROLE);
             }
@@ -61,7 +69,7 @@ public class UserServiceImpl implements UserService {
     public Set<String> getPermissionsByRoleName(String roleName) {
         Set<String> permissions = cacheUtils.getRolesOrPermissions(roleName, CacheUtils.CacheType.PERMISSIONS);
         if (permissions == null) {
-            permissions = userMapper.selectPermissionsByRoleName(roleName);
+            permissions = permissionMapper.selectPermissionsByRoleName(roleName);
             if (!permissions.isEmpty()) {
                 cacheUtils.cacheRolesOrPermissions(roleName, permissions, CacheUtils.CacheType.PERMISSIONS);
             }

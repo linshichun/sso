@@ -30,24 +30,4 @@
         WHERE user_name = #{userName}
     </select>
 
-    <select id="selectRolesByUserName" parameterType="string" resultType="string">
-        SELECT role_name
-        FROM role
-            JOIN user_role
-                ON role.role_id = user_role.role_id
-            JOIN user
-                ON user_role.user_id = user.user_id
-        WHERE user.user_name = #{userName}
-    </select>
-
-    <select id="selectPermissionsByRoleName" parameterType="string" resultType="string">
-        SELECT permission
-        FROM permission
-            JOIN role_permission
-                ON permission.permission_id = role_permission.permission_id
-            JOIN role
-                ON role_permission.role_id = role.role_id
-        WHERE role.role_name = #{roleName}
-    </select>
-
 </mapper>

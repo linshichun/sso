@@ -4,13 +4,13 @@
 <mapper namespace="win.scolia.sso.dao.UserMapper">
 
     <insert id="insertUser" parameterType="win.scolia.sso.api.bean.entity.User">
-        INSERT INTO user (username, password, salt, create_time, last_modified)
+        INSERT INTO user (userName, password, salt, create_time, last_modified)
         VALUES (#{user.userName}, #{user.password}, #{user.salt}, #{user.createTime}, #{user.lastModified})
     </insert>
 
     <resultMap id="userMap" type="win.scolia.sso.api.bean.entity.User">
         <id column="user_id" property="userId"/>
-        <result column="username" property="userName"/>
+        <result column="userName" property="userName"/>
         <result column="password" property="password"/>
         <result column="salt" property="salt"/>
         <result column="create_time" property="createTime"/>
@@ -21,13 +21,13 @@
             resultMap="userMap">
         SELECT
             user_id,
-            username,
+            userName,
             password,
             salt,
             create_time,
             last_modified
         FROM user
-        WHERE username = #{userName}
+        WHERE userName = #{userName}
     </select>
 
     <select id="selectRolesByUserName" parameterType="string" resultType="string">
@@ -37,7 +37,7 @@
                 ON role.role_id = user_role.role_id
             JOIN user
                 ON user_role.user_id = user.user_id
-        WHERE user.username = #{userName}
+        WHERE user.userName = #{userName}
     </select>
 
     <select id="selectPermissionsByRoleName" parameterType="string" resultType="string">

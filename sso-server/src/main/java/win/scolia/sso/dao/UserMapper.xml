@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="win.scolia.sso.dao.AccountMapper">
+<mapper namespace="win.scolia.sso.dao.UserMapper">
 
-    <insert id="insertUser" parameterType="win.scolia.sso.api.bean.entity.User"
-            useGeneratedKeys="true" keyColumn="user_id"
-            keyProperty="user.userId">
+    <insert id="insertUser" parameterType="win.scolia.sso.api.bean.entity.User">
         INSERT INTO user (username, password, salt, create_time, last_modified)
-        VALUES (#{user.username}, #{user.password}, #{user.salt}, #{user.createTime}, #{user.lastModified})
+        VALUES (#{user.userName}, #{user.password}, #{user.salt}, #{user.createTime}, #{user.lastModified})
     </insert>
 
-    <select id="selectPasswordAndSaltByUsername" parameterType="string"
-            resultType="win.scolia.sso.api.bean.entity.User">
+    <resultMap id="userMap" type="win.scolia.sso.api.bean.entity.User">
+        <id column="user_id" property="userId"/>
+        <result column="username" property="userName"/>
+        <result column="password" property="password"/>
+        <result column="salt" property="salt"/>
+        <result column="create_time" property="createTime"/>
+        <result column="last_modified" property="lastModified"/>
+    </resultMap>
+
+    <select id="selectUserByUserName" parameterType="string"
+            resultMap="userMap">
         SELECT
             user_id,
             username,
             password,
-            salt
+            salt,
+            create_time,
+            last_modified
         FROM user
-        WHERE username = #{username}
+        WHERE username = #{userName}
     </select>
 
     <select id="selectRolesByUserName" parameterType="string" resultType="string">
@@ -28,7 +37,7 @@
                 ON role.role_id = user_role.role_id
             JOIN user
                 ON user_role.user_id = user.user_id
-        WHERE user.username = #{username}
+        WHERE user.username = #{userName}
     </select>
 
     <select id="selectPermissionsByRoleName" parameterType="string" resultType="string">

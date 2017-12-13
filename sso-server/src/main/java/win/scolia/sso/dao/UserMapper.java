@@ -10,28 +10,27 @@ import java.util.Set;
  * Created by scolia on 2017/11/27
  */
 @Repository
-public interface AccountMapper {
+public interface UserMapper {
 
     /**
      * 插入一个新的用户
      * @param user 插入的用户对象
-     * @return 返回主键
      */
-    Integer insertUser(@Param("user") User user);
+    void insertUser(@Param("user") User user);
 
     /**
      * 根据用户名获得用户信息
      * @param username 要查询的用户名
-     * @return 返回查询得到的用户密码
+     * @return 返回查询得到的用户
      */
-    User selectPasswordAndSaltByUsername(@Param("username") String username);
+    User selectUserByUserName(@Param("userName") String username);
 
     /**
      * 根据用户名获取用户的角色
      * @param username 用户名
      * @return 返回角色列表
      */
-    Set<String> selectRolesByUserName(@Param("username") String username);
+    Set<String> selectRolesByUserName(@Param("userName") String username);
 
     /**
      * 根据角色名获取角色的权限

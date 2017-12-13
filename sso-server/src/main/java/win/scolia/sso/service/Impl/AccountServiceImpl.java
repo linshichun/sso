@@ -1,17 +1,19 @@
-package win.scolia.sso.service;
+package win.scolia.sso.service.Impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import win.scolia.sso.api.bean.entity.User;
 import win.scolia.sso.api.bean.vo.UserVO;
 import win.scolia.sso.api.server.AccountService;
-import win.scolia.sso.dao.AccountMapper;
+import win.scolia.sso.service.UserService;
+import win.scolia.sso.util.CacheUtils;
 import win.scolia.sso.util.EncryptUtils;
 import win.scolia.sso.util.TokenUtils;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by scolia on 2017/11/27
@@ -23,29 +25,30 @@ public class AccountServiceImpl implements AccountService {
     private EncryptUtils encryptUtil;
 
     @Autowired
-    private AccountMapper accountMapper;
+    private UserService userService;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private CacheUtils cacheUtils;
 
     @Override
     public Long register(UserVO userVO) {
         User user = new User();
-        user.setUsername(userVO.getUserName());
+        user.setUserName(userVO.getUserName());
         user.setSalt(encryptUtil.getRandomSalt());
         user.setPassword(encryptUtil.getEncryptedPassword(userVO.getPassword(), user.getSalt()));
         user.setCreateTime(new Date());
         user.setLastModified(new Date());
-        accountMapper.insertUser(user);
+        userService.createUser(user);
         return user.getUserId();
     }
 
     @Override
     public String login(UserVO userVO) {
-        User user = accountMapper.selectPasswordAndSaltByUsername(userVO.getUserName());
+        User user = userService.getUserByUsername(userVO.getUserName());
         String tempPassword = encryptUtil.getEncryptedPassword(userVO.getPassword(), user.getSalt());
         if (StringUtils.equals(user.getPassword(), tempPassword)) {
-            return TokenUtils.getToken(userVO.getUserName());
+            String token = TokenUtils.getToken(userVO.getUserName());
+            return token;
         }
         return null;
     }
@@ -68,7 +71,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Set<String> getRoles(UserVO userVO) {
         String userName = userVO.getUserName();
-        return accountMapper.selectRolesByUserName(userName);
+        return userService.getRolesByUserName(userName);
     }
 
     @Override
@@ -78,10 +81,10 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Set<String> getPermissions(UserVO userVO) {
-        Set<String> roles = accountMapper.selectRolesByUserName(userVO.getUserName());
+        Set<String> roles = this.getRoles(userVO);
         Set<String> permissions = new HashSet<>();
         for (String role : roles) {
-            Set<String> permission = accountMapper.selectPermissionsByRoleName(role);
+            Set<String> permission = userService.getPermissionsByRoleName(role);
             permissions.addAll(permission);
         }
         return permissions;

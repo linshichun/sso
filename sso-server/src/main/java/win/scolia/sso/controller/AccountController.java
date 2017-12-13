@@ -3,18 +3,17 @@ package win.scolia.sso.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import win.scolia.sso.api.bean.vo.MessageVO;
 import win.scolia.sso.api.bean.vo.UserVO;
 import win.scolia.sso.api.server.AccountService;
+import win.scolia.sso.exception.DuplicateUserException;
 import win.scolia.sso.util.MessageUtils;
 
 @Controller
@@ -33,7 +32,7 @@ public class AccountController {
      * @param bindingResult 数据校验的结果
      * @return 返回状态码和详细信息
      */
-    @PutMapping("register")
+    @PostMapping("register")
     public ResponseEntity<MessageVO> register(@Validated(UserVO.register.class) UserVO userVO,
                                               BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -46,9 +45,9 @@ public class AccountController {
                 LOGGER.info("Register user: {}", userVO);
             }
             return ResponseEntity.ok().build();
-        } catch (DuplicateKeyException e) {
+        } catch (DuplicateUserException e) {
             MessageVO messageVO = new MessageVO();
-            MessageUtils.putMessage(messageVO,"error","该用户已被占用");
+            MessageUtils.putMessage(messageVO, "error", "该用户已被占用");
             return ResponseEntity.badRequest().body(messageVO);
         } catch (Exception e) {
             LOGGER.error("User register error", e);
@@ -59,7 +58,7 @@ public class AccountController {
     /**
      * 使用用户名和密码登录
      *
-     * @param userVO 用户信息
+     * @param userVO        用户信息
      * @param bindingResult 数据校验的结果
      * @return 返回状态码和详细信息
      */
@@ -73,7 +72,7 @@ public class AccountController {
         try {
             String token = accountService.login(userVO);
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Login user: {}", userVO);
+                LOGGER.info("Login user: {}", userVO.getUserName());
             }
             MessageVO messageVO = new MessageVO();
             MessageUtils.putMessage(messageVO, "token", token);

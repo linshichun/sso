@@ -1,7 +1,5 @@
 package win.scolia.sso.api.bean.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.Date;
 
 /**
@@ -12,11 +10,10 @@ public class User {
 
     private Long userId;
 
-    private String username;
+    private String userName;
 
     private String password;
 
-    @JsonIgnore
     private String salt;
 
     private Date createTime;
@@ -31,12 +28,12 @@ public class User {
         this.userId = userId;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getPassword() {
@@ -75,7 +72,7 @@ public class User {
     public String toString() {
         return "User{" +
                 "userId=" + userId +
-                ", username='" + username + '\'' +
+                ", userName='" + userName + '\'' +
                 ", password='" + password + '\'' +
                 ", salt='" + salt + '\'' +
                 ", createTime=" + createTime +

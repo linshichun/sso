@@ -30,10 +30,10 @@ public class AccountController {
      *
      * @param userVO        用户的信息
      * @param bindingResult 数据校验的结果
-     * @return 返回状态码和详细信息
+     * @return 201 表示注册成功, 400 参数错误, 500 服务器错误
      */
     @PostMapping("register")
-    public ResponseEntity<MessageVO> register(@Validated(UserVO.register.class) UserVO userVO,
+    public ResponseEntity<MessageVO> register(@Validated(UserVO.Register.class) UserVO userVO,
                                               BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             MessageVO messageVO = MessageUtils.makeValidMessage(bindingResult);
@@ -44,13 +44,13 @@ public class AccountController {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Register user: {}", userVO);
             }
-            return ResponseEntity.ok().build();
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (DuplicateUserException e) {
             MessageVO messageVO = new MessageVO();
             MessageUtils.putMessage(messageVO, "error", "该用户已被占用");
             return ResponseEntity.badRequest().body(messageVO);
         } catch (Exception e) {
-            LOGGER.error("User register error", e);
+            LOGGER.error("User Register error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -60,25 +60,55 @@ public class AccountController {
      *
      * @param userVO        用户信息
      * @param bindingResult 数据校验的结果
-     * @return 返回状态码和详细信息
+     * @return 202 登录成功, 401 登录失败, 500 服务器错误
      */
-    @PostMapping("login")
-    public ResponseEntity<MessageVO> login(@Validated(UserVO.login.class) UserVO userVO,
-                                           BindingResult bindingResult) {
+    @PostMapping("loginByPassword")
+    public ResponseEntity<MessageVO> loginByPassword(@Validated(UserVO.LoginByPassword.class) UserVO userVO,
+                                                     BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             MessageVO messageVO = MessageUtils.makeValidMessage(bindingResult);
             return ResponseEntity.badRequest().body(messageVO);
         }
         try {
             String token = accountService.login(userVO);
+            if (token == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Login user: {}", userVO.getUserName());
             }
             MessageVO messageVO = new MessageVO();
             MessageUtils.putMessage(messageVO, "token", token);
-            return ResponseEntity.ok().body(messageVO);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(messageVO);
         } catch (Exception e) {
-            LOGGER.error("User login error", e);
+            LOGGER.error("User LoginByPassword error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * 使用用户名和token进行登录
+     * @param userVO 用户信息
+     * @param bindingResult 数据校验的结果
+     * @return 202 登录成功, 401 登录失败, 500 服务器错误
+     */
+    @PostMapping("loginByToken")
+    public ResponseEntity<MessageVO> loginByToken(@Validated(UserVO.LoginByToken.class) UserVO userVO,
+                                                     BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            MessageVO messageVO = MessageUtils.makeValidMessage(bindingResult);
+            return ResponseEntity.badRequest().body(messageVO);
+        }
+        try {
+            if (!accountService.login(userVO.getUserName(), userVO.getToken())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Login user: {}", userVO.getUserName());
+            }
+            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        } catch (Exception e) {
+            LOGGER.error("User LoginByPassword error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

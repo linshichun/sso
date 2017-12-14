@@ -25,10 +25,11 @@ public interface AccountService {
 
     /**
      * 根据token登录
+     * @param userName 用户名
      * @param token token
      * @return 返回对应的用户名, 失败返回null
      */
-    String login(String token);
+    Boolean login(String userName, String token);
 
     /**
      * 根据用户名登出

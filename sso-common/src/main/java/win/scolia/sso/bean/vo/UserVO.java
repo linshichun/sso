@@ -8,23 +8,24 @@ import javax.validation.constraints.NotNull;
 public class UserVO {
 
     // 注册组
-    public interface register {}
+    public interface Register {}
 
-    // 登录组
-    public interface login {}
+    // 密码登录组
+    public interface LoginByPassword {}
 
-    @NotNull(message = "用户名不能为空", groups = {register.class, login.class})
+    // token登录zu
+    public interface LoginByToken {}
+
+    @NotNull(message = "用户名不能为空", groups = {Register.class, LoginByPassword.class, LoginByToken.class})
     private String userName;
 
-    @NotNull(message = "密码不能为空", groups = {register.class, login.class})
+    @NotNull(message = "密码不能为空", groups = {Register.class, LoginByPassword.class})
     private String password;
 
-    public UserVO() {
-    }
+    @NotNull(message = "token不能为空", groups = {LoginByToken.class})
+    private String token;
 
-    public UserVO(String userName, String password) {
-        this.userName = userName;
-        this.password = password;
+    public UserVO() {
     }
 
     public String getUserName() {
@@ -43,11 +44,20 @@ public class UserVO {
         this.password = password;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     @Override
     public String toString() {
         return "UserVO{" +
                 "userName='" + userName + '\'' +
                 ", password='" + password + '\'' +
+                ", token='" + token + '\'' +
                 '}';
     }
 }

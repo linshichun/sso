@@ -46,15 +46,20 @@ public class AccountServiceImpl implements AccountService {
         User user = userService.getUserByUsername(userVO.getUserName());
         String tempPassword = encryptUtil.getEncryptedPassword(userVO.getPassword(), user.getSalt());
         if (StringUtils.equals(user.getPassword(), tempPassword)) {
-            String token = tokenUtils.getToken(userVO.getUserName());
+            String token = tokenUtils.getNewToken(userVO.getUserName());
+            tokenUtils.cacheToken(userVO.getUserName(), token);
             return token;
         }
         return null;
     }
 
     @Override
-    public String login(String token) {
-        return null;
+    public Boolean login(String userName, String token) {
+        String realToken = tokenUtils.getToken(userName);
+        if (StringUtils.equals(realToken, token)) {
+            return true;
+        }
+        return false;
     }
 
     @Override

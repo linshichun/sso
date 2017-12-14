@@ -2,6 +2,7 @@ package win.scolia.sso.util;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -11,6 +12,7 @@ import java.util.UUID;
  * 实现加密的工具类
  */
 @Component
+@PropertySource("classpath:sso.properties")
 public class EncryptUtils {
 
     @Value("${sso.encrypt.salt}")

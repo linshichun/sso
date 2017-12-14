@@ -10,9 +10,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import win.scolia.sso.api.bean.vo.MessageVO;
-import win.scolia.sso.api.bean.vo.UserVO;
-import win.scolia.sso.api.server.AccountService;
+import win.scolia.sso.bean.vo.MessageVO;
+import win.scolia.sso.bean.vo.UserVO;
+import win.scolia.sso.service.AccountService;
 import win.scolia.sso.exception.DuplicateUserException;
 import win.scolia.sso.util.MessageUtils;
 

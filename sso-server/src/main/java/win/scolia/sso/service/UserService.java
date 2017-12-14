@@ -1,7 +1,7 @@
 package win.scolia.sso.service;
 
 import org.apache.ibatis.annotations.Param;
-import win.scolia.sso.api.bean.entity.User;
+import win.scolia.sso.bean.entity.User;
 
 import java.util.Set;
 

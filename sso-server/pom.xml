@@ -14,22 +14,13 @@
     <dependencies>
         <dependency>
             <groupId>win.scolia</groupId>
-            <artifactId>sso-api</artifactId>
+            <artifactId>sso-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <!-- spring  -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
-        <!-- 数据校验 -->
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
         </dependency>
         <!-- Spring redis -->
         <dependency>

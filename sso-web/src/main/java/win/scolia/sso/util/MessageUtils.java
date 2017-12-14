@@ -2,9 +2,10 @@ package win.scolia.sso.util;
 
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import win.scolia.sso.api.bean.vo.MessageVO;
+import win.scolia.sso.bean.vo.MessageVO;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class MessageUtils {
@@ -39,8 +40,8 @@ public class MessageUtils {
             errorList.add(message);
             messageVO.getMessages().put(key, errorList);
         } else {
-            if (entity instanceof List) {
-                ((List) entity).add(message);
+            if (entity instanceof Collection) {
+                ((Collection) entity).add(message);
             } else {
                 messageVO.getMessages().put(key, message);
             }

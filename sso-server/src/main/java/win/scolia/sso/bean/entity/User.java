@@ -1,4 +1,4 @@
-package win.scolia.sso.api.bean.entity;
+package win.scolia.sso.bean.entity;
 
 import java.util.Date;
 

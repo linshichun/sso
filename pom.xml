@@ -16,8 +16,9 @@
     </parent>
 
     <modules>
-        <module>sso-api</module>
+        <module>sso-web</module>
         <module>sso-server</module>
+        <module>sso-common</module>
     </modules>
 
     <!-- 集中管理版本依赖 -->

@@ -1,20 +1,16 @@
 package win.scolia.sso.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.alibaba.druid.support.http.StatViewServlet;
-import com.alibaba.druid.support.http.WebStatFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 
 /**
  * Created by scolia on 2017/11/27
- *
+ * <p>
  * 配置数据源
  */
 @Configuration
@@ -63,32 +59,6 @@ public class DataSourceConfig {
 
     @Value("${spring.datasource.testOnReturn}")
     private boolean testOnReturn;
-
-    @Value("${spring.datasource.filters}")
-    private String filters;
-
-    @Value("${spring.datasource.logSlowSql}")
-    private String logSlowSql;
-
-    @Bean
-    public ServletRegistrationBean druidServlet() {
-        ServletRegistrationBean reg = new ServletRegistrationBean();
-        reg.setServlet(new StatViewServlet());
-        reg.addUrlMappings("/druid/*");
-        reg.addInitParameter("logSlowSql", logSlowSql);
-        return reg;
-    }
-
-    @Bean
-    public FilterRegistrationBean filterRegistrationBean() {
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-        filterRegistrationBean.setFilter(new WebStatFilter());
-        filterRegistrationBean.addUrlPatterns("/*");
-        filterRegistrationBean.addInitParameter("exclusions", "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*");
-        filterRegistrationBean.addInitParameter("profileEnable", "true");
-        return filterRegistrationBean;
-    }
-
 
     @Bean(name = "dataSource", destroyMethod = "close", initMethod = "init")
     public DruidDataSource dataSource() {

@@ -3,7 +3,7 @@ package win.scolia.sso.service.Impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
-import win.scolia.sso.api.bean.entity.User;
+import win.scolia.sso.bean.entity.User;
 import win.scolia.sso.dao.PermissionMapper;
 import win.scolia.sso.dao.RoleMapper;
 import win.scolia.sso.dao.UserMapper;

@@ -2,7 +2,7 @@ package win.scolia.sso.dao;
 
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
-import win.scolia.sso.api.bean.entity.User;
+import win.scolia.sso.bean.entity.User;
 
 /**
  * Created by scolia on 2017/11/27

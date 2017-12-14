@@ -1,4 +1,4 @@
-package win.scolia.sso.api.bean.vo;
+package win.scolia.sso.bean.vo;
 
 import javax.validation.constraints.NotNull;
 

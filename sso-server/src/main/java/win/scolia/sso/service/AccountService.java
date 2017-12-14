@@ -1,6 +1,6 @@
-package win.scolia.sso.api.server;
+package win.scolia.sso.service;
 
-import win.scolia.sso.api.bean.vo.UserVO;
+import win.scolia.sso.bean.vo.UserVO;
 
 import java.util.Set;
 

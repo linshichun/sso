@@ -44,36 +44,33 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByUsername(String username) {
         User user = cacheUtils.getUser(username);
-        if (user == null) {
-            user = userMapper.selectUserByUserName(username);
-            if (user != null) {
-                cacheUtils.cacheUser(user);
-            }
+        if (user != null) {
+            return user;
         }
+        user = userMapper.selectUserByUserName(username);
+        cacheUtils.cacheUser(user);
         return user;
     }
 
     @Override
-    public Set<String> getRolesByUserName(String username) {
-        Set<String> roles = cacheUtils.getRolesOrPermissions(username, CacheUtils.CacheType.ROLE);
-        if (roles == null) {
-            roles = roleMapper.selectRolesByUserName(username);
-            if (!roles.isEmpty()) {
-                cacheUtils.cacheRolesOrPermissions(username, roles, CacheUtils.CacheType.ROLE);
-            }
+    public Set<String> getRolesByUserName(String userName) {
+        Set<String> roles = cacheUtils.getRoles(userName);
+        if (roles != null) {
+            return roles;
         }
+        roles = roleMapper.selectRolesByUserName(userName);
+        cacheUtils.cacheRoles(userName, roles);
         return roles;
     }
 
     @Override
     public Set<String> getPermissionsByRoleName(String roleName) {
-        Set<String> permissions = cacheUtils.getRolesOrPermissions(roleName, CacheUtils.CacheType.PERMISSIONS);
-        if (permissions == null) {
-            permissions = permissionMapper.selectPermissionsByRoleName(roleName);
-            if (!permissions.isEmpty()) {
-                cacheUtils.cacheRolesOrPermissions(roleName, permissions, CacheUtils.CacheType.PERMISSIONS);
-            }
+        Set<String> permissions = cacheUtils.getPermissions(roleName);
+        if (permissions != null) {
+            return permissions;
         }
+        permissions = permissionMapper.selectPermissionsByRoleName(roleName);
+        cacheUtils.cachePermissions(roleName, permissions);
         return permissions;
     }
 }

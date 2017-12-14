@@ -17,7 +17,7 @@
 
     <modules>
         <module>sso-web</module>
-        <module>sso-server</module>
+        <module>sso-service</module>
         <module>sso-common</module>
     </modules>
 

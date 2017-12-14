@@ -7,7 +7,6 @@ import win.scolia.sso.bean.entity.User;
 import win.scolia.sso.bean.vo.UserVO;
 import win.scolia.sso.service.AccountService;
 import win.scolia.sso.service.UserService;
-import win.scolia.sso.util.CacheUtils;
 import win.scolia.sso.util.EncryptUtils;
 import win.scolia.sso.util.TokenUtils;
 
@@ -28,7 +27,7 @@ public class AccountServiceImpl implements AccountService {
     private UserService userService;
 
     @Autowired
-    private CacheUtils cacheUtils;
+    private TokenUtils tokenUtils;
 
     @Override
     public Long register(UserVO userVO) {
@@ -47,7 +46,7 @@ public class AccountServiceImpl implements AccountService {
         User user = userService.getUserByUsername(userVO.getUserName());
         String tempPassword = encryptUtil.getEncryptedPassword(userVO.getPassword(), user.getSalt());
         if (StringUtils.equals(user.getPassword(), tempPassword)) {
-            String token = TokenUtils.getToken(userVO.getUserName());
+            String token = tokenUtils.getToken(userVO.getUserName());
             return token;
         }
         return null;

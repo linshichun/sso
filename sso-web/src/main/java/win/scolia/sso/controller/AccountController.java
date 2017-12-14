@@ -70,7 +70,7 @@ public class AccountController {
             return ResponseEntity.badRequest().body(messageVO);
         }
         try {
-            String token = accountService.login(userVO);
+            String token = accountService.loginByPassword(userVO.getUserName(),userVO.getPassword());
             if (token == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
@@ -100,7 +100,7 @@ public class AccountController {
             return ResponseEntity.badRequest().body(messageVO);
         }
         try {
-            if (!accountService.login(userVO.getUserName(), userVO.getToken())) {
+            if (!accountService.loginByToken(userVO.getUserName(), userVO.getToken())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
             if (LOGGER.isInfoEnabled()) {

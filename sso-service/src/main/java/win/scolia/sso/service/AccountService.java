@@ -18,10 +18,11 @@ public interface AccountService {
 
     /**
      * 登录
-     * @param userVO 要登录的用户对象
+     * @param userName 用户名
+     * @param password 密码
      * @return 登录成功时返回token, 失败时返回null
      */
-    String login(UserVO userVO);
+    String loginByPassword(String userName, String password);
 
     /**
      * 根据token登录
@@ -29,45 +30,25 @@ public interface AccountService {
      * @param token token
      * @return 返回对应的用户名, 失败返回null
      */
-    Boolean login(String userName, String token);
+    Boolean loginByToken(String userName, String token);
 
     /**
      * 根据用户名登出
-     * @param userVO 要登出的用户对象
+     * @param userName 用户名
      */
-    void logout(UserVO userVO);
+    void logout(String userName);
 
     /**
-     * 登出
-     * @param token 要登出的用户的token
-     */
-    void logout(String token);
-
-    /**
-     * 获取用户名获取角色
-     * @param userVO 角色信息
+     * 根据用户名获取角色
+     * @param userName 用户名
      * @return 返回用户的角色列表
      */
-    Set<String> getRoles(UserVO userVO);
+    Set<String> getRoles(String userName);
 
     /**
-     * 获取用户的角色
-     * @param token 用户token
-     * @return 返回用户的角色列表
-     */
-    Set<String> getRoles(String token);
-
-    /**
-     * 获取用户名获取权限
-     * @param userVO 角色信息
+     * 根据角色获取权限
+     * @param roleName 角色名
      * @return 返回权限列表
      */
-    Set<String> getPermissions(UserVO userVO);
-
-    /**
-     * 获取角色的权限
-     * @param token 用户token
-     * @return 返回权限列表
-     */
-    Set<String> getPermissions(String token);
+    Set<String> getPermissions(String roleName);
 }

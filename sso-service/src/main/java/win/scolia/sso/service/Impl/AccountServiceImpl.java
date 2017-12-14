@@ -11,7 +11,6 @@ import win.scolia.sso.util.EncryptUtils;
 import win.scolia.sso.util.TokenUtils;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -42,60 +41,37 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public String login(UserVO userVO) {
-        User user = userService.getUserByUsername(userVO.getUserName());
-        String tempPassword = encryptUtil.getEncryptedPassword(userVO.getPassword(), user.getSalt());
+    public String loginByPassword(String userName, String password) {
+        User user = userService.getUserByUsername(userName);
+        String tempPassword = encryptUtil.getEncryptedPassword(password, user.getSalt());
         if (StringUtils.equals(user.getPassword(), tempPassword)) {
-            String token = tokenUtils.getNewToken(userVO.getUserName());
-            tokenUtils.cacheToken(userVO.getUserName(), token);
+            String token = tokenUtils.getNewToken(userName);
+            tokenUtils.cacheToken(userName, token);
             return token;
         }
         return null;
     }
 
     @Override
-    public Boolean login(String userName, String token) {
+    public Boolean loginByToken(String userName, String token) {
         String realToken = tokenUtils.getToken(userName);
-        if (StringUtils.equals(realToken, token)) {
-            return true;
-        }
-        return false;
+        return StringUtils.equals(realToken, token);
     }
 
     @Override
-    public void logout(UserVO userVO) {
-
+    public void logout(String userName) {
+        tokenUtils.clearToken(userName);
     }
 
     @Override
-    public void logout(String token) {
-
-    }
-
-    @Override
-    public Set<String> getRoles(UserVO userVO) {
-        String userName = userVO.getUserName();
+    public Set<String> getRoles(String userName) {
         return userService.getRolesByUserName(userName);
     }
 
     @Override
-    public Set<String> getRoles(String token) {
-        return null;
+    public Set<String> getPermissions(String roleName) {
+        return userService.getPermissionsByRoleName(roleName);
     }
 
-    @Override
-    public Set<String> getPermissions(UserVO userVO) {
-        Set<String> roles = this.getRoles(userVO);
-        Set<String> permissions = new HashSet<>();
-        for (String role : roles) {
-            Set<String> permission = userService.getPermissionsByRoleName(role);
-            permissions.addAll(permission);
-        }
-        return permissions;
-    }
 
-    @Override
-    public Set<String> getPermissions(String token) {
-        return null;
-    }
 }

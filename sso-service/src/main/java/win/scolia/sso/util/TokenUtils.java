@@ -69,4 +69,13 @@ public class TokenUtils {
         return token;
     }
 
+    /**
+     * 清理用户的登录token
+     * @param userName 用户名
+     */
+    public void clearToken(String userName) {
+        String cacheKey = String.format("%s_%s_%s", prefix, TOKEN_PREFIX, userName);
+        stringRedisTemplate.delete(cacheKey);
+    }
+
 }

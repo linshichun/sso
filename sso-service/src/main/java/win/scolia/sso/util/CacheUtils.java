@@ -48,7 +48,7 @@ public class CacheUtils {
         if (user == null) {
             return;
         }
-        String cacheKey = String.format("%s_%s_%s", prefix, USER_PREFIX, user.getUserName());
+        String cacheKey = String.format("%s:%s:%s", prefix, USER_PREFIX, user.getUserName());
         try {
             userRedisTemplate.opsForValue().set(cacheKey, user, expire, TimeUnit.SECONDS);
             if (LOGGER.isInfoEnabled()) {
@@ -69,7 +69,7 @@ public class CacheUtils {
         if (StringUtils.isEmpty(username)) {
             return null;
         }
-        String cacheKey = String.format("%s_%s_%s", prefix, USER_PREFIX, username);
+        String cacheKey = String.format("%s:%s:%s", prefix, USER_PREFIX, username);
         User user = null;
         try {
             BoundValueOperations<String, User> operations = userRedisTemplate.boundValueOps(cacheKey);
@@ -95,7 +95,7 @@ public class CacheUtils {
         if (StringUtils.isEmpty(userName) || CollectionUtils.isEmpty(roles)) {
             return;
         }
-        String cacheKey = String.format("%s_%s_%s", prefix, ROLE_PREFIX, userName);
+        String cacheKey = String.format("%s:%s:%s", prefix, ROLE_PREFIX, userName);
         try {
             setRedisTemplate.opsForValue().set(cacheKey, roles, expire, TimeUnit.SECONDS);
             if (LOGGER.isInfoEnabled()) {
@@ -116,7 +116,7 @@ public class CacheUtils {
         if (StringUtils.isEmpty(userName)) {
             return null;
         }
-        String cacheKey = String.format("%s_%s_%s", prefix, ROLE_PREFIX, userName);
+        String cacheKey = String.format("%s:%s:%s", prefix, ROLE_PREFIX, userName);
         Set<String> roles = null;
         try {
             BoundValueOperations<String, Set<String>> operations = setRedisTemplate.boundValueOps(cacheKey);
@@ -141,7 +141,7 @@ public class CacheUtils {
         if (StringUtils.isEmpty(roleName) || CollectionUtils.isEmpty(permissions)) {
             return;
         }
-        String cacheKey = String.format("%s_%s_%s", prefix, PERMISSION_PREFIX, roleName);
+        String cacheKey = String.format("%s:%s:%s", prefix, PERMISSION_PREFIX, roleName);
         try {
             setRedisTemplate.opsForValue().set(cacheKey, permissions, expire, TimeUnit.SECONDS);
             if (LOGGER.isInfoEnabled()) {
@@ -161,7 +161,7 @@ public class CacheUtils {
         if (StringUtils.isEmpty(roleName)) {
             return null;
         }
-        String cacheKey = String.format("%s_%s_%s", prefix, PERMISSION_PREFIX, roleName);
+        String cacheKey = String.format("%s:%s:%s", prefix, PERMISSION_PREFIX, roleName);
         Set<String> permissions = null;
         try {
             BoundValueOperations<String, Set<String>> operations = setRedisTemplate.boundValueOps(cacheKey);

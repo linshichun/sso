@@ -33,6 +33,7 @@ public class MessageUtils {
      * @param key 消息键
      * @param message   消息
      */
+    @SuppressWarnings("unchecked")
     public static void addMessage(MessageVO messageVO, String key, String message) {
         Object entity = messageVO.getMessages().get(key);
         if (entity == null) {

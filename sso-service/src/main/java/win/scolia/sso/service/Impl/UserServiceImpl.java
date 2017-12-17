@@ -1,16 +1,20 @@
 package win.scolia.sso.service.Impl;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import win.scolia.sso.bean.entity.User;
+import win.scolia.sso.bean.vo.UserVO;
 import win.scolia.sso.dao.PermissionMapper;
 import win.scolia.sso.dao.RoleMapper;
 import win.scolia.sso.dao.UserMapper;
 import win.scolia.sso.exception.DuplicateUserException;
 import win.scolia.sso.service.UserService;
 import win.scolia.sso.util.CacheUtils;
+import win.scolia.sso.util.EncryptUtils;
 
+import java.util.Date;
 import java.util.Set;
 
 @Service
@@ -28,12 +32,22 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private CacheUtils cacheUtils;
 
+    @Autowired
+    private EncryptUtils encryptUtils;
+
+
     @Override
-    public void createUser(User user) {
-        User cacheUser = getUserByUsername(user.getUserName());
+    public void createUser(UserVO userVO) {
+        User cacheUser = getUserByUsername(userVO.getUserName());
         if (cacheUser != null) {
             throw new DuplicateUserException("该用户已存在");
         }
+        User user = new User();
+        BeanUtils.copyProperties(userVO, user);
+        user.setSalt(encryptUtils.getRandomSalt());
+        user.setPassword(encryptUtils.getEncryptedPassword(user.getPassword(), user.getSalt()));
+        user.setCreateTime(new Date());
+        user.setLastModified(new Date());
         try {
             userMapper.insertUser(user);
         } catch (DuplicateKeyException e) {

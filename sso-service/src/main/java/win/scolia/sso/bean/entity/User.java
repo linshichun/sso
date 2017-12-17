@@ -1,13 +1,15 @@
 package win.scolia.sso.bean.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 用户信息
  * Created by scolia on 2017/11/27
  */
-public class User {
+public class User implements Serializable{
 
+    private static final long serialVersionUID = -3188105297711919345L;
     private Long userId;
 
     private String userName;

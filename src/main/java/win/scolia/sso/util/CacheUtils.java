@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import win.scolia.sso.bean.entity.User;
 
 import java.util.Set;
@@ -48,7 +47,7 @@ public class CacheUtils {
      * @param user 用户对象
      */
     public void cacheUser(User user) {
-        if (user == null) {
+        if (user == null || StringUtils.isEmpty(user.getUserName())) {
             return;
         }
         String cacheKey = String.format("%s:%s:%s", prefix, USER_PREFIX, user.getUserName());
@@ -77,11 +76,13 @@ public class CacheUtils {
         try {
             BoundValueOperations<String, User> operations = userRedisTemplate.boundValueOps(cacheKey);
             user = operations.get();
-            if (this.isFlush) {
-                operations.expire(expire, TimeUnit.SECONDS);
-            }
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Hit cache user: {}", userName);
+            if (user != null) {
+                if (this.isFlush) {
+                    operations.expire(expire, TimeUnit.SECONDS);
+                }
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Hit cache user: {}", userName);
+                }
             }
         } catch (Exception e) {
             LOGGER.error("Cache error: {}", e);
@@ -99,16 +100,19 @@ public class CacheUtils {
         }
         String cacheKey = String.format("%s:%s:%s", prefix, USER_PREFIX, userName);
         userRedisTemplate.delete(cacheKey);
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Clear cache user: {}", userName);
+        }
     }
 
     /**
      * 缓存用户角色信息
      *
      * @param userName 用户名称
-     * @param roles    用户对应的角色
+     * @param roles    用户对应的角色, 可以为空集合
      */
     public void cacheRoles(String userName, Set<String> roles) {
-        if (StringUtils.isEmpty(userName) || CollectionUtils.isEmpty(roles)) {
+        if (StringUtils.isEmpty(userName) || roles == null) {
             return;
         }
         String cacheKey = String.format("%s:%s:%s", prefix, ROLE_PREFIX, userName);
@@ -137,11 +141,13 @@ public class CacheUtils {
         try {
             BoundValueOperations<String, Set<String>> operations = setRedisTemplate.boundValueOps(cacheKey);
             roles = operations.get();
-            if (this.isFlush) {
-                operations.expire(expire, TimeUnit.SECONDS);
-            }
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Hit cache role: {}:{}", userName, roles);
+            if (roles != null) {
+                if (this.isFlush) {
+                    operations.expire(expire, TimeUnit.SECONDS);
+                }
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Hit cache role: {}:{}", userName, roles);
+                }
             }
         } catch (Exception e) {
             LOGGER.error("Cache error: {}", e);
@@ -156,7 +162,7 @@ public class CacheUtils {
      * @param permissions 权限信息
      */
     public void cachePermissions(String roleName, Set<String> permissions) {
-        if (StringUtils.isEmpty(roleName) || CollectionUtils.isEmpty(permissions)) {
+        if (StringUtils.isEmpty(roleName) || permissions == null) {
             return;
         }
         String cacheKey = String.format("%s:%s:%s", prefix, PERMISSION_PREFIX, roleName);
@@ -184,19 +190,18 @@ public class CacheUtils {
         try {
             BoundValueOperations<String, Set<String>> operations = setRedisTemplate.boundValueOps(cacheKey);
             permissions = operations.get();
-            if (this.isFlush) {
-                operations.expire(expire, TimeUnit.SECONDS);
-            }
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Hit cache permissions: {}:{}", roleName, permissions);
+            if (permissions != null) {
+                if (this.isFlush) {
+                    operations.expire(expire, TimeUnit.SECONDS);
+                }
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Hit cache permissions: {}:{}", roleName, permissions);
+                }
             }
         } catch (Exception e) {
             LOGGER.error("Cache error: {}", e);
         }
         return permissions;
     }
-
-
-
 
 }

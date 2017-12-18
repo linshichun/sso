@@ -211,7 +211,7 @@ public class AccountController {
             } else {
                 MessageVO messageVO = new MessageVO();
                 MessageUtils.putMessage(messageVO, "error", "用户名或密码错误");
-                return ResponseEntity.badRequest().build();
+                return ResponseEntity.badRequest().body(messageVO);
             }
         } catch (Exception e) {
             LOGGER.error("Change password error", e);

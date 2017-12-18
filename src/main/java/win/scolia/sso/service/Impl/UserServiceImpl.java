@@ -59,10 +59,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean changePasswordByOldPassword(String userName, String oldPassword, String newPassword) {
-        User user = cacheUtils.getUser(userName);
-        if (user == null) {
-            user = userMapper.selectUserByUserName(userName);
-        }
+        User user = this.getUserByUserName(userName);
         String tempPassword = encryptUtils.getEncryptedPassword(oldPassword, user.getSalt());
         if (StringUtils.equals(tempPassword, user.getPassword())) {
             String password = encryptUtils.getEncryptedPassword(newPassword, user.getSalt());

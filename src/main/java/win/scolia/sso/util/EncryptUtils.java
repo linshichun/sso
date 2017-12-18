@@ -1,6 +1,7 @@
 package win.scolia.sso.util;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -10,13 +11,11 @@ import java.util.UUID;
  * 实现加密的工具类
  */
 @Component
+
 public class EncryptUtils {
 
+    @Value("${sso.encrypt.salt}")
     private String systemSalt;
-
-    public EncryptUtils(EnvUtils envUtils) {
-        this.systemSalt = envUtils.getEncryptSalt();
-    }
 
     /**
      * 生成私有盐

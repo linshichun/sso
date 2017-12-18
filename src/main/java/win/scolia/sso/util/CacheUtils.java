@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -15,17 +16,14 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class CacheUtils {
 
+    @Value("${sso.cache.prefix:SSO}")
     private String prefix;
 
+    @Value("${sso.cache.expire:2592000}")
     private long expire;
 
+    @Value("${sso.cache.flushExpireWhenHit:true}")
     private boolean isFlush;
-
-    public CacheUtils(EnvUtils envUtils) {
-        this.prefix = envUtils.getCachePrefix();
-        this.expire = envUtils.getCacheExpire();
-        this.isFlush = envUtils.getCacheExpireFlushWhenHit();
-    }
 
     private static final String USER_PREFIX = "USER";
 

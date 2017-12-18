@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.PropertySource;
 
 /**
  * Created by scolia on 2017/11/27
@@ -14,6 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @MapperScan("win.scolia.sso.dao")
+@PropertySource("classpath:sso.properties")
 public class SSOApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SSOApplication.class);

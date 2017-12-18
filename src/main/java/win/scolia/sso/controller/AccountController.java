@@ -5,6 +5,7 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,10 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import win.scolia.sso.bean.entity.User;
 import win.scolia.sso.bean.vo.MessageVO;
 import win.scolia.sso.bean.vo.UserVO;
@@ -71,9 +69,6 @@ public class AccountController {
             MessageVO messageVO = new MessageVO();
             MessageUtils.putMessage(messageVO, "error", "该用户已被占用");
             return ResponseEntity.badRequest().body(messageVO);
-        } catch (Exception e) {
-            LOGGER.error("User Register error", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -103,9 +98,6 @@ public class AccountController {
             MessageVO messageVO = new MessageVO();
             MessageUtils.putMessage(messageVO, "error", "用户名或密码错误");
             return ResponseEntity.badRequest().body(messageVO);
-        } catch (Exception e) {
-            LOGGER.error("User login error", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -116,14 +108,9 @@ public class AccountController {
     @GetMapping("logout")
     @RequiresAuthentication
     public ResponseEntity<Void> logout() {
-        try {
-            Subject subject = SecurityUtils.getSubject();
-            subject.logout();
-            return ResponseEntity.ok().build();
-        }catch (Exception e) {
-            LOGGER.error("User login error", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        Subject subject = SecurityUtils.getSubject();
+        subject.logout();
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -134,15 +121,10 @@ public class AccountController {
     @RequiresAuthentication
     public ResponseEntity<Map<String, String>> current() {
         Subject subject = SecurityUtils.getSubject();
-        try {
-            User user = (User) subject.getPrincipal();
-            Map<String, String> msg = new HashMap<>();
-            msg.put("userName", user.getUserName());
-            return ResponseEntity.ok(msg);
-        } catch (Exception e) {
-            LOGGER.error("Get current user name error", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        User user = (User) subject.getPrincipal();
+        Map<String, String> msg = new HashMap<>();
+        msg.put("userName", user.getUserName());
+        return ResponseEntity.ok(msg);
     }
 
     /**
@@ -153,16 +135,11 @@ public class AccountController {
     @RequiresAuthentication
     public ResponseEntity<Map<String, Set<String>>> currentRoles() {
         Subject subject = SecurityUtils.getSubject();
-        try {
-            User user = (User) subject.getPrincipal();
-            Set<String> roles = roleService.getRolesByUserName(user.getUserName());
-            Map<String, Set<String>> msg = new HashMap<>();
-            msg.put("roles", roles);
-            return ResponseEntity.ok(msg);
-        } catch (Exception e) {
-            LOGGER.error("Get current user name error", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        User user = (User) subject.getPrincipal();
+        Set<String> roles = roleService.getRolesByUserName(user.getUserName());
+        Map<String, Set<String>> msg = new HashMap<>();
+        msg.put("roles", roles);
+        return ResponseEntity.ok(msg);
     }
 
     /**
@@ -173,20 +150,15 @@ public class AccountController {
     @RequiresAuthentication
     public ResponseEntity<Map<String, Set<String>>> currentPermissions() {
         Subject subject = SecurityUtils.getSubject();
-        try {
-            User user = (User) subject.getPrincipal();
-            Set<String> roles = roleService.getRolesByUserName(user.getUserName());
-            Set<String> permissions = new HashSet<>();
-            for (String role: roles) {
-                permissions.addAll(permissionService.getPermissionsByRoleName(role));
-            }
-            Map<String, Set<String>> msg = new HashMap<>();
-            msg.put("permissions", permissions);
-            return ResponseEntity.ok(msg);
-        } catch (Exception e) {
-            LOGGER.error("Get current user name error", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        User user = (User) subject.getPrincipal();
+        Set<String> roles = roleService.getRolesByUserName(user.getUserName());
+        Set<String> permissions = new HashSet<>();
+        for (String role: roles) {
+            permissions.addAll(permissionService.getPermissionsByRoleName(role));
         }
+        Map<String, Set<String>> msg = new HashMap<>();
+        msg.put("permissions", permissions);
+        return ResponseEntity.ok(msg);
     }
 
     /**
@@ -203,20 +175,27 @@ public class AccountController {
             MessageVO messageVO = MessageUtils.makeValidMessage(bindingResult);
             return ResponseEntity.badRequest().body(messageVO);
         }
-        try {
-            boolean success = userService.changePasswordByOldPassword(userVO.getUserName(), userVO.getOldPassword(),
-                    userVO.getNewPassword());
-            if (success) {
-                return ResponseEntity.ok().build();
-            } else {
-                MessageVO messageVO = new MessageVO();
-                MessageUtils.putMessage(messageVO, "error", "用户名或密码错误");
-                return ResponseEntity.badRequest().body(messageVO);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Change password error", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        boolean success = userService.changePasswordByOldPassword(userVO.getUserName(), userVO.getOldPassword(),
+                userVO.getNewPassword());
+        if (success) {
+            return ResponseEntity.ok().build();
+        } else {
+            MessageVO messageVO = new MessageVO();
+            MessageUtils.putMessage(messageVO, "error", "用户名或密码错误");
+            return ResponseEntity.badRequest().body(messageVO);
         }
+    }
+
+    /**
+     * 删除某个用户
+     * @param userName 用户名
+     * @return 200 成功, 403 权限不足, 500 服务器错误
+     */
+    @DeleteMapping("{userName}")
+    @RequiresPermissions("system:user:delete")
+    public ResponseEntity<Void> deleteUser(@PathVariable("userName") String userName) {
+        userService.removeUserByUserName(userName);
+        return ResponseEntity.ok().build();
     }
 
 }

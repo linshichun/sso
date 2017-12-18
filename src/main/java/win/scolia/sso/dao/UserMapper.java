@@ -32,4 +32,10 @@ public interface UserMapper {
      */
     void updatePasswordByUserName(@Param("userName") String userName, @Param("password") String password);
 
+    /**
+     * 根据用户名删除用户
+     * @param userName 用户名
+     */
+    void deleteUserByUserName(@Param("userName") String userName);
+
 }

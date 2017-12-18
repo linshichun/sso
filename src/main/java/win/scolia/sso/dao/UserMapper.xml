@@ -34,4 +34,8 @@
         UPDATE user SET password = #{password} WHERE user_name = #{userName}
     </update>
 
+    <delete id="deleteUserByUserName" parameterType="string">
+        DELETE FROM user WHERE user_name = #{userName}
+    </delete>
+
 </mapper>

@@ -70,4 +70,10 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+    @Override
+    public void removeUserByUserName(String userName) {
+        cacheUtils.clearUser(userName);
+        userMapper.deleteUserByUserName(userName);
+    }
+
 }

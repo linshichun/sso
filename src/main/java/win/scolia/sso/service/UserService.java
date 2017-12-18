@@ -27,4 +27,10 @@ public interface UserService {
      */
     boolean changePasswordByOldPassword(String userName, String oldPassword, String newPassword);
 
+    /**
+     * 根据用户名删除用户
+     * @param userName 用户名
+     */
+    void removeUserByUserName(String userName);
+
 }

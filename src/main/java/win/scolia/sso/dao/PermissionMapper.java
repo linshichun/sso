@@ -2,11 +2,39 @@ package win.scolia.sso.dao;
 
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+import win.scolia.sso.bean.entity.Permission;
 
+import java.util.List;
 import java.util.Set;
 
 @Repository
 public interface PermissionMapper {
+
+    /**
+     * 新增一条权限
+     * @param permission 权限
+     */
+    void insertPermission(@Param("permission") String permission);
+
+    /**
+     * 根据权限名称来删除权限
+     * @param permission 权限名称
+     */
+    void deletePermission(@Param("permission") String permission);
+
+    /**
+     * 通过权限id, 删除其在映射表中的所有记录
+     * @param permissionId 权限id
+     */
+    void deletePermissionAllMapByPermissionId(@Param("permissionId") Long permissionId);
+
+    /**
+     * 更新权限名
+     * @param oldPermission 旧的权限名
+     * @param newPermission 新的权限名
+     */
+    void updatePermission(@Param("oldPermission") String oldPermission,
+                          @Param("newPermission") String newPermission);
 
     /**
      * 根据角色名获取角色的权限
@@ -14,4 +42,17 @@ public interface PermissionMapper {
      * @return 返回权限列表
      */
     Set<String> selectPermissionsByRoleName(@Param("roleName") String roleName);
+
+    /**
+     * 获取权限对象
+     * @param permission 权限
+     * @return 权限对象
+     */
+    Permission selectPermission(@Param("permission") String permission);
+
+    /**
+     * 列出所有的权限
+     * @return 权限列表
+     */
+    List<Permission> selectAllPermissions();
 }

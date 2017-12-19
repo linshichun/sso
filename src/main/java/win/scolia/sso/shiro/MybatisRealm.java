@@ -47,7 +47,7 @@ public class MybatisRealm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         User user = (User) principals.getPrimaryPrincipal();
-        Set<String> roles = roleService.getRolesByUserName(user.getUserName());
+        Set<String> roles = roleService.getUserRolesByUserName(user.getUserName());
         Set<String> permissions = new HashSet<>();
         for (String role : roles) {
             Set<String> perms = permissionService.getPermissionsByRoleName(role);

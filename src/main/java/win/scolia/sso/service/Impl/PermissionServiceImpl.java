@@ -19,12 +19,12 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public Set<String> getPermissionsByRoleName(String roleName) {
-        Set<String> permissions = cacheUtils.getPermissions(roleName);
+        Set<String> permissions = cacheUtils.getRolePermissions(roleName);
         if (permissions != null) {
             return permissions;
         }
         permissions = permissionMapper.selectPermissionsByRoleName(roleName);
-        cacheUtils.cachePermissions(roleName, permissions);
+        cacheUtils.cacheRolePermissions(roleName, permissions);
         return permissions;
     }
 }

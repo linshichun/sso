@@ -2,7 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="win.scolia.sso.dao.RoleMapper">
-    <select id="selectRolesByUserName" parameterType="string" resultType="string">
+
+    <insert id="insertRole" parameterType="string">
+        INSERT INTO role SET role_name = #{roleName}
+    </insert>
+
+    <delete id="deleteRoleByName" parameterType="string">
+        DELETE FROM role WHERE role_name = #{roleName}
+    </delete>
+
+    <delete id="deleteRoleAllMapByRoleId" parameterType="long">
+        DELETE FROM user_role WHERE role_id = #{roleId}
+    </delete>
+    
+    <update id="updateRoleByName" parameterType="string">
+        UPDATE role SET role_name = #{newRoleName} WHERE role_name = #{oldRoleName}
+    </update>
+
+    <select id="selectUserRolesByUserName" parameterType="string" resultType="string">
         SELECT role_name
         FROM role
             JOIN user_role
@@ -10,6 +27,21 @@
             JOIN user
                 ON user_role.user_id = user.user_id
         WHERE user.user_name = #{userName}
+    </select>
+    
+    <resultMap id="roleMap" type="win.scolia.sso.bean.entity.Role">
+        <id column="role_id" property="roleId" />
+        <result column="role_name" property="roleName" />
+        <result column="create_time" property="createTime" />
+        <result column="last_modified" property="lastModified" />
+    </resultMap>
+    
+    <select id="selectRoleByRoleName" parameterType="string" resultMap="roleMap">
+        SELECT role_id, role_name, create_time, last_modified FROM role WHERE role_name = #{roleName}
+    </select>
+
+    <select id="selectAllRoles" parameterType="string" resultMap="roleMap">
+        SELECT role_id, role_name, create_time, last_modified FROM role
     </select>
 </mapper>
 

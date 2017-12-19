@@ -109,7 +109,7 @@ public class CacheUtils {
      * @param userName 用户名称
      * @param roles    用户对应的角色, 可以为空集合
      */
-    public void cacheRoles(String userName, Set<String> roles) {
+    public void cacheUserRoles(String userName, Set<String> roles) {
         if (StringUtils.isEmpty(userName) || roles == null) {
             return;
         }
@@ -130,7 +130,7 @@ public class CacheUtils {
      * @param userName 用户名
      * @return 角色信息, 失败时返回null
      */
-    public Set<String> getRoles(String userName) {
+    public Set<String> getUserRoles(String userName) {
         if (StringUtils.isEmpty(userName)) {
             return null;
         }
@@ -159,7 +159,7 @@ public class CacheUtils {
      * @param roleName    角色名
      * @param permissions 权限信息
      */
-    public void cachePermissions(String roleName, Set<String> permissions) {
+    public void cacheRolePermissions(String roleName, Set<String> permissions) {
         if (StringUtils.isEmpty(roleName) || permissions == null) {
             return;
         }
@@ -179,7 +179,7 @@ public class CacheUtils {
      * @param roleName 角色名称
      * @return 权限信息, 失败时返回null
      */
-    public Set<String> getPermissions(String roleName) {
+    public Set<String> getRolePermissions(String roleName) {
         if (StringUtils.isEmpty(roleName)) {
             return null;
         }

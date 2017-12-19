@@ -14,6 +14,7 @@ import win.scolia.sso.util.CacheUtils;
 import win.scolia.sso.util.EncryptUtils;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -31,7 +32,7 @@ public class UserServiceImpl implements UserService {
     public void createUser(UserVO userVO) {
         User cacheUser = getUserByUserName(userVO.getUserName());
         if (cacheUser != null) {
-            throw new DuplicateUserException("该用户已存在");
+            throw new DuplicateUserException("User already exist");
         }
         User user = new User();
         BeanUtils.copyProperties(userVO, user);
@@ -42,19 +43,14 @@ public class UserServiceImpl implements UserService {
         try {
             userMapper.insertUser(user);
         } catch (DuplicateKeyException e) {
-            throw new DuplicateUserException("该用户已存在", e);
+            throw new DuplicateUserException("User already exist", e);
         }
     }
 
     @Override
-    public User getUserByUserName(String userName) {
-        User user = cacheUtils.getUser(userName);
-        if (user != null) {
-            return user;
-        }
-        user = userMapper.selectUserByUserName(userName);
-        cacheUtils.cacheUser(user);
-        return user;
+    public void removeUserByUserName(String userName) {
+        cacheUtils.clearUser(userName);
+        userMapper.deleteUserByUserName(userName);
     }
 
     @Override
@@ -71,9 +67,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void removeUserByUserName(String userName) {
-        cacheUtils.clearUser(userName);
-        userMapper.deleteUserByUserName(userName);
+    public User getUserByUserName(String userName) {
+        User user = cacheUtils.getUser(userName);
+        if (user != null) {
+            return user;
+        }
+        user = userMapper.selectUserByUserName(userName);
+        cacheUtils.cacheUser(user);
+        return user;
     }
+
+    @Override
+    public List<User> listUsers() {
+        // TODO 完成列出用户的功能
+        return null;
+    }
+
 
 }

@@ -8,6 +8,14 @@
         VALUES (#{user.userName}, #{user.password}, #{user.salt}, #{user.createTime}, #{user.lastModified})
     </insert>
 
+    <delete id="deleteUserByUserName" parameterType="string">
+        DELETE FROM user WHERE user_name = #{userName}
+    </delete>
+
+    <update id="updatePasswordByUserName" parameterType="string">
+        UPDATE user SET password = #{password} WHERE user_name = #{userName}
+    </update>
+
     <resultMap id="userMap" type="win.scolia.sso.bean.entity.User">
         <id column="user_id" property="userId"/>
         <result column="user_name" property="userName"/>
@@ -30,12 +38,15 @@
         WHERE user_name = #{userName}
     </select>
 
-    <update id="updatePasswordByUserName" parameterType="string">
-        UPDATE user SET password = #{password} WHERE user_name = #{userName}
-    </update>
-
-    <delete id="deleteUserByUserName" parameterType="string">
-        DELETE FROM user WHERE user_name = #{userName}
-    </delete>
-
+    <select id="selectAllUsers" parameterType="string"
+            resultMap="userMap">
+        SELECT
+            user_id,
+            user_name,
+            password,
+            salt,
+            create_time,
+            last_modified
+        FROM user
+    </select>
 </mapper>

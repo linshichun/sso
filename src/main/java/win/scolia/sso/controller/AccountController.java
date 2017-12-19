@@ -136,7 +136,7 @@ public class AccountController {
     public ResponseEntity<Map<String, Set<String>>> currentRoles() {
         Subject subject = SecurityUtils.getSubject();
         User user = (User) subject.getPrincipal();
-        Set<String> roles = roleService.getRolesByUserName(user.getUserName());
+        Set<String> roles = roleService.getUserRolesByUserName(user.getUserName());
         Map<String, Set<String>> msg = new HashMap<>();
         msg.put("roles", roles);
         return ResponseEntity.ok(msg);
@@ -151,7 +151,7 @@ public class AccountController {
     public ResponseEntity<Map<String, Set<String>>> currentPermissions() {
         Subject subject = SecurityUtils.getSubject();
         User user = (User) subject.getPrincipal();
-        Set<String> roles = roleService.getRolesByUserName(user.getUserName());
+        Set<String> roles = roleService.getUserRolesByUserName(user.getUserName());
         Set<String> permissions = new HashSet<>();
         for (String role: roles) {
             permissions.addAll(permissionService.getPermissionsByRoleName(role));

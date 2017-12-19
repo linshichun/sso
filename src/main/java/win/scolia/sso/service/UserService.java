@@ -3,6 +3,8 @@ package win.scolia.sso.service;
 import win.scolia.sso.bean.entity.User;
 import win.scolia.sso.bean.vo.UserVO;
 
+import java.util.List;
+
 public interface UserService {
 
     /**
@@ -12,11 +14,10 @@ public interface UserService {
     void createUser(UserVO userVO);
 
     /**
-     * 根据用户名获得用户信息
-     * @param userName 要查询的用户名
-     * @return 返回查询得到的用户密码
+     * 根据用户名删除用户
+     * @param userName 用户名
      */
-    User getUserByUserName(String userName);
+    void removeUserByUserName(String userName);
 
     /**
      * 根据旧密码修改新密码
@@ -28,9 +29,15 @@ public interface UserService {
     boolean changePasswordByOldPassword(String userName, String oldPassword, String newPassword);
 
     /**
-     * 根据用户名删除用户
-     * @param userName 用户名
+     * 根据用户名获得用户信息
+     * @param userName 要查询的用户名
+     * @return 返回查询得到的用户密码
      */
-    void removeUserByUserName(String userName);
+    User getUserByUserName(String userName);
 
+    /**
+     * 列出所有的用户
+     * @return 用户列表
+     */
+    List<User> listUsers();
 }

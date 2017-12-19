@@ -4,6 +4,8 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import win.scolia.sso.bean.entity.User;
 
+import java.util.List;
+
 /**
  * Created by scolia on 2017/11/27
  */
@@ -18,12 +20,10 @@ public interface UserMapper {
     void insertUser(@Param("user") User user);
 
     /**
-     * 根据用户名获得用户信息
-     *
-     * @param userName 要查询的用户名
-     * @return 返回查询得到的用户
+     * 根据用户名删除用户
+     * @param userName 用户名
      */
-    User selectUserByUserName(@Param("userName") String userName);
+    void deleteUserByUserName(@Param("userName") String userName);
 
     /**
      * 修改某用户的密码
@@ -33,9 +33,16 @@ public interface UserMapper {
     void updatePasswordByUserName(@Param("userName") String userName, @Param("password") String password);
 
     /**
-     * 根据用户名删除用户
-     * @param userName 用户名
+     * 根据用户名获得用户信息
+     *
+     * @param userName 要查询的用户名
+     * @return 返回查询得到的用户
      */
-    void deleteUserByUserName(@Param("userName") String userName);
+    User selectUserByUserName(@Param("userName") String userName);
 
+    /**
+     * 获取所有的用户
+     * @return 用户列表
+     */
+    List<User> selectAllUsers();
 }

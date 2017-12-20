@@ -24,10 +24,16 @@ public interface RoleMapper {
     void deleteRoleByName(@Param("roleName") String roleName);
 
     /**
-     * 通过角色id, 删除其在映射表中的所有记录
+     * 通过角色id, 删除其在 用户-角色 映射表中的所有记录
      * @param roleId 角色id
      */
-    void deleteRoleAllMapByRoleId(@Param("roleId") Long roleId);
+    void deleteUserRoleMapByRoleId(@Param("roleId") Long roleId);
+
+    /**
+     * 通过用户id, 删除其在 用户-角色 映射表中的所有记录
+     * @param userId 用户id
+     */
+    void deleteUserRoleMapByUserId(@Param("userId") Long userId);
 
     /**
      * 更新角色名

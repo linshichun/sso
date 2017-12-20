@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import win.scolia.sso.bean.entity.Role;
+import win.scolia.sso.dao.PermissionMapper;
 import win.scolia.sso.dao.RoleMapper;
 import win.scolia.sso.service.RoleService;
 import win.scolia.sso.util.CacheUtils;
@@ -19,8 +20,10 @@ public class RoleServiceImpl implements RoleService {
     private RoleMapper roleMapper;
 
     @Autowired
-    private CacheUtils cacheUtils;
+    private PermissionMapper permissionMapper;
 
+    @Autowired
+    private CacheUtils cacheUtils;
 
     @Override
     public void createRole(String roleName) {
@@ -35,7 +38,8 @@ public class RoleServiceImpl implements RoleService {
             return;
         }
         roleMapper.deleteRoleByName(roleName);
-        roleMapper.deleteRoleAllMapByRoleId(role.getRoleId());
+        roleMapper.deleteUserRoleMapByRoleId(role.getRoleId()); // 删除 用户-角色的映射
+        permissionMapper.deleteRolePermissionMapByRoleId(role.getRoleId()); // 删除 角色-权限 的映射
     }
 
     @Override

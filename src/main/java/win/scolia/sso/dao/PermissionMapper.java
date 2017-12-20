@@ -23,10 +23,16 @@ public interface PermissionMapper {
     void deletePermission(@Param("permission") String permission);
 
     /**
-     * 通过权限id, 删除其在映射表中的所有记录
+     * 通过权限id, 删除其在 角色-权限 映射表中的所有记录
      * @param permissionId 权限id
      */
-    void deletePermissionAllMapByPermissionId(@Param("permissionId") Long permissionId);
+    void deleteRolePermissionMapByPermissionId(@Param("permissionId") Long permissionId);
+
+    /**
+     * 通过角色id, 删除其在 角色-权限 映射表中的所有记录
+     * @param roleId 角色id
+     */
+    void deleteRolePermissionMapByRoleId(@Param("roleId") Long roleId);
 
     /**
      * 更新权限名

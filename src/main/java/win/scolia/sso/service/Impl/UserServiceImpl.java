@@ -5,8 +5,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import win.scolia.sso.bean.entity.User;
 import win.scolia.sso.bean.vo.UserVO;
+import win.scolia.sso.dao.RoleMapper;
 import win.scolia.sso.dao.UserMapper;
 import win.scolia.sso.exception.DuplicateUserException;
 import win.scolia.sso.service.UserService;
@@ -21,6 +23,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private RoleMapper roleMapper;
 
     @Autowired
     private CacheUtils cacheUtils;
@@ -47,10 +52,16 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Transactional
     @Override
     public void removeUserByUserName(String userName) {
-        cacheUtils.clearUser(userName);
-        userMapper.deleteUserByUserName(userName);
+        User user = cacheUtils.getUser(userName);
+        if (user == null) {
+            user = userMapper.selectUserByUserName(userName);
+        }
+        userMapper.deleteUserByUserName(userName); // 删除角色表中的记录
+        roleMapper.deleteUserRoleMapByUserId(user.getUserId()); // 删除 用户-角色 表中的映射
+        cacheUtils.clearUser(userName); // 清除缓存
     }
 
     @Override

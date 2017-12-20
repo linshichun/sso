@@ -11,8 +11,12 @@
         DELETE FROM permission WHERE permission = #{permission}
     </delete>
 
-    <delete id="deletePermissionAllMapByPermissionId" parameterType="long">
+    <delete id="deleteRolePermissionMapByPermissionId" parameterType="long">
         DELETE FROM role_permission WHERE permission_id = #{permissionId}
+    </delete>
+
+    <delete id="deleteRolePermissionMapByRoleId" parameterType="long">
+        DELETE FROM role_permission WHERE role_id = #{roleId}
     </delete>
     
     <update id="updatePermission" parameterType="string">

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * Created by scolia on 2017/11/27
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.PropertySource;
 @SpringBootApplication
 @MapperScan("win.scolia.sso.dao")
 @PropertySource("classpath:sso.properties")
+@EnableTransactionManagement
 public class SSOApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SSOApplication.class);

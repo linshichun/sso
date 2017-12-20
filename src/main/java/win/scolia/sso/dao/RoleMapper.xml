@@ -11,8 +11,12 @@
         DELETE FROM role WHERE role_name = #{roleName}
     </delete>
 
-    <delete id="deleteRoleAllMapByRoleId" parameterType="long">
+    <delete id="deleteUserRoleMapByRoleId" parameterType="long">
         DELETE FROM user_role WHERE role_id = #{roleId}
+    </delete>
+
+    <delete id="deleteUserRoleMapByUserId" parameterType="long">
+        DELETE FROM user_role WHERE user_id = #{userId}
     </delete>
     
     <update id="updateRoleByName" parameterType="string">

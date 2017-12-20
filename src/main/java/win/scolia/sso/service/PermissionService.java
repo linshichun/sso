@@ -1,8 +1,31 @@
 package win.scolia.sso.service;
 
+import win.scolia.sso.bean.entity.Permission;
+
+import java.util.List;
 import java.util.Set;
 
 public interface PermissionService {
+
+
+    /**
+     * 创建一个权限
+     * @param permission 权限
+     */
+    void createPermission(String permission);
+
+    /**
+     * 删除一个权限
+     * @param permission 权限
+     */
+    void removePermission(String permission);
+
+    /**
+     * 修改一个权限
+     * @param oldPermission 旧权限
+     * @param newPermission 新权限
+     */
+    void changePermission(String oldPermission, String newPermission);
 
     /**
      * 根据角色名获取角色的权限
@@ -10,4 +33,10 @@ public interface PermissionService {
      * @return 返回权限列表
      */
     Set<String> getPermissionsByRoleName(String roleName);
+
+    /**
+     * 列出所有的权限
+     * @return 权限列表
+     */
+    List<Permission> listAllPermission();
 }

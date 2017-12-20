@@ -53,6 +53,12 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
             <version>${spring.boot.starter.version}</version>
         </dependency>
+        <!-- spring jdbc -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <version>${spring.boot.starter.version}</version>
+        </dependency>
         <!-- 数据校验 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

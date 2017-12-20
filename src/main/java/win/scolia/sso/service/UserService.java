@@ -24,7 +24,7 @@ public interface UserService {
      * @param userName 用户名
      * @param oldPassword 旧密码, 明文
      * @param newPassword 新密码, 明文
-     * @return 返回true表示修改成功, false表示修改失败
+     * @return 返回true表示修改成功, false表示修改失败(密码或用户名不对)
      */
     boolean changePasswordByOldPassword(String userName, String oldPassword, String newPassword);
 

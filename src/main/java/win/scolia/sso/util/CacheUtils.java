@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import win.scolia.sso.bean.entity.Role;
 import win.scolia.sso.bean.entity.User;
 
 import java.util.Set;
@@ -49,6 +48,8 @@ public class CacheUtils {
      * @return cacheKey
      */
     private String getCacheKey(String prefix, String key){
+        assert !StringUtils.isEmpty(prefix) : "Prefix can not be empty";
+        assert !StringUtils.isEmpty(key) : "Key can not be empty";
         return String.format("%s:%s:%s", this.prefix, prefix, key);
     }
 
@@ -60,9 +61,8 @@ public class CacheUtils {
      * @return boolean 表示是否缓存成功
      */
     private boolean cacheObject(String cacheKey, Object target) {
-        if (StringUtils.isEmpty(cacheKey) || target == null) {
-            return false;
-        }
+        assert !StringUtils.isEmpty(cacheKey) : "CacheKey can not be empty";
+        assert target != null : "Cache target can not be null";
         try {
             redisTemplate.opsForValue().set(cacheKey, target, expire, TimeUnit.SECONDS);
             return true;
@@ -79,11 +79,9 @@ public class CacheUtils {
      * @param clazz 缓存的对象类型
      * @return 缓存的对象
      */
-    @SuppressWarnings("unchecked")
     private <T> T getCacheObject(String cacheKey, Class<T> clazz) {
-        if (StringUtils.isEmpty(cacheKey) || clazz == null) {
-            return null;
-        }
+        assert !StringUtils.isEmpty(cacheKey) : "CacheKey can not be empty";
+        assert clazz != null : "Clazz can not be null";
         try {
             BoundValueOperations<String, Object> operations = redisTemplate.boundValueOps(cacheKey);
             Object target = operations.get();
@@ -112,6 +110,7 @@ public class CacheUtils {
      * @param cacheKey 缓存key
      */
     private void clearCache(String cacheKey) {
+        assert !StringUtils.isEmpty(cacheKey) : "CacheKey can not be empty";
         redisTemplate.delete(cacheKey);
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Clear cache user: {}", cacheKey);
@@ -142,6 +141,9 @@ public class CacheUtils {
      * @return 缓存的用户对象, 失败时返回null
      */
     public User getUser(String userName) {
+        if (StringUtils.isEmpty(userName)) {
+            return null;
+        }
         String cacheKey = this.getCacheKey(USER_PREFIX, userName);
         return this.getCacheObject(cacheKey, User.class);
     }
@@ -156,50 +158,6 @@ public class CacheUtils {
             return;
         }
         String cacheKey = this.getCacheKey(USER_PREFIX, userName);
-        this.clearCache(cacheKey);
-    }
-
-    /**
-     * 缓存角色对象
-     *
-     * @param role 角色对象
-     */
-    public void cacheRole(Role role) {
-        if (role == null || StringUtils.isEmpty(role.getRoleName())) {
-            return;
-        }
-        String cacheKey = this.getCacheKey(ROLE_PREFIX, role.getRoleName());
-        if (this.cacheObject(cacheKey, role)){
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Cache user: {}", role.getRoleName());
-            }
-        }
-    }
-
-    /**
-     * 获取缓存的角色对象
-     *
-     * @param roleName 角色名
-     * @return 角色对象
-     */
-    public Role getRole(String roleName) {
-        if (StringUtils.isEmpty(roleName)) {
-            return null;
-        }
-        String cacheKey = this.getCacheKey(ROLE_PREFIX, roleName);
-        return this.getCacheObject(cacheKey, Role.class);
-    }
-
-    /**
-     * 清除用户的缓存
-     *
-     * @param roleName 用户名
-     */
-    public void clearRole(String roleName) {
-        if (StringUtils.isEmpty(roleName)) {
-            return;
-        }
-        String cacheKey = this.getCacheKey(USER_PREFIX, roleName);
         this.clearCache(cacheKey);
     }
 

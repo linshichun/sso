@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
      * 参数错误
      * @return 400
      */
-    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ExceptionHandler(value = {MissingServletRequestParameterException.class, IllegalArgumentException.class})
     public ResponseEntity<String> bedRequestHandler(HttpServletRequest request) {
         if (LOGGER.isWarnEnabled()) {
             String param;

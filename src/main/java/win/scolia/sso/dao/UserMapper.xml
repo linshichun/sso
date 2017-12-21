@@ -16,7 +16,7 @@
         UPDATE user SET password = #{password} WHERE user_name = #{userName}
     </update>
 
-    <resultMap id="userSafelyMap" type="win.scolia.sso.bean.entity.User">
+    <resultMap id="userSafelyMap" type="win.scolia.sso.bean.entity.UserSafely">
         <id column="user_id" property="userId"/>
         <result column="user_name" property="userName"/>
         <result column="create_time" property="createTime"/>

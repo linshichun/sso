@@ -65,6 +65,9 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             user = userMapper.selectUserByUserName(userName);
         }
+        if (user == null) {
+            throw new IllegalArgumentException("User not exist"); // 用户不存在
+        }
         userMapper.deleteUserByUserName(userName); // 删除角色表中的记录
         roleMapper.deleteUserRoleMapByUserId(user.getUserId()); // 删除 用户-角色 表中的映射
         cacheUtils.clearUser(userName); // 清除缓存

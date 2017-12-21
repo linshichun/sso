@@ -16,7 +16,6 @@ public interface RoleMapper {
      */
     void insertRole(@Param("roleName") String roleName);
 
-
     /**
      * 根据角色名删除记录
      * @param roleName 角色名
@@ -45,10 +44,10 @@ public interface RoleMapper {
 
     /**
      * 根据用户名获取用户的角色
-     * @param username 用户名
+     * @param userName 用户名
      * @return 返回角色列表
      */
-    Set<String> selectUserRolesByUserName(@Param("userName") String username);
+    Set<String> selectUserRolesByUserName(@Param("userName") String userName);
 
     /**
      * 通过角色名获取角色对象

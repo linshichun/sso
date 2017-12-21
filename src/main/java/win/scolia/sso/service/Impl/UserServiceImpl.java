@@ -100,6 +100,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserSafely getUserSafelyByUserName(String userName) {
         User user = this.getUserByUserName(userName);
+        if (user == null) {
+            return null;
+        }
         UserSafely userSafely = new UserSafely();
         BeanUtils.copyProperties(user, userSafely);
         return userSafely;

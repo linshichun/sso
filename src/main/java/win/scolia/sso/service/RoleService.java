@@ -1,8 +1,8 @@
 package win.scolia.sso.service;
 
+import com.github.pagehelper.PageInfo;
 import win.scolia.sso.bean.entity.Role;
 
-import java.util.List;
 import java.util.Set;
 
 public interface RoleService {
@@ -35,7 +35,8 @@ public interface RoleService {
 
     /**
      * 获取所有的角色信息
+     * @param pageNum 页码
      * @return 角色列表
      */
-    List<Role> listRoles();
+    PageInfo<Role> listRoles(Integer pageNum);
 }

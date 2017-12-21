@@ -1,5 +1,6 @@
 package win.scolia.sso.service.Impl;
 
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,6 +9,7 @@ import win.scolia.sso.dao.PermissionMapper;
 import win.scolia.sso.dao.RoleMapper;
 import win.scolia.sso.service.RoleService;
 import win.scolia.sso.util.CacheUtils;
+import win.scolia.sso.util.PageUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -24,6 +26,9 @@ public class RoleServiceImpl implements RoleService {
 
     @Autowired
     private CacheUtils cacheUtils;
+
+    @Autowired
+    private PageUtils pageUtils;
 
     @Override
     public void createRole(String roleName) {
@@ -59,9 +64,11 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<Role> listRoles() {
-        // TODO 获取所有的角色信息
-        return null;
+    public PageInfo<Role> listRoles(Integer pageNum) {
+        pageUtils.startPage(pageNum);
+        List<Role> roles = roleMapper.selectAllRoles();
+        return pageUtils.getPageInfo(roles);
     }
+
 
 }

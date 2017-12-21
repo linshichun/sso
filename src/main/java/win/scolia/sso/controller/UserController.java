@@ -7,11 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import win.scolia.sso.bean.entity.User;
+import win.scolia.sso.bean.entity.UserSafely;
 import win.scolia.sso.service.UserService;
 
+/**
+ * 主要负责用户管理的相关信息
+ */
 @Controller
-@RequestMapping(value = "account")
+@RequestMapping(value = "account/users")
 public class UserController {
 
     @Autowired
@@ -31,9 +34,12 @@ public class UserController {
 
     @GetMapping("{userName}")
     @RequiresPermissions("system:user:get")
-    public ResponseEntity<User> getUser(@PathVariable("userName") String userName) {
-        userService.removeUserByUserName(userName);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<UserSafely> getUser(@PathVariable("userName") String userName) {
+        UserSafely userSafely = userService.getUserSafelyByUserName(userName);
+        if (userSafely == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().body(userSafely);
     }
 
     /**
@@ -41,7 +47,7 @@ public class UserController {
      * @param pageNum 页码
      * @return 200 成功
      */
-    @GetMapping("/users")
+    @GetMapping("/list")
     @RequiresPermissions("system:user:list")
     public ResponseEntity<PageInfo> listUsers(@RequestParam(value = "pageNum") Integer pageNum) {
         return ResponseEntity.ok(userService.listUsersSafely(pageNum));

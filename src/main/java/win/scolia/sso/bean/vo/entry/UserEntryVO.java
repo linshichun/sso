@@ -1,11 +1,11 @@
-package win.scolia.sso.bean.vo;
+package win.scolia.sso.bean.vo.entry;
 
 import javax.validation.constraints.NotNull;
 
 /**
- * 用户的传输对象
+ * 用户信息的输入VO对象
  */
-public class UserVO {
+public class UserEntryVO {
 
     // 注册组
     public interface Register {}
@@ -62,7 +62,7 @@ public class UserVO {
 
     @Override
     public String toString() {
-        return "UserVO{" +
+        return "UserEntryVO{" +
                 "userName='" + userName + '\'' +
                 ", password='" + password + '\'' +
                 ", oldPassword='" + oldPassword + '\'' +

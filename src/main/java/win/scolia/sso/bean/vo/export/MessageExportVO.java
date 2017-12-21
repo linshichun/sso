@@ -1,20 +1,20 @@
-package win.scolia.sso.bean.vo;
+package win.scolia.sso.bean.vo.export;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 响应信息的VO
+ * 信息输出VO对象
  */
-public class MessageVO {
+public class MessageExportVO {
 
     private Map<String, Object> messages;
 
-    public MessageVO() {
+    public MessageExportVO() {
         this.messages = new HashMap<>();
     }
 
-    public MessageVO(Map<String, Object> messages) {
+    public MessageExportVO(Map<String, Object> messages) {
         this.messages = messages;
     }
 
@@ -28,7 +28,7 @@ public class MessageVO {
 
     @Override
     public String toString() {
-        return "MessageVO{" +
+        return "MessageExportVO{" +
                 "messages=" + messages +
                 '}';
     }

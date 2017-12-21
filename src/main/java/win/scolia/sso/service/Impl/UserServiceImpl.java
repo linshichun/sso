@@ -1,5 +1,6 @@
 package win.scolia.sso.service.Impl;
 
+import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,13 +8,15 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import win.scolia.sso.bean.entity.User;
-import win.scolia.sso.bean.vo.UserVO;
+import win.scolia.sso.bean.entity.UserSafely;
+import win.scolia.sso.bean.vo.entry.UserEntryVO;
 import win.scolia.sso.dao.RoleMapper;
 import win.scolia.sso.dao.UserMapper;
 import win.scolia.sso.exception.DuplicateUserException;
 import win.scolia.sso.service.UserService;
 import win.scolia.sso.util.CacheUtils;
 import win.scolia.sso.util.EncryptUtils;
+import win.scolia.sso.util.PageUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -33,14 +36,17 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private EncryptUtils encryptUtils;
 
+    @Autowired
+    private PageUtils pageUtils;
+
     @Override
-    public void createUser(UserVO userVO) {
-        User cacheUser = getUserByUserName(userVO.getUserName());
+    public void createUser(UserEntryVO userEntryVO) {
+        User cacheUser = getUserByUserName(userEntryVO.getUserName());
         if (cacheUser != null) {
             throw new DuplicateUserException("User already exist");
         }
         User user = new User();
-        BeanUtils.copyProperties(userVO, user);
+        BeanUtils.copyProperties(userEntryVO, user);
         user.setSalt(encryptUtils.getRandomSalt());
         user.setPassword(encryptUtils.getEncryptedPassword(user.getPassword(), user.getSalt()));
         user.setCreateTime(new Date());
@@ -89,10 +95,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> listUsers() {
-        // TODO 完成列出用户的功能
-        return null;
+    public UserSafely getUserSafelyByUserName(String userName) {
+        User user = this.getUserByUserName(userName);
+        UserSafely userSafely = new UserSafely();
+        BeanUtils.copyProperties(user, userSafely);
+        return userSafely;
     }
 
-
+    @Override
+    public PageInfo<UserSafely> listUsersSafely(Integer pageNum) {
+        pageUtils.startPage(pageNum);
+        List<UserSafely> userSafelyList = userMapper.selectAllUserSafely();
+        return pageUtils.getPageInfo(userSafelyList);
+    }
 }

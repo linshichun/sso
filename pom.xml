@@ -24,7 +24,8 @@
         <spring.boot.starter.version>1.5.9.RELEASE</spring.boot.starter.version>
         <spring.session.version>1.3.1.RELEASE</spring.session.version>
         <spring.data.redis.version>2.0.2.RELEASE</spring.data.redis.version>
-        <mybatis.spring.boot.starter.version>1.3.1</mybatis.spring.boot.starter.version>
+        <mybatis.starter.version>1.3.1</mybatis.starter.version>
+        <pageHepler.version>1.2.3</pageHepler.version>
         <mysql.connector.version>5.1.45</mysql.connector.version>
         <druid.version>1.1.6</druid.version>
         <common.codec.version>1.11</common.codec.version>
@@ -69,7 +70,13 @@
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>${mybatis.spring.boot.starter.version}</version>
+            <version>${mybatis.starter.version}</version>
+        </dependency>
+        <!-- pageHelper -->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>${pageHepler.version}</version>
         </dependency>
         <!-- MySQl驱动 -->
         <dependency>

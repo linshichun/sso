@@ -16,13 +16,16 @@
         UPDATE user SET password = #{password} WHERE user_name = #{userName}
     </update>
 
-    <resultMap id="userMap" type="win.scolia.sso.bean.entity.User">
+    <resultMap id="userSafelyMap" type="win.scolia.sso.bean.entity.User">
         <id column="user_id" property="userId"/>
         <result column="user_name" property="userName"/>
-        <result column="password" property="password"/>
-        <result column="salt" property="salt"/>
         <result column="create_time" property="createTime"/>
         <result column="last_modified" property="lastModified"/>
+    </resultMap>
+
+    <resultMap id="userMap" type="win.scolia.sso.bean.entity.User" extends="userSafelyMap">
+        <result column="password" property="password"/>
+        <result column="salt" property="salt"/>
     </resultMap>
 
     <select id="selectUserByUserName" parameterType="string"
@@ -38,13 +41,11 @@
         WHERE user_name = #{userName}
     </select>
 
-    <select id="selectAllUsers" parameterType="string"
-            resultMap="userMap">
+    <select id="selectAllUserSafely" parameterType="string"
+            resultMap="userSafelyMap">
         SELECT
             user_id,
             user_name,
-            password,
-            salt,
             create_time,
             last_modified
         FROM user

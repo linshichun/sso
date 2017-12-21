@@ -1,12 +1,15 @@
 package win.scolia.sso.handler;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -20,12 +23,33 @@ public class GlobalExceptionHandler {
 
     private static Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    private static ObjectMapper MAPPER = new ObjectMapper();
+
     /**
-     * 未登录的异常处理
+     * 参数错误
+     * @return 400
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<String> bedRequestHandler(HttpServletRequest request) {
+        if (LOGGER.isWarnEnabled()) {
+            String param;
+            try {
+                param = MAPPER.writeValueAsString(request.getParameterMap());
+            } catch (JsonProcessingException e) {
+                param = null;
+            }
+            LOGGER.warn("{} try to access {}, but parameter error in: {}", request.getRemoteHost(),
+                    request.getRequestURI(), param);
+        }
+        return ResponseEntity.badRequest().body("Parameter error");
+    }
+
+    /**
+     * 未认证
      * @return 401
      */
     @ExceptionHandler(UnauthenticatedException.class)
-    public ResponseEntity<Void> authorizationExceptionHandler(HttpServletRequest request){
+    public ResponseEntity<Void> unauthorizedHandler(HttpServletRequest request){
         if (LOGGER.isWarnEnabled()) {
             LOGGER.warn("{} try to access {}, but not signin", request.getRemoteHost(), request.getRequestURI());
         }
@@ -37,7 +61,7 @@ public class GlobalExceptionHandler {
      * @return 403
      */
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<Void> authorizedExceptionHandler(HttpServletRequest request){
+    public ResponseEntity<Void> forbiddenHandler(HttpServletRequest request){
         if (LOGGER.isWarnEnabled()) {
             LOGGER.warn("{} try to access {}, but miss permission", request.getRemoteHost(), request.getRequestURI());
         }

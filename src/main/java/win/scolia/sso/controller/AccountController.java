@@ -5,7 +5,6 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import win.scolia.sso.bean.entity.User;
-import win.scolia.sso.bean.vo.MessageVO;
-import win.scolia.sso.bean.vo.UserVO;
+import win.scolia.sso.bean.vo.entry.UserEntryVO;
+import win.scolia.sso.bean.vo.export.MessageExportVO;
 import win.scolia.sso.exception.DuplicateUserException;
 import win.scolia.sso.service.PermissionService;
 import win.scolia.sso.service.RoleService;
@@ -30,6 +32,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 主要负责登录注册等功能
+ */
 @Controller
 @RequestMapping(value = "account")
 public class AccountController {
@@ -48,56 +53,56 @@ public class AccountController {
     /**
      * 用户注册
      *
-     * @param userVO        用户的信息
+     * @param userEntryVO        用户的信息
      * @param bindingResult 数据校验的结果
      * @return 201 表示注册成功, 400 参数错误, 500 服务器错误
      */
     @PostMapping("register")
-    public ResponseEntity<MessageVO> register(@Validated(UserVO.Register.class) UserVO userVO,
-                                              BindingResult bindingResult) {
+    public ResponseEntity<MessageExportVO> register(@Validated(UserEntryVO.Register.class) UserEntryVO userEntryVO,
+                                                    BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            MessageVO messageVO = MessageUtils.makeValidMessage(bindingResult);
-            return ResponseEntity.badRequest().body(messageVO);
+            MessageExportVO messageExportVO = MessageUtils.makeValidMessage(bindingResult);
+            return ResponseEntity.badRequest().body(messageExportVO);
         }
         try {
-            userService.createUser(userVO);
+            userService.createUser(userEntryVO);
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Register user: {}", userVO);
+                LOGGER.info("Register user: {}", userEntryVO.getUserName());
             }
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (DuplicateUserException e) {
-            MessageVO messageVO = new MessageVO();
-            MessageUtils.putMessage(messageVO, "error", "该用户已被占用");
-            return ResponseEntity.badRequest().body(messageVO);
+            MessageExportVO messageExportVO = new MessageExportVO();
+            MessageUtils.putMessage(messageExportVO, "error", "该用户已被占用");
+            return ResponseEntity.badRequest().body(messageExportVO);
         }
     }
 
     /**
      * 使用用户名和密码登录
      *
-     * @param userVO        用户信息
+     * @param userEntryVO        用户信息
      * @param bindingResult 数据校验的结果
      * @return 200 登录成功, 400 参数错误/登录失败, 500 服务器错误
      */
     @PostMapping("login")
-    public ResponseEntity<MessageVO> login(@Validated(UserVO.LoginByPassword.class) UserVO userVO,
-                                           BindingResult bindingResult) {
+    public ResponseEntity<MessageExportVO> login(@Validated(UserEntryVO.LoginByPassword.class) UserEntryVO userEntryVO,
+                                                 BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            MessageVO messageVO = MessageUtils.makeValidMessage(bindingResult);
-            return ResponseEntity.badRequest().body(messageVO);
+            MessageExportVO messageExportVO = MessageUtils.makeValidMessage(bindingResult);
+            return ResponseEntity.badRequest().body(messageExportVO);
         }
         try {
             Subject subject = SecurityUtils.getSubject();
-            AuthenticationToken token = new UsernamePasswordToken(userVO.getUserName(), userVO.getPassword());
+            AuthenticationToken token = new UsernamePasswordToken(userEntryVO.getUserName(), userEntryVO.getPassword());
             subject.login(token);
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Login user: {}", userVO.getUserName());
+                LOGGER.info("Login user: {}", userEntryVO.getUserName());
             }
             return ResponseEntity.ok().build();
         } catch (AuthenticationException e) {
-            MessageVO messageVO = new MessageVO();
-            MessageUtils.putMessage(messageVO, "error", "用户名或密码错误");
-            return ResponseEntity.badRequest().body(messageVO);
+            MessageExportVO messageExportVO = new MessageExportVO();
+            MessageUtils.putMessage(messageExportVO, "error", "用户名或密码错误");
+            return ResponseEntity.badRequest().body(messageExportVO);
         }
     }
 
@@ -163,39 +168,26 @@ public class AccountController {
 
     /**
      * 修改密码
-     * @param userVO 用户信息
+     * @param userEntryVO 用户信息
      * @param bindingResult 数据校验的结果
      * @return 200 表示成功, 400 参数错误/旧密码错误 500 服务器错误
      */
     @PutMapping("current/password")
     @RequiresAuthentication
-    public ResponseEntity<MessageVO> changePassword(@Validated(UserVO.ChangePassword.class) UserVO userVO,
-                                               BindingResult bindingResult) {
+    public ResponseEntity<MessageExportVO> changePassword(@Validated(UserEntryVO.ChangePassword.class) UserEntryVO userEntryVO,
+                                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            MessageVO messageVO = MessageUtils.makeValidMessage(bindingResult);
-            return ResponseEntity.badRequest().body(messageVO);
+            MessageExportVO messageExportVO = MessageUtils.makeValidMessage(bindingResult);
+            return ResponseEntity.badRequest().body(messageExportVO);
         }
-        boolean success = userService.changePasswordByOldPassword(userVO.getUserName(), userVO.getOldPassword(),
-                userVO.getNewPassword());
+        boolean success = userService.changePasswordByOldPassword(userEntryVO.getUserName(), userEntryVO.getOldPassword(),
+                userEntryVO.getNewPassword());
         if (success) {
             return ResponseEntity.ok().build();
         } else {
-            MessageVO messageVO = new MessageVO();
-            MessageUtils.putMessage(messageVO, "error", "用户名或密码错误");
-            return ResponseEntity.badRequest().body(messageVO);
+            MessageExportVO messageExportVO = new MessageExportVO();
+            MessageUtils.putMessage(messageExportVO, "error", "用户名或密码错误");
+            return ResponseEntity.badRequest().body(messageExportVO);
         }
     }
-
-    /**
-     * 删除某个用户
-     * @param userName 用户名
-     * @return 200 成功, 403 权限不足, 500 服务器错误
-     */
-    @DeleteMapping("{userName}")
-    @RequiresPermissions("system:user:delete")
-    public ResponseEntity<Void> deleteUser(@PathVariable("userName") String userName) {
-        userService.removeUserByUserName(userName);
-        return ResponseEntity.ok().build();
-    }
-
 }

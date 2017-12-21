@@ -1,17 +1,17 @@
 package win.scolia.sso.service;
 
+import com.github.pagehelper.PageInfo;
 import win.scolia.sso.bean.entity.User;
-import win.scolia.sso.bean.vo.UserVO;
-
-import java.util.List;
+import win.scolia.sso.bean.entity.UserSafely;
+import win.scolia.sso.bean.vo.entry.UserEntryVO;
 
 public interface UserService {
 
     /**
      * 插入一个新的用户
-     * @param userVO 插入的用户对象
+     * @param userEntryVO 插入的用户对象
      */
-    void createUser(UserVO userVO);
+    void createUser(UserEntryVO userEntryVO);
 
     /**
      * 根据用户名删除用户
@@ -36,8 +36,16 @@ public interface UserService {
     User getUserByUserName(String userName);
 
     /**
-     * 列出所有的用户
+     * 获取用户对象, 不包含敏感信息
+     * @param userName 用户名
+     * @return 安全的用户对象
+     */
+    UserSafely getUserSafelyByUserName(String userName);
+
+    /**
+     * 列出所有的用户, 不包含敏感信息
+     * @param pageNum 页码数
      * @return 用户列表
      */
-    List<User> listUsers();
+    PageInfo<UserSafely> listUsersSafely(Integer pageNum);
 }

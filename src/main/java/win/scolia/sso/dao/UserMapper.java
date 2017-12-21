@@ -3,6 +3,7 @@ package win.scolia.sso.dao;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import win.scolia.sso.bean.entity.User;
+import win.scolia.sso.bean.entity.UserSafely;
 
 import java.util.List;
 
@@ -41,8 +42,8 @@ public interface UserMapper {
     User selectUserByUserName(@Param("userName") String userName);
 
     /**
-     * 获取所有的用户
+     * 获取所有的用户, 不包含敏感信息
      * @return 用户列表
      */
-    List<User> selectAllUsers();
+    List<UserSafely> selectAllUserSafely();
 }

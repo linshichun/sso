@@ -210,7 +210,8 @@ public class CacheUtils {
      * 清除所有的 用户-角色 缓存信息
      */
     public void clearAllUserRoles() {
-        // TODO
+        Set<String> keys = redisTemplate.keys(String.format("%s:%s", prefix, USER_ROLE_PREFIX));
+        redisTemplate.delete(keys);
     }
 
     /**
@@ -261,7 +262,8 @@ public class CacheUtils {
      * 清除所有的 角色-权限 缓存信息
      */
     public void clearAllRolePermissions(){
-        // TODO
+        Set<String> keys = redisTemplate.keys(String.format("%s:%s", prefix, ROLE_PERMISSION_PREFIX));
+        redisTemplate.delete(keys);
     }
 
 }

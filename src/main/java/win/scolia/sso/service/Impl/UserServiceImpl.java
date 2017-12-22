@@ -39,6 +39,20 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PageUtils pageUtils;
 
+    /**
+     * 获取用户对象, 并且获得到的用户对象不进行缓存
+     * @param userName 用户名
+     * @return 用户对象或null
+     */
+    private User getUserSimply(String userName) {
+        assert !StringUtils.isEmpty(userName) : "UserName can not be empty";
+        User user = cacheUtils.getUser(userName);
+        if (user == null) {
+            user = userMapper.selectUserByUserName(userName);
+        }
+        return user;
+    }
+
     @Override
     public void createUser(UserEntryVO userEntryVO) {
         User cacheUser = getUserByUserName(userEntryVO.getUserName());
@@ -61,10 +75,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void removeUserByUserName(String userName) {
-        User user = cacheUtils.getUser(userName);
-        if (user == null) {
-            user = userMapper.selectUserByUserName(userName);
-        }
+        User user = this.getUserSimply(userName);
         if (user == null) {
             throw new IllegalArgumentException("User not exist"); // 用户不存在
         }
@@ -88,11 +99,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByUserName(String userName) {
-        User user = cacheUtils.getUser(userName);
-        if (user != null) {
-            return user;
-        }
-        user = userMapper.selectUserByUserName(userName);
+        User user = this.getUserSimply(userName);
         cacheUtils.cacheUser(user);
         return user;
     }
@@ -113,5 +120,11 @@ public class UserServiceImpl implements UserService {
         pageUtils.startPage(pageNum);
         List<UserSafely> userSafelyList = userMapper.selectAllUserSafely();
         return pageUtils.getPageInfo(userSafelyList);
+    }
+
+    @Override
+    public boolean checkUserNameUsable(String userName) {
+        User user = this.getUserSimply(userName);
+        return user == null;
     }
 }

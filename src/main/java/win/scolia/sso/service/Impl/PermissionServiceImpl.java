@@ -1,5 +1,6 @@
 package win.scolia.sso.service.Impl;
 
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,6 +8,7 @@ import win.scolia.sso.bean.entity.Permission;
 import win.scolia.sso.dao.PermissionMapper;
 import win.scolia.sso.service.PermissionService;
 import win.scolia.sso.util.CacheUtils;
+import win.scolia.sso.util.PageUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -19,6 +21,9 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Autowired
     private CacheUtils cacheUtils;
+
+    @Autowired
+    private PageUtils pageUtils;
 
     @Override
     public void createPermission(String permission) {
@@ -53,8 +58,9 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public List<Permission> listAllPermission() {
-        // TODO 列出所有权限
-        return null;
+    public PageInfo<Permission> listAllPermission(Integer pageNum) {
+        pageUtils.startPage(pageNum);
+        List<Permission> permissions = permissionMapper.selectAllPermissions();
+        return pageUtils.getPageInfo(permissions);
     }
 }

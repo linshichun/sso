@@ -195,6 +195,25 @@ public class CacheUtils {
     }
 
     /**
+     * 清除特定用户的 用户-角色 缓存信息
+     * @param userName 用户名
+     */
+    public void clearUserRoles(String userName) {
+        if (StringUtils.isEmpty(userName)) {
+            return;
+        }
+        String cacheKey = this.getCacheKey(USER_ROLE_PREFIX, userName);
+        this.clearCache(cacheKey);
+    }
+
+    /**
+     * 清除所有的 用户-角色 缓存信息
+     */
+    public void clearAllUserRoles() {
+        // TODO
+    }
+
+    /**
      * 缓存角色的权限信息
      *
      * @param roleName    角色名
@@ -224,6 +243,25 @@ public class CacheUtils {
         }
         String cacheKey = this.getCacheKey(ROLE_PERMISSION_PREFIX, roleName);
         return this.getCacheObject(cacheKey, Set.class);
+    }
+
+    /**
+     * 清除 角色-权限 的缓存信息
+     * @param roleName 角色名
+     */
+    public void clearRolePermissions(String roleName) {
+        if (StringUtils.isEmpty(roleName)) {
+            return ;
+        }
+        String cacheKey = this.getCacheKey(ROLE_PERMISSION_PREFIX, roleName);
+        this.clearCache(cacheKey);
+    }
+
+    /**
+     * 清除所有的 角色-权限 缓存信息
+     */
+    public void clearAllRolePermissions(){
+        // TODO
     }
 
 }

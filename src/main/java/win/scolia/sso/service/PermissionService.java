@@ -1,8 +1,8 @@
 package win.scolia.sso.service;
 
+import com.github.pagehelper.PageInfo;
 import win.scolia.sso.bean.entity.Permission;
 
-import java.util.List;
 import java.util.Set;
 
 public interface PermissionService {
@@ -38,5 +38,5 @@ public interface PermissionService {
      * 列出所有的权限
      * @return 权限列表
      */
-    List<Permission> listAllPermission();
+    PageInfo<Permission> listAllPermission(Integer pageNum);
 }

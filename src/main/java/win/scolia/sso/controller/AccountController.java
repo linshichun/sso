@@ -1,5 +1,6 @@
 package win.scolia.sso.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -53,7 +54,7 @@ public class AccountController {
     /**
      * 用户注册
      *
-     * @param userEntryVO        用户的信息
+     * @param userEntryVO   用户的信息
      * @param bindingResult 数据校验的结果
      * @return 201 表示注册成功, 400 参数错误, 500 服务器错误
      */
@@ -78,9 +79,27 @@ public class AccountController {
     }
 
     /**
+     * 注册时, 检查用户名是否可用
+     *
+     * @param userName 用户名
+     * @return 200 可用, 409 不可用, 400 参数错误
+     */
+    @PostMapping("register/check")
+    public ResponseEntity<Void> checkRepeatUserName(String userName) {
+        if (StringUtils.isEmpty(userName)) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (userService.checkUserNameUsable(userName)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
+
+    /**
      * 使用用户名和密码登录
      *
-     * @param userEntryVO        用户信息
+     * @param userEntryVO   用户信息
      * @param bindingResult 数据校验的结果
      * @return 200 登录成功, 400 参数错误/登录失败, 500 服务器错误
      */
@@ -108,6 +127,7 @@ public class AccountController {
 
     /**
      * 登出
+     *
      * @return 200 成功, 500 服务器错误
      */
     @GetMapping("logout")
@@ -120,6 +140,7 @@ public class AccountController {
 
     /**
      * 获取当前用户信息
+     *
      * @return 200 成功, 500 服务器错误
      */
     @GetMapping("current")
@@ -134,6 +155,7 @@ public class AccountController {
 
     /**
      * 获取当前用户角色信息
+     *
      * @return 200 成功, 500 服务器错误
      */
     @GetMapping("current/roles")
@@ -149,6 +171,7 @@ public class AccountController {
 
     /**
      * 获取当前用户权限信息
+     *
      * @return 200 成功, 500 服务器错误
      */
     @GetMapping("current/permissions")
@@ -158,7 +181,7 @@ public class AccountController {
         User user = (User) subject.getPrincipal();
         Set<String> roles = roleService.getUserRolesByUserName(user.getUserName());
         Set<String> permissions = new HashSet<>();
-        for (String role: roles) {
+        for (String role : roles) {
             permissions.addAll(permissionService.getPermissionsByRoleName(role));
         }
         Map<String, Set<String>> msg = new HashMap<>();
@@ -168,7 +191,8 @@ public class AccountController {
 
     /**
      * 修改密码
-     * @param userEntryVO 用户信息
+     *
+     * @param userEntryVO   用户信息
      * @param bindingResult 数据校验的结果
      * @return 200 表示成功, 400 参数错误/旧密码错误 500 服务器错误
      */

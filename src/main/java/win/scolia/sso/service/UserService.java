@@ -48,4 +48,11 @@ public interface UserService {
      * @return 用户列表
      */
     PageInfo<UserSafely> listUsersSafely(Integer pageNum);
+
+    /**
+     *  检查用户名是否可用
+     * @param userName 用户名
+     * @return 可用是返回true, 否则返回false
+     */
+    boolean checkUserNameUsable(String userName);
 }

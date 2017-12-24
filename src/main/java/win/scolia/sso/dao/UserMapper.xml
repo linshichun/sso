@@ -13,7 +13,7 @@
     </delete>
 
     <update id="updatePasswordByUserName" parameterType="string">
-        UPDATE user SET password = #{password} WHERE user_name = #{userName}
+        UPDATE user SET password = #{password}, last_modified = NOW() WHERE user_name = #{userName}
     </update>
 
     <resultMap id="userSafelyMap" type="win.scolia.sso.bean.entity.UserSafely">

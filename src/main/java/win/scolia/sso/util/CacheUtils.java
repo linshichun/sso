@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import win.scolia.sso.bean.entity.Permission;
+import win.scolia.sso.bean.entity.Role;
 import win.scolia.sso.bean.entity.User;
 
 import java.util.Set;
@@ -44,10 +46,10 @@ public class CacheUtils {
      * 获取缓存key
      *
      * @param prefix 前置
-     * @param key 原来的key
+     * @param key    原来的key
      * @return cacheKey
      */
-    private String getCacheKey(String prefix, String key){
+    private String getCacheKey(String prefix, String key) {
         assert !StringUtils.isEmpty(prefix) : "Prefix can not be empty";
         assert !StringUtils.isEmpty(key) : "Key can not be empty";
         return String.format("%s:%s:%s", this.prefix, prefix, key);
@@ -57,7 +59,7 @@ public class CacheUtils {
      * 缓存一个对象
      *
      * @param cacheKey key
-     * @param target 缓存目标
+     * @param target   缓存目标
      * @return boolean 表示是否缓存成功
      */
     private boolean cacheObject(String cacheKey, Object target) {
@@ -76,7 +78,7 @@ public class CacheUtils {
      * 获取缓存的对象
      *
      * @param cacheKey 缓存key
-     * @param clazz 缓存的对象类型
+     * @param clazz    缓存的对象类型
      * @return 缓存的对象
      */
     private <T> T getCacheObject(String cacheKey, Class<T> clazz) {
@@ -127,7 +129,7 @@ public class CacheUtils {
             return;
         }
         String cacheKey = this.getCacheKey(USER_PREFIX, user.getUserName());
-        if (this.cacheObject(cacheKey, user)){
+        if (this.cacheObject(cacheKey, user)) {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Cache user: {}", user.getUserName());
             }
@@ -158,6 +160,50 @@ public class CacheUtils {
             return;
         }
         String cacheKey = this.getCacheKey(USER_PREFIX, userName);
+        this.clearCache(cacheKey);
+    }
+
+    /**
+     * 缓存角色对象
+     *
+     * @param role 角色对象
+     */
+    public void cacheRole(Role role) {
+        if (role == null || StringUtils.isEmpty(role.getRoleName())) {
+            return;
+        }
+        String cacheKey = this.getCacheKey(ROLE_PREFIX, role.getRoleName());
+        if (this.cacheObject(cacheKey, role)) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Cache user: {}", role.getRoleName());
+            }
+        }
+    }
+
+    /**
+     * 获取缓存的角色对象
+     *
+     * @param roleName 角色名
+     * @return 缓存的用户对象, 失败时返回null
+     */
+    public Role getRole(String roleName) {
+        if (StringUtils.isEmpty(roleName)) {
+            return null;
+        }
+        String cacheKey = this.getCacheKey(ROLE_PREFIX, roleName);
+        return this.getCacheObject(cacheKey, Role.class);
+    }
+
+    /**
+     * 清除角色的缓存
+     *
+     * @param roleName 用户名
+     */
+    public void clearRole(String roleName) {
+        if (StringUtils.isEmpty(roleName)) {
+            return;
+        }
+        String cacheKey = this.getCacheKey(ROLE_PREFIX, roleName);
         this.clearCache(cacheKey);
     }
 
@@ -196,6 +242,7 @@ public class CacheUtils {
 
     /**
      * 清除特定用户的 用户-角色 缓存信息
+     *
      * @param userName 用户名
      */
     public void clearUserRoles(String userName) {
@@ -210,8 +257,52 @@ public class CacheUtils {
      * 清除所有的 用户-角色 缓存信息
      */
     public void clearAllUserRoles() {
-        Set<String> keys = redisTemplate.keys(String.format("%s:%s", prefix, USER_ROLE_PREFIX));
+        Set<String> keys = redisTemplate.keys(String.format("%s:%s:*", prefix, USER_ROLE_PREFIX));
         redisTemplate.delete(keys);
+    }
+
+    /**
+     * 缓存权限
+     *
+     * @param permission 权限
+     */
+    public void cachePermission(Permission permission) {
+        if (permission == null || StringUtils.isEmpty(permission.getPermission())) {
+            return;
+        }
+        String cacheKey = this.getCacheKey(PERMISSION_PREFIX, permission.getPermission());
+        if (this.cacheObject(cacheKey, permission)) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Cache user: {}", permission.getPermission());
+            }
+        }
+    }
+
+    /**
+     * 获取缓存的权限对象
+     *
+     * @param permission 权限
+     * @return 缓存的权限对象, 失败时返回null
+     */
+    public Permission getPermission(String permission) {
+        if (StringUtils.isEmpty(permission)) {
+            return null;
+        }
+        String cacheKey = this.getCacheKey(PERMISSION_PREFIX, permission);
+        return this.getCacheObject(cacheKey, Permission.class);
+    }
+
+    /**
+     * 清除权限的缓存
+     *
+     * @param permission 权限
+     */
+    public void clearPermission(String permission) {
+        if (StringUtils.isEmpty(permission)) {
+            return;
+        }
+        String cacheKey = this.getCacheKey(PERMISSION_PREFIX, permission);
+        this.clearCache(cacheKey);
     }
 
     /**
@@ -234,6 +325,7 @@ public class CacheUtils {
 
     /**
      * 获取角色的权限信息
+     *
      * @param roleName 角色名称
      * @return 权限信息, 失败时返回null
      */
@@ -248,11 +340,12 @@ public class CacheUtils {
 
     /**
      * 清除 角色-权限 的缓存信息
+     *
      * @param roleName 角色名
      */
     public void clearRolePermissions(String roleName) {
         if (StringUtils.isEmpty(roleName)) {
-            return ;
+            return;
         }
         String cacheKey = this.getCacheKey(ROLE_PERMISSION_PREFIX, roleName);
         this.clearCache(cacheKey);
@@ -261,8 +354,8 @@ public class CacheUtils {
     /**
      * 清除所有的 角色-权限 缓存信息
      */
-    public void clearAllRolePermissions(){
-        Set<String> keys = redisTemplate.keys(String.format("%s:%s", prefix, ROLE_PERMISSION_PREFIX));
+    public void clearAllRolePermissions() {
+        Set<String> keys = redisTemplate.keys(String.format("%s:%s:*", prefix, ROLE_PERMISSION_PREFIX));
         redisTemplate.delete(keys);
     }
 

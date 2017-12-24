@@ -15,10 +15,24 @@ public interface PermissionService {
     void createPermission(String permission);
 
     /**
+     * 为角色添加权限
+     * @param roleName 角色名
+     * @param permission 权限
+     */
+    void addPermissionToRole(String roleName, String permission);
+
+    /**
      * 删除一个权限
      * @param permission 权限
      */
     void removePermission(String permission);
+
+    /**
+     * 删除角色的权限
+     * @param roleName 角色名
+     * @param permission 权限
+     */
+    void removeRolePermission(String roleName, String permission);
 
     /**
      * 修改一个权限
@@ -33,6 +47,13 @@ public interface PermissionService {
      * @return 返回权限列表
      */
     Set<String> getPermissionsByRoleName(String roleName);
+
+    /**
+     * 获取权限对象
+     * @param permission 具体的权限
+     * @return 权限对象
+     */
+    Permission getPermission(String permission);
 
     /**
      * 列出所有的权限

@@ -17,6 +17,13 @@ public interface PermissionMapper {
     void insertPermission(@Param("permission") String permission);
 
     /**
+     * 为角色添加权限
+     * @param roleId 角色id
+     * @param permissionId 权限id
+     */
+    void insertRolePermission(@Param("roleId") Long roleId, @Param("permissionId") Long permissionId);
+
+    /**
      * 根据权限名称来删除权限
      * @param permission 权限名称
      */
@@ -33,6 +40,14 @@ public interface PermissionMapper {
      * @param roleId 角色id
      */
     void deleteRolePermissionMapByRoleId(@Param("roleId") Long roleId);
+
+    /**
+     *  通过 角色id和权限id, 删除其在 角色-权限 映射表中的所有记录
+     * @param roleId 角色id
+     * @param permissionId 权限id
+     */
+    void deleteRolePermissionMapByRoleIdAndPermissionId(@Param("roleId") Long roleId,
+                                                        @Param("permissionId") Long permissionId);
 
     /**
      * 更新权限名

@@ -31,7 +31,7 @@ public interface UserService {
     /**
      * 根据用户名获得用户信息
      * @param userName 要查询的用户名
-     * @return 返回查询得到的用户密码
+     * @return 返回查询得到的用户对象, 包含敏感信息
      */
     User getUserByUserName(String userName);
 

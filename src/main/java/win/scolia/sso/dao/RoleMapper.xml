@@ -7,6 +7,10 @@
         INSERT INTO role SET role_name = #{roleName}
     </insert>
 
+    <insert id="insertUserRoleMap" parameterType="long">
+        INSERT INTO user_role SET user_id = #{userId}, role_id=#{roldId}
+    </insert>
+
     <delete id="deleteRoleByName" parameterType="string">
         DELETE FROM role WHERE role_name = #{roleName}
     </delete>
@@ -18,9 +22,13 @@
     <delete id="deleteUserRoleMapByUserId" parameterType="long">
         DELETE FROM user_role WHERE user_id = #{userId}
     </delete>
+
+    <delete id="deleteUserRoleMapByUserIdAndRoleId" parameterType="long">
+        DELETE FROM user_role WHERE user_id = #{userId} AND role_id = #{roleId}
+    </delete>
     
     <update id="updateRoleByName" parameterType="string">
-        UPDATE role SET role_name = #{newRoleName} WHERE role_name = #{oldRoleName}
+        UPDATE role SET role_name = #{newRoleName}, last_modified = NOW() WHERE role_name = #{oldRoleName}
     </update>
 
     <select id="selectUserRolesByUserName" parameterType="string" resultType="string">

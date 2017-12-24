@@ -14,10 +14,24 @@ public interface RoleService {
     void createRole(String roleName);
 
     /**
+     * 为用户添加角色
+     * @param userName 用户名
+     * @param roleName 角色名
+     */
+    void addRoleToUser(String userName, String roleName);
+
+    /**
      * 删除一个角色, 同时将其在映射表中的记录也删除掉
      * @param roleName 角色名
      */
     void removeRole(String roleName);
+
+    /**
+     * 为用户移除一个角色
+     * @param userName 用户名
+     * @param roleName 角色名
+     */
+    void romeUserRole(String userName, String roleName);
 
     /**
      * 更新角色名称
@@ -34,9 +48,18 @@ public interface RoleService {
     Set<String> getUserRolesByUserName(String username);
 
     /**
+     * 根据角色名获取角色
+     * @param roleName 角色名
+     * @return 角色对象或null
+     */
+    Role getRoleByRoleName(String roleName);
+
+    /**
      * 获取所有的角色信息
      * @param pageNum 页码
      * @return 角色列表
      */
     PageInfo<Role> listRoles(Integer pageNum);
+
+
 }

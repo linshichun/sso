@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void createUser(UserEntryVO userEntryVO) {
-        User cacheUser = getUserByUserName(userEntryVO.getUserName());
+        User cacheUser = this.getUserByUserName(userEntryVO.getUserName());
         if (cacheUser != null) {
             throw new DuplicateUserException("User already exist");
         }

@@ -17,6 +17,13 @@ public interface RoleMapper {
     void insertRole(@Param("roleName") String roleName);
 
     /**
+     * 添加用户和角色的映射关系
+     * @param userId 用户id
+     * @param roleId 角色id
+     */
+    void insertUserRoleMap(@Param("userId") Long userId, @Param("roleId") Long roleId);
+
+    /**
      * 根据角色名删除记录
      * @param roleName 角色名
      */
@@ -33,6 +40,13 @@ public interface RoleMapper {
      * @param userId 用户id
      */
     void deleteUserRoleMapByUserId(@Param("userId") Long userId);
+
+    /**
+     * 通过 用户id和角色id, 删除映射
+     * @param userId 用户id
+     * @param roleId 角色id
+     */
+    void deleteUserRoleMapByUserIdAndRoleId(@Param("userId") Long userId, @Param("roleId") Long roleId);
 
     /**
      * 更新角色名

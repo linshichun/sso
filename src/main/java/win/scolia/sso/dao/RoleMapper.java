@@ -3,6 +3,7 @@ package win.scolia.sso.dao;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import win.scolia.sso.bean.entity.Role;
+import win.scolia.sso.bean.entity.UserRole;
 
 import java.util.List;
 import java.util.Set;
@@ -12,16 +13,15 @@ public interface RoleMapper {
 
     /**
      * 添加一个角色
-     * @param roleName 角色名
+     * @param role 角色对象
      */
-    void insertRole(@Param("roleName") String roleName);
+    void insertRole(Role role);
 
     /**
      * 添加用户和角色的映射关系
-     * @param userId 用户id
-     * @param roleId 角色id
+     * @param userRole 用户和角色的映射对象
      */
-    void insertUserRoleMap(@Param("userId") Long userId, @Param("roleId") Long roleId);
+    void insertUserRoleMap(UserRole userRole);
 
     /**
      * 根据角色名删除记录
@@ -51,10 +51,9 @@ public interface RoleMapper {
     /**
      * 更新角色名
      * @param oldRoleName 旧角色名
-     * @param newRoleName 新角色名
+     * @param role 新角色对象
      */
-    void updateRoleByName(@Param("oldRoleName") String oldRoleName,
-                          @Param("newRoleName") String newRoleName);
+    void updateRoleByName(@Param("oldRoleName") String oldRoleName, @Param("role") Role role);
 
     /**
      * 根据用户名获取用户的角色

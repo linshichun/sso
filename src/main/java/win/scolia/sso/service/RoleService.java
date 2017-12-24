@@ -60,6 +60,4 @@ public interface RoleService {
      * @return 角色列表
      */
     PageInfo<Role> listRoles(Integer pageNum);
-
-
 }

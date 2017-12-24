@@ -90,7 +90,9 @@ public class UserServiceImpl implements UserService {
         String tempPassword = encryptUtils.getEncryptedPassword(oldPassword, user.getSalt());
         if (StringUtils.equals(tempPassword, user.getPassword())) {
             String password = encryptUtils.getEncryptedPassword(newPassword, user.getSalt());
-            userMapper.updatePasswordByUserName(userName, password);
+            user.setPassword(password);
+            user.setLastModified(new Date());
+            userMapper.updatePasswordByUserName(user);
             cacheUtils.clearUser(userName);
             return true;
         }

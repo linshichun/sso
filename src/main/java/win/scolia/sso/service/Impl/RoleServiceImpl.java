@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import win.scolia.sso.bean.entity.Role;
+import win.scolia.sso.bean.entity.UserRole;
 import win.scolia.sso.bean.entity.UserSafely;
 import win.scolia.sso.dao.PermissionMapper;
 import win.scolia.sso.dao.RoleMapper;
@@ -13,6 +14,7 @@ import win.scolia.sso.service.UserService;
 import win.scolia.sso.util.CacheUtils;
 import win.scolia.sso.util.PageUtils;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -37,7 +39,12 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void createRole(String roleName) {
-        roleMapper.insertRole(roleName);
+        Role cacheRole = this.getRoleByRoleName(roleName);
+        if (cacheRole != null) {
+            throw new IllegalArgumentException("Role already exist");
+        }
+        Role role = new Role(roleName, new Date(), new Date());
+        roleMapper.insertRole(role);
     }
 
     @Override
@@ -50,7 +57,8 @@ public class RoleServiceImpl implements RoleService {
         if (role == null) {
             throw new IllegalArgumentException("Role not exist");
         }
-        roleMapper.insertUserRoleMap(user.getUserId(), role.getRoleId());
+        UserRole userRole = new UserRole(user.getUserId(), role.getRoleId(), new Date(), new Date());
+        roleMapper.insertUserRoleMap(userRole);
         cacheUtils.clearUserRoles(userName);
     }
 
@@ -85,7 +93,8 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void changeRoleName(String oldRoleName, String newRoleName) {
-        roleMapper.updateRoleByName(oldRoleName, newRoleName);
+        Role role = new Role(newRoleName, new Date());
+        roleMapper.updateRoleByName(oldRoleName, role);
         cacheUtils.clearRole(oldRoleName);
         cacheUtils.clearAllUserRoles(); // 清除所有的 用户-角色 缓存
         cacheUtils.clearRolePermissions(oldRoleName); // 清除对应的 角色-权限 缓存

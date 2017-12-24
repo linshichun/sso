@@ -98,9 +98,9 @@ public class UserController {
      * @param pageNum 页码
      * @return 200 成功
      */
-    @GetMapping("/list")
+    @GetMapping("list")
     @RequiresPermissions("system:user:list")
-    public ResponseEntity<PageInfo> listUsers(@RequestParam(value = "pageNum") Integer pageNum) {
+    public ResponseEntity<PageInfo> listUsers(@RequestParam Integer pageNum) {
         return ResponseEntity.ok(userService.listUsersSafely(pageNum));
     }
 }

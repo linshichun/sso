@@ -3,35 +3,43 @@
 
 <mapper namespace="win.scolia.sso.dao.RoleMapper">
 
-    <insert id="insertRole" parameterType="string">
-        INSERT INTO role SET role_name = #{roleName}
+    <insert id="insertRole">
+        INSERT INTO role (role_name, create_time, last_modified)
+        VALUES (#{roleName}, #{createTime}, #{lastModified})
     </insert>
 
-    <insert id="insertUserRoleMap" parameterType="long">
-        INSERT INTO user_role SET user_id = #{userId}, role_id=#{roldId}
+    <insert id="insertUserRoleMap">
+        INSERT INTO user_role(user_id, role_id, create_time, last_modified)
+        VALUES (#{userId}, #{roleId}, #{createTime}, #{lastModified})
     </insert>
 
-    <delete id="deleteRoleByName" parameterType="string">
-        DELETE FROM role WHERE role_name = #{roleName}
+    <delete id="deleteRoleByName">
+        DELETE FROM role
+        WHERE role_name = #{roleName}
     </delete>
 
-    <delete id="deleteUserRoleMapByRoleId" parameterType="long">
-        DELETE FROM user_role WHERE role_id = #{roleId}
+    <delete id="deleteUserRoleMapByRoleId">
+        DELETE FROM user_role
+        WHERE role_id = #{roleId}
     </delete>
 
-    <delete id="deleteUserRoleMapByUserId" parameterType="long">
-        DELETE FROM user_role WHERE user_id = #{userId}
+    <delete id="deleteUserRoleMapByUserId">
+        DELETE FROM user_role
+        WHERE user_id = #{userId}
     </delete>
 
-    <delete id="deleteUserRoleMapByUserIdAndRoleId" parameterType="long">
-        DELETE FROM user_role WHERE user_id = #{userId} AND role_id = #{roleId}
+    <delete id="deleteUserRoleMapByUserIdAndRoleId">
+        DELETE FROM user_role
+        WHERE user_id = #{userId} AND role_id = #{roleId}
     </delete>
-    
-    <update id="updateRoleByName" parameterType="string">
-        UPDATE role SET role_name = #{newRoleName}, last_modified = NOW() WHERE role_name = #{oldRoleName}
+
+    <update id="updateRoleByName">
+        UPDATE role
+        SET role_name = #{role.roleName}, last_modified = #{role.lastModified}
+        WHERE role_name = #{oldRoleName}
     </update>
 
-    <select id="selectUserRolesByUserName" parameterType="string" resultType="string">
+    <select id="selectUserRolesByUserName">
         SELECT role_name
         FROM role
             JOIN user_role
@@ -40,20 +48,31 @@
                 ON user_role.user_id = user.user_id
         WHERE user.user_name = #{userName}
     </select>
-    
+
     <resultMap id="roleMap" type="win.scolia.sso.bean.entity.Role">
-        <id column="role_id" property="roleId" />
-        <result column="role_name" property="roleName" />
-        <result column="create_time" property="createTime" />
-        <result column="last_modified" property="lastModified" />
+        <id column="role_id" property="roleId"/>
+        <result column="role_name" property="roleName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="last_modified" property="lastModified"/>
     </resultMap>
-    
-    <select id="selectRoleByRoleName" parameterType="string" resultMap="roleMap">
-        SELECT role_id, role_name, create_time, last_modified FROM role WHERE role_name = #{roleName}
+
+    <select id="selectRoleByRoleName" resultMap="roleMap">
+        SELECT
+            role_id,
+            role_name,
+            create_time,
+            last_modified
+        FROM role
+        WHERE role_name = #{roleName}
     </select>
 
-    <select id="selectAllRoles" parameterType="string" resultMap="roleMap">
-        SELECT role_id, role_name, create_time, last_modified FROM role
+    <select id="selectAllRoles" resultMap="roleMap">
+        SELECT
+            role_id,
+            role_name,
+            create_time,
+            last_modified
+        FROM role
     </select>
 </mapper>
 

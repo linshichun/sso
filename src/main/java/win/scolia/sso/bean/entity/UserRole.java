@@ -2,28 +2,35 @@ package win.scolia.sso.bean.entity;
 
 import java.util.Date;
 
-public class Role {
+/**
+ * 用户和角色的映射关系
+ */
+public class UserRole {
+
+    private Long userId;
 
     private Long roleId;
-
-    private String roleName;
 
     private Date createTime;
 
     private Date lastModified;
 
-    public Role() {
+    public UserRole() {
     }
 
-    public Role(String roleName, Date createTime, Date lastModified) {
-        this.roleName = roleName;
+    public UserRole(Long userId, Long roleId, Date createTime, Date lastModified) {
+        this.userId = userId;
+        this.roleId = roleId;
         this.createTime = createTime;
         this.lastModified = lastModified;
     }
 
-    public Role(String roleName, Date lastModified) {
-        this.roleName = roleName;
-        this.lastModified = lastModified;
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Long getRoleId() {
@@ -32,14 +39,6 @@ public class Role {
 
     public void setRoleId(Long roleId) {
         this.roleId = roleId;
-    }
-
-    public String getRoleName() {
-        return roleName;
-    }
-
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
     }
 
     public Date getCreateTime() {
@@ -58,12 +57,11 @@ public class Role {
         this.lastModified = lastModified;
     }
 
-
     @Override
     public String toString() {
-        return "Role{" +
-                "roleId=" + roleId +
-                ", roleName='" + roleName + '\'' +
+        return "UserRole{" +
+                "userId=" + userId +
+                ", roleId=" + roleId +
                 ", createTime=" + createTime +
                 ", lastModified=" + lastModified +
                 '}';

@@ -1,11 +1,8 @@
 package win.scolia.sso.bean.entity;
 
-import java.io.Serializable;
 import java.util.Date;
 
-public class Permission implements Serializable {
-
-    private static final long serialVersionUID = -7674596189540207828L;
+public class Permission {
 
     private Long permissionId;
 

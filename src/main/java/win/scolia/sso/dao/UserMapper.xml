@@ -5,15 +5,15 @@
 
     <insert id="insertUser" parameterType="win.scolia.sso.bean.entity.User">
         INSERT INTO user (user_name, password, salt, create_time, last_modified)
-        VALUES (#{user.userName}, #{user.password}, #{user.salt}, #{user.createTime}, #{user.lastModified})
+        VALUES (#{userName}, #{password}, #{salt}, #{createTime}, #{lastModified})
     </insert>
 
-    <delete id="deleteUserByUserName" parameterType="string">
+    <delete id="deleteUserByUserName">
         DELETE FROM user WHERE user_name = #{userName}
     </delete>
 
-    <update id="updatePasswordByUserName" parameterType="string">
-        UPDATE user SET password = #{password}, last_modified = NOW() WHERE user_name = #{userName}
+    <update id="updatePasswordByUserName">
+        UPDATE user SET password = #{password}, last_modified = #{lastModified} WHERE user_name = #{userName}
     </update>
 
     <resultMap id="userSafelyMap" type="win.scolia.sso.bean.entity.UserSafely">
@@ -28,8 +28,7 @@
         <result column="salt" property="salt"/>
     </resultMap>
 
-    <select id="selectUserByUserName" parameterType="string"
-            resultMap="userMap">
+    <select id="selectUserByUserName" resultMap="userMap">
         SELECT
             user_id,
             user_name,
@@ -41,8 +40,7 @@
         WHERE user_name = #{userName}
     </select>
 
-    <select id="selectAllUserSafely" parameterType="string"
-            resultMap="userSafelyMap">
+    <select id="selectAllUserSafely" resultMap="userSafelyMap">
         SELECT
             user_id,
             user_name,

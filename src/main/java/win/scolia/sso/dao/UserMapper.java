@@ -18,7 +18,7 @@ public interface UserMapper {
      *
      * @param user 插入的用户对象
      */
-    void insertUser(@Param("user") User user);
+    void insertUser(User user);
 
     /**
      * 根据用户名删除用户
@@ -28,10 +28,9 @@ public interface UserMapper {
 
     /**
      * 修改某用户的密码
-     * @param userName 用户名
-     * @param password 密码, 密文
+     * @param user 用户对象, 要求必须有userName, password 和 lastModified 属性
      */
-    void updatePasswordByUserName(@Param("userName") String userName, @Param("password") String password);
+    void updatePasswordByUserName(User user);
 
     /**
      * 根据用户名获得用户信息

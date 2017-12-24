@@ -21,14 +21,15 @@ public class MyCredentialsMatcher implements CredentialsMatcher {
     private EncryptUtils encryptUtils;
 
     @Override
-    public boolean doCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) {
+    public boolean doCredentialsMatch(AuthenticationToken authenticationToken, AuthenticationInfo info) {
         // 真实的用户
-        User realUser = (User) info.getPrincipals().getPrimaryPrincipal();
+        User user = (User) info.getPrincipals().getPrimaryPrincipal();
+        String password = (String) info.getCredentials();
         // 用户提交的信息
-        UsernamePasswordToken usernamePasswordToken = (UsernamePasswordToken) token;
-        String rawPassword = new String(usernamePasswordToken.getPassword());
+        UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
+        String rawPassword = new String(token.getPassword());
         // 加密
-        String password = encryptUtils.getEncryptedPassword(rawPassword, realUser.getSalt());
-        return StringUtils.equals(password, realUser.getPassword());
+        String tempPassword = encryptUtils.getEncryptedPassword(rawPassword, user.getSalt());
+        return StringUtils.equals(password, tempPassword);
     }
 }

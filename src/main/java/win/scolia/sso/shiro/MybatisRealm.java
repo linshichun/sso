@@ -31,14 +31,14 @@ public class MybatisRealm extends AuthorizingRealm {
      * 进行用户登录
      */
     @Override
-    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-        String userName = (String) token.getPrincipal();
-        User realUser;
-        realUser = userService.getUserByUserName(userName);
-        if (realUser == null) {
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
+        UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
+        String userName = token.getUsername();
+        User user = userService.getUserByUserName(userName);
+        if (user == null) {
             throw new UnknownAccountException(String.format("Can not find the user: %s", userName));
         }
-        return new SimpleAuthenticationInfo(realUser, realUser.getPassword(), getClass().getSimpleName());
+        return new SimpleAuthenticationInfo(user, user.getPassword(), getName());
     }
 
     /**
@@ -46,7 +46,7 @@ public class MybatisRealm extends AuthorizingRealm {
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        User user = (User) principals.getPrimaryPrincipal();
+        User user  = (User) principals.getPrimaryPrincipal();
         Set<String> roles = roleService.getUserRolesByUserName(user.getUserName());
         Set<String> permissions = new HashSet<>();
         for (String role : roles) {

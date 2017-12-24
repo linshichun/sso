@@ -1,59 +1,50 @@
 package win.scolia.sso.bean.vo.export;
 
-import java.util.Date;
+import win.scolia.sso.bean.entity.UserSafely;
+
+import java.util.Set;
 
 /**
- * 用户信息的输出VO
+ * 用户当前信息
  */
 public class UserExportVO {
 
-    private Long userId;
+    private UserSafely user;
 
-    private String userName;
+    private Set<String> roles;
 
-    private Date createTime;
+    private Set<String> permissions;
 
-    private Date lastModified;
-
-    public Long getUserId() {
-        return userId;
+    public UserExportVO() {
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public UserExportVO(UserSafely user, Set<String> roles, Set<String> permissions) {
+        this.user = user;
+        this.roles = roles;
+        this.permissions = permissions;
     }
 
-    public String getUserName() {
-        return userName;
+    public UserSafely getUser() {
+        return user;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUser(UserSafely user) {
+        this.user = user;
     }
 
-    public Date getCreateTime() {
-        return createTime;
+    public Set<String> getRoles() {
+        return roles;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
     }
 
-    public Date getLastModified() {
-        return lastModified;
+    public Set<String> getPermissions() {
+        return permissions;
     }
 
-    public void setLastModified(Date lastModified) {
-        this.lastModified = lastModified;
-    }
-
-    @Override
-    public String toString() {
-        return "UserExportVO{" +
-                "userId=" + userId +
-                ", userName='" + userName + '\'' +
-                ", createTime=" + createTime +
-                ", lastModified=" + lastModified +
-                '}';
+    public void setPermissions(Set<String> permissions) {
+        this.permissions = permissions;
     }
 }

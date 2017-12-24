@@ -39,7 +39,7 @@
         WHERE role_name = #{oldRoleName}
     </update>
 
-    <select id="selectUserRolesByUserName">
+    <select id="selectUserRolesByUserName" resultType="string">
         SELECT role_name
         FROM role
             JOIN user_role

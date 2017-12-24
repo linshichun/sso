@@ -92,7 +92,6 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-
     /**
      * 列出所有的用户
      * @param pageNum 页码

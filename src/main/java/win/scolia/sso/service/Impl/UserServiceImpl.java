@@ -101,8 +101,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByUserName(String userName) {
-        User user = this.getUserSimply(userName);
-        cacheUtils.cacheUser(user);
+        User user = cacheUtils.getUser(userName);
+        if (user == null) {
+            user = userMapper.selectUserByUserName(userName);
+            cacheUtils.cacheUser(user);
+        }
         return user;
     }
 

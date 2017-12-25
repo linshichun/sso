@@ -6,12 +6,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import win.scolia.sso.bean.entity.Permission;
 import win.scolia.sso.bean.entity.Role;
+import win.scolia.sso.bean.entity.RolePermission;
 import win.scolia.sso.dao.PermissionMapper;
 import win.scolia.sso.service.PermissionService;
 import win.scolia.sso.service.RoleService;
 import win.scolia.sso.util.CacheUtils;
 import win.scolia.sso.util.PageUtils;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -32,7 +34,8 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public void createPermission(String permission) {
-        permissionMapper.insertPermission(permission);
+        Permission p = new Permission(permission, new Date(), new Date());
+        permissionMapper.insertPermission(p);
     }
 
     @Override
@@ -45,7 +48,8 @@ public class PermissionServiceImpl implements PermissionService {
         if (p == null) {
             throw new IllegalArgumentException("Permission not exist");
         }
-        permissionMapper.insertRolePermission(role.getRoleId(), p.getPermissionId());
+        RolePermission rolePermission = new RolePermission(role.getRoleId(), p.getPermissionId(), new Date(), new Date());
+        permissionMapper.insertRolePermission(rolePermission);
         cacheUtils.clearRolePermissions(roleName);
     }
 
@@ -79,7 +83,10 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public void changePermission(String oldPermission, String newPermission) {
-        permissionMapper.updatePermission(oldPermission, newPermission);
+        Permission permission = new Permission();
+        permission.setPermission(newPermission);
+        permission.setLastModified(new Date());
+        permissionMapper.updatePermission(oldPermission, permission);
         cacheUtils.clearPermission(oldPermission);
         cacheUtils.clearAllRolePermissions();
     }

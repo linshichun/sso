@@ -12,6 +12,15 @@ public class Permission {
 
     private Date lastModified;
 
+    public Permission() {
+    }
+
+    public Permission(String permission, Date createTime, Date lastModified) {
+        this.permission = permission;
+        this.createTime = createTime;
+        this.lastModified = lastModified;
+    }
+
     public Long getPermissionId() {
         return permissionId;
     }

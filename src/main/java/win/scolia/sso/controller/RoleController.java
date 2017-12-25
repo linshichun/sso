@@ -85,6 +85,9 @@ public class RoleController {
     @RequiresPermissions("system:role:get")
     public ResponseEntity<Role> getRole(@PathVariable("roleName") String roleName) {
         Role role = roleService.getRoleByRoleName(roleName);
+        if (role == null) {
+            return ResponseEntity.notFound().build();
+        }
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("{} get role info: {}", ShiroUtils.getCurrentUserName(), roleName);
         }
@@ -102,7 +105,7 @@ public class RoleController {
     public ResponseEntity<PageInfo> listRoles(@RequestParam Integer pageNum) {
         PageInfo pageInfo = roleService.listRoles(pageNum);
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("{} list roles in page: {}", roleService.listRoles(pageNum), pageNum);
+            LOGGER.info("{} list roles in page: {}", ShiroUtils.getCurrentUserName(), pageNum);
         }
         return ResponseEntity.ok(pageInfo);
     }

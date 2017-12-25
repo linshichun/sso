@@ -84,11 +84,12 @@ public class PermissionController {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("{} get permission: {}", ShiroUtils.getCurrentUserName(), permission);
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(p);
     }
 
     /**
      * 获取权限列表
+     *
      * @param pageNum 页面
      * @return 200 成功
      */

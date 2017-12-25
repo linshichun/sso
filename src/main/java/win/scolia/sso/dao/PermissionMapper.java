@@ -3,6 +3,7 @@ package win.scolia.sso.dao;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import win.scolia.sso.bean.entity.Permission;
+import win.scolia.sso.bean.entity.RolePermission;
 
 import java.util.List;
 import java.util.Set;
@@ -12,16 +13,15 @@ public interface PermissionMapper {
 
     /**
      * 新增一条权限
-     * @param permission 权限
+     * @param permission 权限对象
      */
-    void insertPermission(@Param("permission") String permission);
+    void insertPermission(Permission permission);
 
     /**
      * 为角色添加权限
-     * @param roleId 角色id
-     * @param permissionId 权限id
+     * @param rolePermission 角色权限映射对象
      */
-    void insertRolePermission(@Param("roleId") Long roleId, @Param("permissionId") Long permissionId);
+    void insertRolePermission(RolePermission rolePermission);
 
     /**
      * 根据权限名称来删除权限
@@ -52,10 +52,9 @@ public interface PermissionMapper {
     /**
      * 更新权限名
      * @param oldPermission 旧的权限名
-     * @param newPermission 新的权限名
+     * @param permission 新的权限对象
      */
-    void updatePermission(@Param("oldPermission") String oldPermission,
-                          @Param("newPermission") String newPermission);
+    void updatePermission(@Param("oldPermission") String oldPermission, @Param("permission") Permission permission);
 
     /**
      * 根据角色名获取角色的权限

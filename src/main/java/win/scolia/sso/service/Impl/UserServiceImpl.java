@@ -87,6 +87,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean changePasswordByOldPassword(String userName, String oldPassword, String newPassword) {
         User user = this.getUserByUserName(userName);
+        if (user == null) {
+            throw new IllegalArgumentException("User not exist"); // 用户不存在
+        }
         String tempPassword = encryptUtils.getEncryptedPassword(oldPassword, user.getSalt());
         if (StringUtils.equals(tempPassword, user.getPassword())) {
             String password = encryptUtils.getEncryptedPassword(newPassword, user.getSalt());
@@ -97,6 +100,19 @@ public class UserServiceImpl implements UserService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void changePasswordDirectly(String userName, String newPassword) {
+        User user = this.getUserByUserName(userName);
+        if (user == null) {
+            throw new IllegalArgumentException("User not exist"); // 用户不存在
+        }
+        String password = encryptUtils.getEncryptedPassword(newPassword, user.getSalt());
+        user.setPassword(password);
+        user.setLastModified(new Date());
+        userMapper.updatePasswordByUserName(user);
+        cacheUtils.clearUser(userName);
     }
 
     @Override

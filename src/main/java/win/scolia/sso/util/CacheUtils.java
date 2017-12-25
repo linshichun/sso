@@ -91,12 +91,12 @@ public class CacheUtils {
                 if (this.isFlush) {
                     operations.expire(expire, TimeUnit.SECONDS);
                 }
-                if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info("Hit cache: {}", cacheKey);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Hit cache: {}", cacheKey);
                 }
             } else {
-                if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info("Cache miss: {}", cacheKey);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Cache miss: {}", cacheKey);
                 }
             }
             return clazz.cast(target);
@@ -114,8 +114,8 @@ public class CacheUtils {
     private void clearCache(String cacheKey) {
         assert !StringUtils.isEmpty(cacheKey) : "CacheKey can not be empty";
         redisTemplate.delete(cacheKey);
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Clear cache user: {}", cacheKey);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Clear cache user: {}", cacheKey);
         }
     }
 
@@ -130,8 +130,8 @@ public class CacheUtils {
         }
         String cacheKey = this.getCacheKey(USER_PREFIX, user.getUserName());
         if (this.cacheObject(cacheKey, user)) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Cache user: {}", user.getUserName());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Cache user: {}", user.getUserName());
             }
         }
     }
@@ -174,8 +174,8 @@ public class CacheUtils {
         }
         String cacheKey = this.getCacheKey(ROLE_PREFIX, role.getRoleName());
         if (this.cacheObject(cacheKey, role)) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Cache user: {}", role.getRoleName());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Cache user: {}", role.getRoleName());
             }
         }
     }
@@ -219,8 +219,8 @@ public class CacheUtils {
         }
         String cacheKey = this.getCacheKey(USER_ROLE_PREFIX, userName);
         if (this.cacheObject(cacheKey, roles)) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Cache: {}", cacheKey);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Cache: {}", cacheKey);
             }
         }
     }
@@ -259,6 +259,9 @@ public class CacheUtils {
     public void clearAllUserRoles() {
         Set<String> keys = redisTemplate.keys(String.format("%s:%s:*", prefix, USER_ROLE_PREFIX));
         redisTemplate.delete(keys);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Clear all user's roles cache");
+        }
     }
 
     /**
@@ -272,8 +275,8 @@ public class CacheUtils {
         }
         String cacheKey = this.getCacheKey(PERMISSION_PREFIX, permission.getPermission());
         if (this.cacheObject(cacheKey, permission)) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Cache user: {}", permission.getPermission());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Cache user: {}", permission.getPermission());
             }
         }
     }
@@ -317,8 +320,8 @@ public class CacheUtils {
         }
         String cacheKey = this.getCacheKey(ROLE_PERMISSION_PREFIX, roleName);
         if (this.cacheObject(cacheKey, permissions)) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Cache: {}", cacheKey);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Cache: {}", cacheKey);
             }
         }
     }
@@ -357,6 +360,9 @@ public class CacheUtils {
     public void clearAllRolePermissions() {
         Set<String> keys = redisTemplate.keys(String.format("%s:%s:*", prefix, ROLE_PERMISSION_PREFIX));
         redisTemplate.delete(keys);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Clear all role's permissions cache");
+        }
     }
 
 }

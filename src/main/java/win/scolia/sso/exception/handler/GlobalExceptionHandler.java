@@ -1,4 +1,4 @@
-package win.scolia.sso.handler;
+package win.scolia.sso.exception.handler;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;

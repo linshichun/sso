@@ -29,6 +29,13 @@ public interface UserService {
     boolean changePasswordByOldPassword(String userName, String oldPassword, String newPassword);
 
     /**
+     * 直接修改密码, 仅作为后台管理使用
+     * @param userName 用户名
+     * @param newPassword 新密码
+     */
+    void changePasswordDirectly(String userName, String newPassword);
+
+    /**
      * 根据用户名获得用户信息
      * @param userName 要查询的用户名
      * @return 返回查询得到的用户对象, 包含敏感信息

@@ -26,6 +26,7 @@ import win.scolia.sso.service.PermissionService;
 import win.scolia.sso.service.RoleService;
 import win.scolia.sso.service.UserService;
 import win.scolia.sso.util.MessageUtils;
+import win.scolia.sso.util.ShiroUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -84,6 +85,9 @@ public class AccountController {
     @PostMapping("register/check")
     public ResponseEntity<Void> checkRepeatUserName(@RequestParam String userName) {
         if (userService.checkUserNameUsable(userName)) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Check Repeat user: {}", userName);
+            }
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
@@ -128,6 +132,10 @@ public class AccountController {
     @RequiresUser
     public ResponseEntity<Void> logout() {
         Subject subject = SecurityUtils.getSubject();
+        if (LOGGER.isInfoEnabled()) {
+            User user = (User) subject.getPrincipal();
+            LOGGER.info("User logout: {}", user.getUserName());
+        }
         subject.logout();
         return ResponseEntity.ok().build();
     }
@@ -140,8 +148,7 @@ public class AccountController {
     @GetMapping("current")
     @RequiresUser
     public ResponseEntity<UserExportVO> current() {
-        Subject subject = SecurityUtils.getSubject();
-        User user = (User) subject.getPrincipal();
+        User user = ShiroUtils.getCurrentUser();
         UserSafely userSafely = new UserSafely();
         BeanUtils.copyProperties(user, userSafely);
         Set<String> roles = roleService.getUserRolesByUserName(userSafely.getUserName());
@@ -150,6 +157,9 @@ public class AccountController {
             permissions.addAll(permissionService.getPermissionsByRoleName(roleName));
         }
         UserExportVO vo = new UserExportVO(userSafely, roles, permissions);
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("User get current info: {}", user.getUserName());
+        }
         return ResponseEntity.ok(vo);
     }
 
@@ -172,6 +182,9 @@ public class AccountController {
                 userEntryVO.getNewPassword());
         if (success) {
             this.logout();
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Change user password: {}", userEntryVO.getUserName());
+            }
             return ResponseEntity.ok().build();
         } else {
             MessageExportVO vo = new MessageExportVO();

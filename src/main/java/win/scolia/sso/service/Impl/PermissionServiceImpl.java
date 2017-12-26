@@ -70,7 +70,7 @@ public class PermissionServiceImpl implements PermissionService {
     public void removePermission(String permission) {
         Permission p = this.getPermission(permission);
         if (p == null) {
-            return;
+            throw new MissPermissionException(String.format("%s not exist", permission));
         }
         // 删除权限的同时, 也删除其映射表中的相关记录
         permissionMapper.deletePermission(permission);
@@ -95,6 +95,10 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public void changePermission(String oldPermission, String newPermission) {
+        Permission cachePermission = this.getPermission(oldPermission);
+        if (cachePermission == null) {
+            throw new MissPermissionException(String.format("%s not exist", oldPermission));
+        }
         Permission permission = new Permission(newPermission, new Date());
         permissionMapper.updatePermission(oldPermission, permission);
         cacheUtils.clearPermission(oldPermission);

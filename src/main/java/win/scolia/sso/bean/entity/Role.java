@@ -15,14 +15,14 @@ public class Role {
     public Role() {
     }
 
-    public Role(String roleName, Date createTime, Date lastModified) {
+    public Role(String roleName, Date lastModified) {
         this.roleName = roleName;
-        this.createTime = createTime;
         this.lastModified = lastModified;
     }
 
-    public Role(String roleName, Date lastModified) {
+    public Role(String roleName, Date createTime, Date lastModified) {
         this.roleName = roleName;
+        this.createTime = createTime;
         this.lastModified = lastModified;
     }
 

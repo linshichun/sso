@@ -11,6 +11,8 @@ import win.scolia.sso.bean.entity.UserSafely;
 import win.scolia.sso.dao.PermissionMapper;
 import win.scolia.sso.dao.RoleMapper;
 import win.scolia.sso.exception.DuplicateRoleException;
+import win.scolia.sso.exception.MissRoleException;
+import win.scolia.sso.exception.MissUserException;
 import win.scolia.sso.service.RoleService;
 import win.scolia.sso.service.UserService;
 import win.scolia.sso.util.CacheUtils;
@@ -57,11 +59,11 @@ public class RoleServiceImpl implements RoleService {
     public void addRoleToUser(String userName, String roleName) {
         UserSafely user = userService.getUserSafelyByUserName(userName);
         if (user == null) {
-            throw new IllegalArgumentException("User not exist");
+            throw new MissUserException(String.format("%s not exist", userName));
         }
         Role role = this.getRoleByRoleName(roleName);
         if (role == null) {
-            throw new IllegalArgumentException("Role not exist");
+            throw new MissRoleException(String.format("%s not exist", roleName));
         }
         UserRole userRole = new UserRole(user.getUserId(), role.getRoleId(), new Date(), new Date());
         roleMapper.insertUserRoleMap(userRole);
@@ -87,11 +89,11 @@ public class RoleServiceImpl implements RoleService {
     public void romeUserRole(String userName, String roleName) {
         UserSafely user = userService.getUserSafelyByUserName(userName);
         if (user == null) {
-            throw new IllegalArgumentException("User not exist");
+            throw new MissUserException(String.format("%s not exist", userName));
         }
         Role role = this.getRoleByRoleName(roleName);
         if (role == null) {
-            throw new IllegalArgumentException("Role not exist");
+            throw new MissRoleException(String.format("%s not exist", roleName));
         }
         roleMapper.deleteUserRoleMapByUserIdAndRoleId(user.getUserId(), role.getRoleId()); // 删除 用户-角色 的映射
         cacheUtils.clearUserRoles(userName); // 清除对应的 用户-角色 缓存
@@ -132,6 +134,4 @@ public class RoleServiceImpl implements RoleService {
         List<Role> roles = roleMapper.selectAllRoles();
         return pageUtils.getPageInfo(roles);
     }
-
-
 }

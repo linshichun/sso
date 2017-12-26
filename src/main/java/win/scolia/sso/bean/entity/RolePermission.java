@@ -18,20 +18,10 @@ public class RolePermission {
     public RolePermission() {
     }
 
-    public RolePermission(Long roleId, Long permissionId) {
-        this(roleId, permissionId, new Date(), new Date());
-    }
-
     public RolePermission(Long roleId, Long permissionId, Date createTime, Date lastModified) {
         this.roleId = roleId;
         this.permissionId = permissionId;
         this.createTime = createTime;
-        this.lastModified = lastModified;
-    }
-
-    public RolePermission(Long roleId, Long permissionId, Date lastModified) {
-        this.roleId = roleId;
-        this.permissionId = permissionId;
         this.lastModified = lastModified;
     }
 

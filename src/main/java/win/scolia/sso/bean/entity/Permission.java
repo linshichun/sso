@@ -15,10 +15,6 @@ public class Permission {
     public Permission() {
     }
 
-    public Permission(String permission) {
-        this(permission, new Date(), new Date());
-    }
-
     public Permission(String permission, Date lastModified) {
         this.permission = permission;
         this.lastModified = lastModified;

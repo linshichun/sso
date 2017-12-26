@@ -13,6 +13,7 @@ import win.scolia.sso.bean.vo.entry.UserEntryVO;
 import win.scolia.sso.dao.RoleMapper;
 import win.scolia.sso.dao.UserMapper;
 import win.scolia.sso.exception.DuplicateUserException;
+import win.scolia.sso.exception.MissUserException;
 import win.scolia.sso.service.UserService;
 import win.scolia.sso.util.CacheUtils;
 import win.scolia.sso.util.EncryptUtils;
@@ -77,7 +78,7 @@ public class UserServiceImpl implements UserService {
     public void removeUserByUserName(String userName) {
         User user = this.getUserSimply(userName);
         if (user == null) {
-            throw new IllegalArgumentException("User not exist"); // 用户不存在
+            throw new MissUserException(String.format("%s not exist", userName)); // 用户不存在
         }
         userMapper.deleteUserByUserName(userName); // 删除角色表中的记录
         roleMapper.deleteUserRoleMapByUserId(user.getUserId()); // 删除 用户-角色 表中的映射
@@ -88,7 +89,7 @@ public class UserServiceImpl implements UserService {
     public boolean changePasswordByOldPassword(String userName, String oldPassword, String newPassword) {
         User user = this.getUserByUserName(userName);
         if (user == null) {
-            throw new IllegalArgumentException("User not exist"); // 用户不存在
+            throw new MissUserException(String.format("%s not exist", userName)); // 用户不存在
         }
         String tempPassword = encryptUtils.getEncryptedPassword(oldPassword, user.getSalt());
         if (StringUtils.equals(tempPassword, user.getPassword())) {
@@ -106,7 +107,7 @@ public class UserServiceImpl implements UserService {
     public void changePasswordDirectly(String userName, String newPassword) {
         User user = this.getUserByUserName(userName);
         if (user == null) {
-            throw new IllegalArgumentException("User not exist"); // 用户不存在
+            throw new MissUserException(String.format("%s not exist", userName)); // 用户不存在
         }
         String password = encryptUtils.getEncryptedPassword(newPassword, user.getSalt());
         user.setPassword(password);

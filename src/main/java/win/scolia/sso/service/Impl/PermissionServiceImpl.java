@@ -42,7 +42,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (cachePermission != null) {
             throw new DuplicatePermissionException(String.format("%s already exist", permission));
         }
-        Permission p = new Permission(permission);
+        Permission p = new Permission(permission, new Date(), new Date());
         try {
             permissionMapper.insertPermission(p);
         } catch (DuplicateKeyException e) {
@@ -60,7 +60,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (p == null) {
             throw new MissPermissionException(String.format("%s not exist", permission));
         }
-        RolePermission rolePermission = new RolePermission(role.getRoleId(), p.getPermissionId());
+        RolePermission rolePermission = new RolePermission(role.getRoleId(), p.getPermissionId(), new Date(), new Date());
         permissionMapper.insertRolePermission(rolePermission);
         cacheUtils.clearRolePermissions(roleName);
     }

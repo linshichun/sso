@@ -1,6 +1,7 @@
 package win.scolia.sso.controller;
 
 import com.github.pagehelper.PageInfo;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import win.scolia.sso.util.ShiroUtils;
 
 @Controller
 @RequestMapping(value = "account/permissions")
+@RequiresAuthentication
 public class PermissionController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PermissionController.class);

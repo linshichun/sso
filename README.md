@@ -4,7 +4,7 @@
 
 ## 简介
 
-由于spring session天然支持session跨服务器共享, 使得各子系统中共享同一登录状态的需求变得无比简单.
+由于spring session天然支持session跨服务器共享, 使得在各子系统中共享同一登录状态的需求变得无比简单.
 
 只需要所有子系统都集成spring session, 连接同一个redis集群. 就能实现session共享.
 
@@ -73,6 +73,102 @@
 
 - - -
 
+#### 用户管理
+
+##### 添加用户
+    POST account/users
+    form-data:
+        userName: scolia(用户名)
+        password: 123456(密码)
+    返回:
+        201 成功
+        400 参数错误, 会伴有详细的错误信息.
+        401 未登录
+        403 权限不足
+        409 该用户已存在
+    需求权限:
+        system:user:add
+
+##### 删除用户
+    DELETE account/users/{userName}
+    PathVariable:
+        userName: scolia(要删除的用户名)
+    返回:
+        200 成功
+        401 未登录
+        403 权限不足
+        404 要删除的用户不存在
+    需求权限:
+            system:user:delete
+
+##### 修改某用户的密码
+    PUT account/users/{userName}/password
+    PathVariable:
+        userName: scolia(要修改密码的用户名)
+    form-data:
+        password: 123456(新密码)
+    返回:
+        200 成功
+        401 未登录
+        403 权限不足
+        404 要修改的用户不存在
+    需求权限:
+        system:user:update
+
+##### 获取某个用户的详细信息
+    GET account/users/{userName}
+    PathVariable:
+            userName: scolia(要获取的用户名)
+    返回:
+        200 成功, 并附带详细信息
+        401 未登录
+        403 权限不足
+        404 用户不存在
+    需求权限:
+        system:user:get
+
+##### 列出所有的用户
+    GET account/users/list?pageNum={pageNum}
+    QueryParameters:
+        pageNum:1(页码)
+    返回:
+        200 成功, 附带详细信息
+        401 未登录
+        403 权限不足
+    需求权限:
+        system:user:list
+
+##### 为用户添加角色
+    POST account/users/{userName}/roles
+    PathVariable:
+         userName: scolia(要添加的用户名)
+    form-data:
+         roleName: admin(要添加的角色)
+    返回:
+        200 成功
+        400 角色不存在
+        401 未登录
+        403 权限不足
+        404 用户不存在
+    需求权限:
+        system:user:edit
+
+##### 为用户删除角色
+    DELETE account/users/{userName}/roles/{roleName}
+    PathVariable:
+        userName: scolia(要操作的用户名)
+        roleName: admin(要删除的角色名)
+    返回:
+        200 成功
+        400 角色不存在
+        401 未登录
+        403 权限不足
+        404 用户不存在
+    需求权限:
+            system:user:edit
+
+- - -
+
 #### 权限管理
 
 ##### 添加权限
@@ -87,6 +183,7 @@
     
 #####  删除权限
     DELETE account/permissions/{permission}
+        permission: 要删除的权限
     返回:
         200 成功
         404 要删除的权限存在

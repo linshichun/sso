@@ -2,6 +2,7 @@ package win.scolia.sso.controller;
 
 
 import com.github.pagehelper.PageInfo;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,8 @@ import win.scolia.sso.bean.vo.entry.UserEntryVO;
 import win.scolia.sso.bean.vo.export.MessageExportVO;
 import win.scolia.sso.bean.vo.export.UserExportVO;
 import win.scolia.sso.exception.DuplicateUserException;
+import win.scolia.sso.exception.MissRoleException;
+import win.scolia.sso.exception.MissUserException;
 import win.scolia.sso.service.PermissionService;
 import win.scolia.sso.service.RoleService;
 import win.scolia.sso.service.UserService;
@@ -31,6 +34,7 @@ import java.util.Set;
  */
 @Controller
 @RequestMapping(value = "account/users")
+@RequiresAuthentication
 public class UserController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
@@ -49,7 +53,7 @@ public class UserController {
      *
      * @param userEntryVO   用户信息
      * @param bindingResult 验证信息
-     * @return 201 成功, 400 参数错误
+     * @return 201 成功, 400 参数错误 409 该用户已存在
      */
     @PostMapping
     @RequiresPermissions("system:user:add")
@@ -68,7 +72,7 @@ public class UserController {
         } catch (DuplicateUserException e) {
             MessageExportVO vo = new MessageExportVO();
             MessageUtils.putMessage(vo, "error", "该用户已被占用");
-            return ResponseEntity.badRequest().body(vo);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(vo);
         }
     }
 
@@ -76,16 +80,23 @@ public class UserController {
      * 删除某个用户
      *
      * @param userName 用户名
-     * @return 200 成功, 403 权限不足, 500 服务器错误
+     * @return 200 成功, 403 权限不足, 404 要删除的用户不存在
      */
     @DeleteMapping("{userName}")
     @RequiresPermissions("system:user:delete")
     public ResponseEntity<Void> deleteUser(@PathVariable("userName") String userName) {
-        userService.removeUserByUserName(userName);
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("{} delete user: {}", ShiroUtils.getCurrentUserName(), userName);
+        try {
+            userService.removeUserByUserName(userName);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("{} delete user: {}", ShiroUtils.getCurrentUserName(), userName);
+            }
+            return ResponseEntity.ok().build();
+        } catch (MissUserException e) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("{} delete miss user: {}", ShiroUtils.getCurrentUserName(), userName);
+            }
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok().build();
     }
 
     /**
@@ -93,10 +104,10 @@ public class UserController {
      *
      * @param userName 用户名
      * @param password 密码
-     * @return 200 成功
+     * @return 200 成功, 404 要修改密码的用户不存在
      */
     @PutMapping("{userName}/password")
-    @RequiresPermissions("system:user:edit")
+    @RequiresPermissions("system:user:update")
     public ResponseEntity<Void> changePassword(@PathVariable("userName") String userName, @RequestParam String password) {
         userService.changePasswordDirectly(userName, password);
         if (LOGGER.isInfoEnabled()) {
@@ -151,17 +162,29 @@ public class UserController {
      *
      * @param userName 用户名
      * @param roleName 角色名
-     * @return 200 成功
+     * @return 200 成功 404 用户不存在 400 角色不存在
      */
     @PostMapping("{userName}/roles")
     @RequiresPermissions("system:user:edit")
     public ResponseEntity<Void> addRoleToUser(@PathVariable("userName") String userName,
                                               @RequestParam String roleName) {
-        roleService.addRoleToUser(userName, roleName);
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("{} add user's role: {}:{}", ShiroUtils.getCurrentUserName(), userName, roleName);
+        try {
+            roleService.addRoleToUser(userName, roleName);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("{} add user's role: {}:{}", ShiroUtils.getCurrentUserName(), userName, roleName);
+            }
+            return ResponseEntity.ok().build();
+        } catch (MissUserException e) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("{} add user's role: {}:{}, but miss user", ShiroUtils.getCurrentUserName(), userName, roleName);
+            }
+            return ResponseEntity.notFound().build();
+        } catch (MissRoleException e) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("{} add user's role: {}:{}, but miss role", ShiroUtils.getCurrentUserName(), userName, roleName);
+            }
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok().build();
     }
 
     /**
@@ -169,16 +192,29 @@ public class UserController {
      *
      * @param userName 用户名
      * @param roleName 角色名
-     * @return 200 成功
+     * @return 200 成功 400 角色不存在 404 用户不存在
      */
     @DeleteMapping("{userName}/roles/{roleName}")
     @RequiresPermissions("system:user:edit")
     public ResponseEntity<Void> deleteUserRole(@PathVariable("userName") String userName,
                                                @PathVariable("roleName") String roleName) {
-        roleService.romeUserRole(userName, roleName);
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("{} delete user's role: {}:{}", ShiroUtils.getCurrentUserName(), userName, roleName);
+        try {
+            roleService.romeUserRole(userName, roleName);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("{} delete user's role: {}:{}", ShiroUtils.getCurrentUserName(), userName, roleName);
+            }
+            return ResponseEntity.ok().build();
+        } catch (MissUserException e) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("{} delete user's role: {}:{}, but miss user", ShiroUtils.getCurrentUserName(), userName, roleName);
+            }
+            return ResponseEntity.notFound().build();
+        } catch (MissRoleException e) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("{} delete user's role: {}:{}, but miss role", ShiroUtils.getCurrentUserName(), userName, roleName);
+            }
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok().build();
+
     }
 }

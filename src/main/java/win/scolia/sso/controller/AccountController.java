@@ -54,7 +54,7 @@ public class AccountController {
      *
      * @param userEntryVO   用户的信息
      * @param bindingResult 数据校验的结果
-     * @return 201 表示注册成功, 400 参数错误, 500 服务器错误
+     * @return 201 表示注册成功, 400 参数错误
      */
     @PostMapping("register")
     public ResponseEntity<MessageExportVO> register(@Validated(UserEntryVO.Register.class) UserEntryVO userEntryVO,
@@ -99,7 +99,7 @@ public class AccountController {
      *
      * @param userEntryVO   用户信息
      * @param bindingResult 数据校验的结果
-     * @return 200 登录成功, 400 参数错误/登录失败, 500 服务器错误
+     * @return 200 登录成功, 400 参数错误/登录失败
      */
     @PostMapping("login")
     public ResponseEntity<MessageExportVO> login(@Validated(UserEntryVO.LoginByPassword.class) UserEntryVO userEntryVO,
@@ -126,7 +126,7 @@ public class AccountController {
     /**
      * 登出
      *
-     * @return 200 成功, 500 服务器错误
+     * @return 200 成功 401 未登录
      */
     @GetMapping("logout")
     @RequiresUser
@@ -143,7 +143,7 @@ public class AccountController {
     /**
      * 获取当前用户信息
      *
-     * @return 200 成功, 500 服务器错误
+     * @return 200 成功, 401 未登录
      */
     @GetMapping("current")
     @RequiresUser
@@ -168,7 +168,7 @@ public class AccountController {
      *
      * @param userEntryVO   用户信息
      * @param bindingResult 数据校验的结果
-     * @return 200 表示成功, 400 参数错误/旧密码错误 500 服务器错误
+     * @return 200 表示成功, 400 参数错误/旧密码错误 401 未登录
      */
     @PutMapping("current/password")
     @RequiresUser

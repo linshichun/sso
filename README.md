@@ -4,13 +4,16 @@
 
 ## 简介
 
-    由于spring session带来session共享, 使得sso系统的一处登录, 处处使用的功能变得无比简单.
-    只需要配置redis集群, 并将所有需要用到session的子系统都使用spring session来管理.
-    就能实现sso的核心功能.
+由于spring session天然支持session跨服务器共享, 使得各子系统中共享同一登录状态的需求变得无比简单.
+
+只需要所有子系统都集成spring session, 连接同一个redis集群. 就能实现session共享.
+
+如果还需要使用shiro进行权限管理, 只需要实现自定义Realm, 来访问本系统提供的api, 得到角色和权限信息即可.
 
 ## API:
 
 下面是 *RESTFul* 风格的API, 某些特定的接口需要登录后才能访问, 而登录的用户可能还需要特定的权限.
+
 *{PathVariable}* 中括号表示使用路径参数, 请按照实际需求填写内容.
 
 当使用PUT提交表单时, 由于springMVC的限制, 只能采取 *application/x-www-form-urlencoded* 的方式, 还请注意.

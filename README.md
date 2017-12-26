@@ -2,11 +2,18 @@
 
     使用spring boot, spring session, mybatis, redis, mysql等搭建, 采用RESTFul风格.
 
+## 简介
+
+    由于spring session带来session共享, 使得sso系统的一处登录, 处处使用的功能变得无比简单.
+    只需要配置redis集群, 并将所有需要用到session的子系统都使用spring session来管理.
+    就能实现sso的核心功能.
+
 ## API:
 
 下面是 *RESTFul* 风格的API, 某些特定的接口需要登录后才能访问, 而登录的用户可能还需要特定的权限.
-*{PathVariable}* 中括号表示使用路径参数, 请按照实际需求填写内容. 当使用PUT提交表单时,
-由于springMVC的限制, 只能采取 *application/x-www-form-urlencoded* 的方式, 还请注意.
+*{PathVariable}* 中括号表示使用路径参数, 请按照实际需求填写内容.
+
+当使用PUT提交表单时, 由于springMVC的限制, 只能采取 *application/x-www-form-urlencoded* 的方式, 还请注意.
 
 - - -
 

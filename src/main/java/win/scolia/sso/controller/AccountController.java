@@ -54,7 +54,7 @@ public class AccountController {
      *
      * @param userEntryVO   用户的信息
      * @param bindingResult 数据校验的结果
-     * @return 201 表示注册成功, 400 参数错误
+     * @return 201 表示注册成功, 400 参数错误, 409 用户名已被占用
      */
     @PostMapping("register")
     public ResponseEntity<MessageExportVO> register(@Validated(UserEntryVO.Register.class) UserEntryVO userEntryVO,
@@ -73,9 +73,7 @@ public class AccountController {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Register duplicate user: {}", userEntryVO.getUserName());
             }
-            MessageExportVO vo = new MessageExportVO();
-            MessageUtils.putMessage(vo, "error", "该用户已被占用");
-            return ResponseEntity.badRequest().body(vo);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 

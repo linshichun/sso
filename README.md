@@ -105,7 +105,7 @@
     PUT account/users/{userName}/password
     PathVariable:
         userName: scolia(要修改密码的用户名)
-    form-data:
+    x-www-form-urlencoded:
         password: 123456(新密码)
     返回:
         200 成功
@@ -200,7 +200,7 @@
     PUT account/roles/{oldRoleName}
     PathVariable:
         oldRoleName: admin(原先的角色名)
-    form-data:
+    x-www-form-urlencoded:
         newRoleName: manager(新的角色名)
     返回:
         200 成功
@@ -226,7 +226,7 @@
 ##### 列出所有的角色信息
     GET account/roles/list?pageNum={pageNum}
     QueryParameters:
-        pageNum:1(页码)
+        pageNum: 1(页码)
     返回:
         200 成功
         401 未登录
@@ -295,7 +295,7 @@
     PUT account/permissions/{oldPermission}
     PathVariable:
         oldPermission: system:user:add(旧权限)
-    form-data:
+    x-www-form-urlencoded:
         newPermission: system:user:delete(新权限)
     返回:
         200 成功
@@ -321,7 +321,7 @@
 ##### 列出所有权限
     GET account/permissions/list?pageNum={pageNum}
     QueryParameters:
-        pageNum:1(页码)
+        pageNum: 1(页码)
     返回:
         200 成功
         401 未登录

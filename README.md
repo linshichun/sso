@@ -34,7 +34,7 @@
 ##### 检查用户名是否可用
     POST account/register/check
     form-data:
-            userName: scolia(用户名)
+        userName: scolia(用户名)
     返回:
         200 可用
         409 不可用
@@ -118,7 +118,7 @@
 ##### 获取某个用户的详细信息
     GET account/users/{userName}
     PathVariable:
-            userName: scolia(要获取的用户名)
+        userName: scolia(要获取的用户名)
     返回:
         200 成功, 并附带详细信息
         401 未登录
@@ -128,9 +128,9 @@
         system:user:get
 
 ##### 列出所有的用户
-    GET account/users/list?pageNum={pageNum}
-    QueryParameters:
-        pageNum:1(页码)
+    GET account/users/list/{pageNum}
+    PathVariable:
+        pageNum: 1(页码)
     返回:
         200 成功, 附带详细信息
         401 未登录
@@ -141,9 +141,9 @@
 ##### 为用户添加角色
     POST account/users/{userName}/roles
     PathVariable:
-         userName: scolia(要添加的用户名)
+        userName: scolia(要添加的用户名)
     form-data:
-         roleName: admin(要添加的角色)
+        roleName: admin(要添加的角色)
     返回:
         200 成功
         400 角色不存在
@@ -224,8 +224,8 @@
         system:role:get
 
 ##### 列出所有的角色信息
-    GET account/roles/list?pageNum={pageNum}
-    QueryParameters:
+    GET account/roles/list/{pageNum}
+    PathVariable:
         pageNum: 1(页码)
     返回:
         200 成功
@@ -319,8 +319,8 @@
         system:permission:get
 
 ##### 列出所有权限
-    GET account/permissions/list?pageNum={pageNum}
-    QueryParameters:
+    GET account/permissions/list/{pageNum}
+    PathVariable:
         pageNum: 1(页码)
     返回:
         200 成功

@@ -139,9 +139,9 @@ public class RoleController {
      * @param pageNum 页面
      * @return 200 分页对象
      */
-    @GetMapping("list")
+    @GetMapping("list/{pageNum}")
     @RequiresPermissions("system:role:list")
-    public ResponseEntity<PageInfo> listRoles(@RequestParam Integer pageNum) {
+    public ResponseEntity<PageInfo> listRoles(@PathVariable("pageNum") Integer pageNum) {
         PageInfo pageInfo = roleService.listRoles(pageNum);
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("{} list roles in page: {}", ShiroUtils.getCurrentUserName(), pageNum);

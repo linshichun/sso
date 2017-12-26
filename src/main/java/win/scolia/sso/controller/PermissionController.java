@@ -130,9 +130,9 @@ public class PermissionController {
      * @param pageNum 页面
      * @return 200 成功
      */
-    @RequestMapping("list")
+    @RequestMapping("list/{pageNum}")
     @RequiresPermissions("system:permission:list")
-    public ResponseEntity<PageInfo> listPermissions(@RequestParam Integer pageNum) {
+    public ResponseEntity<PageInfo> listPermissions(@PathVariable("pageNum") Integer pageNum) {
         return ResponseEntity.ok(permissionService.listAllPermission(pageNum));
     }
 }

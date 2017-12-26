@@ -165,7 +165,7 @@
         403 权限不足
         404 用户不存在
     需求权限:
-            system:user:edit
+        system:user:edit
 
 - - -
 

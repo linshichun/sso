@@ -70,6 +70,9 @@ public class AccountController {
             }
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (DuplicateUserException e) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Register duplicate user: {}", userEntryVO.getUserName());
+            }
             MessageExportVO vo = new MessageExportVO();
             MessageUtils.putMessage(vo, "error", "该用户已被占用");
             return ResponseEntity.badRequest().body(vo);
@@ -86,10 +89,13 @@ public class AccountController {
     public ResponseEntity<Void> checkRepeatUserName(@RequestParam String userName) {
         if (userService.checkUserNameUsable(userName)) {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Check Repeat user: {}", userName);
+                LOGGER.info("Check Repeat user: {}, can use", userName);
             }
             return ResponseEntity.ok().build();
         } else {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Check Repeat user: {}, can not use", userName);
+            }
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
@@ -117,6 +123,9 @@ public class AccountController {
             }
             return ResponseEntity.ok().build();
         } catch (AuthenticationException e) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Login user fail: {}", userEntryVO.getUserName());
+            }
             MessageExportVO vo = new MessageExportVO();
             MessageUtils.putMessage(vo, "error", "用户名或密码错误");
             return ResponseEntity.badRequest().body(vo);
@@ -187,6 +196,9 @@ public class AccountController {
             }
             return ResponseEntity.ok().build();
         } else {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Change user password fail: {}", userEntryVO.getUserName());
+            }
             MessageExportVO vo = new MessageExportVO();
             MessageUtils.putMessage(vo, "password", "密码错误");
             return ResponseEntity.badRequest().body(vo);

@@ -150,6 +150,7 @@
         401 未登录
         403 权限不足
         404 用户不存在
+        409 角色已添加
     需求权限:
         system:user:edit
 
@@ -169,6 +170,101 @@
 
 - - -
 
+#### 角色管理
+
+##### 添加角色
+    POST account/roles
+    form-data:
+        roleName: admin(角色名)
+    返回:
+        200 成功
+        401 未登录
+        403 权限不足
+        409 角色已存在
+    需求权限:
+        system:role:add
+
+##### 删除一个角色
+    DELETE account/roles/{roleName}
+    PathVariable:
+        roleName: admin(要删除的角色名)
+    返回:
+        200 成功
+        401 未登录
+        403 权限不足
+        404 角色不存在
+    需求权限:
+        system:role:delete
+
+##### 修改角色名
+    PUT account/roles/{oldRoleName}
+    PathVariable:
+        oldRoleName: admin(原先的角色名)
+    form-data:
+        newRoleName: manager(新的角色名)
+    返回:
+        200 成功
+        400 新角色名已存在
+        401 未登录
+        403 权限不足
+        404 旧角色名不存在
+    需求权限:
+        system:role:update
+
+##### 获取角色的详细信息
+    GET account/roles/{roleName}
+    PathVariable:
+        roleName: admin(要获取的角色名)
+    返回:
+        200 成功
+        401 未登录
+        403 权限不足
+        404 角色不存在
+    需求权限:
+        system:role:get
+
+##### 列出所有的角色信息
+    GET account/roles/list?pageNum={pageNum}
+    QueryParameters:
+        pageNum:1(页码)
+    返回:
+        200 成功
+        401 未登录
+        403 权限不足
+    需求权限:
+        system:role:list
+
+##### 为角色添加权限
+    POST account/roles/{roleName}/permissions
+    PathVariable:
+        roleName: admin(要操作的角色名)
+    form-data:
+        permission: system:user:add(要添加的权限)
+    返回:
+        200 成功
+        401 未登录
+        403 权限不足
+        404 角色不存在
+        409 权限已添加
+    需求权限:
+        system:role:edit
+
+##### 为角色删除一个权限
+    DELETE account/roles/{roleName}/permissions/{permission}
+    PathVariable:
+        roleName: admin(要操作的角色名)
+        permission: system:user:add(要删除的权限)
+    返回:
+        200 成功
+        400 权限不存在
+        401 未登录
+        403 权限不足
+        404 角色不存在
+    需求权限:
+        system:role:edit
+
+- - -
+
 #### 权限管理
 
 ##### 添加权限
@@ -177,15 +273,58 @@
         permission: system:user:add(采用shiro的格式)
     返回:
         200 成功
+        401 未登录
+        403 权限不足
         409 权限已存在
     需求权限:
         system:permission:add
     
 #####  删除权限
     DELETE account/permissions/{permission}
+    PathVariable:
         permission: 要删除的权限
     返回:
         200 成功
-        404 要删除的权限存在
+        401 未登录
+        403 权限不足
+        404 要删除的权限不存在
     需求权限:
         system:permission:delete
+
+##### 修改权限
+    PUT account/permissions/{oldPermission}
+    PathVariable:
+        oldPermission: system:user:add(旧权限)
+    form-data:
+        newPermission: system:user:delete(新权限)
+    返回:
+        200 成功
+        401 未登录
+        403 权限不足
+        404 要修改的权限不存在
+        409 新权限已存在
+    需求权限:
+        system:permission:update
+
+##### 获取权限详情
+    GET account/permissions/{permission}
+    PathVariable:
+        permission: 要获取的权限
+    返回:
+        200 成功
+        401 未登录
+        403 权限不足
+        404 该权限不存在
+    需求权限:
+        system:permission:get
+
+##### 列出所有权限
+    GET account/permissions/list?pageNum={pageNum}
+    QueryParameters:
+        pageNum:1(页码)
+    返回:
+        200 成功
+        401 未登录
+        403 权限不足
+    需求权限:
+        system:permission:list

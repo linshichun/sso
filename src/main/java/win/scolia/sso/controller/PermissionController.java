@@ -77,7 +77,7 @@ public class PermissionController {
      *
      * @param oldPermission 旧权限
      * @param newPermission 新权限
-     * @return 200 成功 404 旧权限不存在
+     * @return 200 成功 404 旧权限不存在 409 新权限已存在
      */
     @PutMapping("{oldPermission}")
     @RequiresPermissions("system:permission:update")
@@ -94,6 +94,11 @@ public class PermissionController {
                 LOGGER.info("{} update miss permission: {} to {}", ShiroUtils.getCurrentUserName(), oldPermission, newPermission);
             }
             return ResponseEntity.notFound().build();
+        } catch (DuplicatePermissionException e) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("{} update duplicate miss permission: {} to {}", ShiroUtils.getCurrentUserName(), oldPermission, newPermission);
+            }
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 

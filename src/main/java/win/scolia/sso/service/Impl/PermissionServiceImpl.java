@@ -61,8 +61,13 @@ public class PermissionServiceImpl implements PermissionService {
             throw new MissPermissionException(String.format("%s not exist", permission));
         }
         RolePermission rolePermission = new RolePermission(role.getRoleId(), p.getPermissionId(), new Date(), new Date());
-        permissionMapper.insertRolePermission(rolePermission);
-        cacheUtils.clearRolePermissions(roleName);
+        try {
+            permissionMapper.insertRolePermission(rolePermission);
+            cacheUtils.clearRolePermissions(roleName);
+        } catch (DuplicateKeyException e) {
+            throw new DuplicatePermissionException(e);
+        }
+
     }
 
     @Transactional
@@ -99,8 +104,13 @@ public class PermissionServiceImpl implements PermissionService {
         if (cachePermission == null) {
             throw new MissPermissionException(String.format("%s not exist", oldPermission));
         }
-        Permission permission = new Permission(newPermission, new Date());
-        permissionMapper.updatePermission(oldPermission, permission);
+        Permission np= this.getPermission(newPermission);
+        if (np != null) {
+            throw new DuplicatePermissionException(String.format("%s already exist", newPermission));
+        }
+        cachePermission.setPermission(newPermission);
+        cachePermission.setLastModified(new Date());
+        permissionMapper.updatePermission(oldPermission, cachePermission);
         cacheUtils.clearPermission(oldPermission);
         cacheUtils.clearAllRolePermissions();
     }

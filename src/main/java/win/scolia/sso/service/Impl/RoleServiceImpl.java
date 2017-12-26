@@ -66,8 +66,13 @@ public class RoleServiceImpl implements RoleService {
             throw new MissRoleException(String.format("%s not exist", roleName));
         }
         UserRole userRole = new UserRole(user.getUserId(), role.getRoleId(), new Date(), new Date());
-        roleMapper.insertUserRoleMap(userRole);
-        cacheUtils.clearUserRoles(userName);
+        try {
+            roleMapper.insertUserRoleMap(userRole);
+            cacheUtils.clearUserRoles(userName);
+        } catch (DuplicateKeyException e) {
+            throw new DuplicateRoleException(e);
+        }
+
     }
 
     @Transactional
@@ -75,7 +80,7 @@ public class RoleServiceImpl implements RoleService {
     public void removeRole(String roleName) {
         Role role = this.getRoleByRoleName(roleName);
         if (role == null) {
-            return;
+            throw new MissRoleException(String.format("%s not exist", roleName));
         }
         roleMapper.deleteRoleByName(roleName);
         roleMapper.deleteUserRoleMapByRoleId(role.getRoleId()); // 删除 用户-角色 的映射
@@ -101,7 +106,16 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void changeRoleName(String oldRoleName, String newRoleName) {
-        Role role = new Role(newRoleName, new Date());
+        Role role = this.getRoleByRoleName(oldRoleName);
+        if (role == null) {
+            throw new MissRoleException(String.format("%s not exist", oldRoleName));
+        }
+        Role newRole = this.getRoleByRoleName(newRoleName);
+        if (newRole != null) {
+            throw new DuplicateRoleException(String.format("%s already exist", newRoleName));
+        }
+        role.setRoleName(newRoleName);
+        role.setLastModified(new Date());
         roleMapper.updateRoleByName(oldRoleName, role);
         cacheUtils.clearRole(oldRoleName);
         cacheUtils.clearAllUserRoles(); // 清除所有的 用户-角色 缓存

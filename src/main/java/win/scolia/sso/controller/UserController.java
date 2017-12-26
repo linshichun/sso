@@ -17,6 +17,7 @@ import win.scolia.sso.bean.entity.UserSafely;
 import win.scolia.sso.bean.vo.entry.UserEntryVO;
 import win.scolia.sso.bean.vo.export.MessageExportVO;
 import win.scolia.sso.bean.vo.export.UserExportVO;
+import win.scolia.sso.exception.DuplicateRoleException;
 import win.scolia.sso.exception.DuplicateUserException;
 import win.scolia.sso.exception.MissRoleException;
 import win.scolia.sso.exception.MissUserException;
@@ -70,6 +71,9 @@ public class UserController {
             }
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (DuplicateUserException e) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("{} add duplicate user: {}", ShiroUtils.getCurrentUserName(), userEntryVO.getUserName());
+            }
             MessageExportVO vo = new MessageExportVO();
             MessageUtils.putMessage(vo, "error", "该用户已被占用");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(vo);
@@ -109,11 +113,18 @@ public class UserController {
     @PutMapping("{userName}/password")
     @RequiresPermissions("system:user:update")
     public ResponseEntity<Void> changePassword(@PathVariable("userName") String userName, @RequestParam String password) {
-        userService.changePasswordDirectly(userName, password);
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("{} change user password: {}", ShiroUtils.getCurrentUserName(), userName);
+        try {
+            userService.changePasswordDirectly(userName, password);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("{} change user password: {}", ShiroUtils.getCurrentUserName(), userName);
+            }
+            return ResponseEntity.ok().build();
+        } catch (MissUserException e) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("{} change miss user password: {}", ShiroUtils.getCurrentUserName(), userName);
+            }
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok().build();
     }
 
     /**
@@ -127,6 +138,9 @@ public class UserController {
     public ResponseEntity<UserExportVO> getUser(@PathVariable("userName") String userName) {
         UserSafely userSafely = userService.getUserSafelyByUserName(userName);
         if (userSafely == null) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("{} get miss user info: {}", ShiroUtils.getCurrentUserName(), userName);
+            }
             return ResponseEntity.notFound().build();
         }
         Set<String> roles = roleService.getUserRolesByUserName(userSafely.getUserName());
@@ -162,7 +176,7 @@ public class UserController {
      *
      * @param userName 用户名
      * @param roleName 角色名
-     * @return 200 成功 404 用户不存在 400 角色不存在
+     * @return 200 成功 404 用户不存在 400 角色不存在 409 角色已添加
      */
     @PostMapping("{userName}/roles")
     @RequiresPermissions("system:user:edit")
@@ -184,6 +198,11 @@ public class UserController {
                 LOGGER.info("{} add user's role: {}:{}, but miss role", ShiroUtils.getCurrentUserName(), userName, roleName);
             }
             return ResponseEntity.badRequest().build();
+        } catch (DuplicateRoleException e) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("{} add duplicate user's role: {}:{}", ShiroUtils.getCurrentUserName(), userName, roleName);
+            }
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 
@@ -215,6 +234,5 @@ public class UserController {
             }
             return ResponseEntity.badRequest().build();
         }
-
     }
 }

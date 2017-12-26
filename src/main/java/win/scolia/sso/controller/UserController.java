@@ -74,9 +74,7 @@ public class UserController {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("{} add duplicate user: {}", ShiroUtils.getCurrentUserName(), userEntryVO.getUserName());
             }
-            MessageExportVO vo = new MessageExportVO();
-            MessageUtils.putMessage(vo, "error", "该用户已被占用");
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(vo);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 

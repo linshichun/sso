@@ -125,7 +125,7 @@ public class AccountController {
                 LOGGER.info("Login user fail: {}", userEntryVO.getUserName());
             }
             MessageExportVO vo = new MessageExportVO();
-            MessageUtils.putMessage(vo, "error", "用户名或密码错误");
+            MessageUtils.putMessage(vo, "authentication", "用户名或密码错误");
             return ResponseEntity.badRequest().body(vo);
         }
     }
@@ -198,7 +198,7 @@ public class AccountController {
                 LOGGER.info("Change user password fail: {}", userEntryVO.getUserName());
             }
             MessageExportVO vo = new MessageExportVO();
-            MessageUtils.putMessage(vo, "password", "密码错误");
+            MessageUtils.putMessage(vo, "authentication", "密码错误");
             return ResponseEntity.badRequest().body(vo);
         }
     }

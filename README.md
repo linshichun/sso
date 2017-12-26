@@ -47,13 +47,12 @@
         rememberMe: true/false(记住我)
     返回:
         200 成功, 并设置SESSION和remeberMe的相关cookie
-        400 参数错误
-        401 登录失败
+        400 参数错误(message对象中有error的key)/登录失败(message对象中有authentication的key)
         
 ##### 登出
     GET account/logout
     返回:
-        200 成功
+        200 成功, 且会清除相应的cookie
         401 未登录
         
 ##### 获取当前登录用户的信息
@@ -69,7 +68,7 @@
         newPassword: 654321(要修改成什么密码)
     返回:
         200 成功
-        400 参数错误/登录失败
+        400 参数错误(message对象中有error的key)/密码错误(message对象中有authentication的key)
         401 未登录
 
 - - -

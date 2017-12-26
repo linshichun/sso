@@ -2,6 +2,7 @@ package win.scolia.sso.service.Impl;
 
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import win.scolia.sso.bean.entity.Role;
@@ -9,6 +10,7 @@ import win.scolia.sso.bean.entity.UserRole;
 import win.scolia.sso.bean.entity.UserSafely;
 import win.scolia.sso.dao.PermissionMapper;
 import win.scolia.sso.dao.RoleMapper;
+import win.scolia.sso.exception.DuplicateRoleException;
 import win.scolia.sso.service.RoleService;
 import win.scolia.sso.service.UserService;
 import win.scolia.sso.util.CacheUtils;
@@ -41,10 +43,14 @@ public class RoleServiceImpl implements RoleService {
     public void createRole(String roleName) {
         Role cacheRole = this.getRoleByRoleName(roleName);
         if (cacheRole != null) {
-            throw new IllegalArgumentException("Role already exist");
+            throw new DuplicateRoleException(String.format("%s already exist", roleName));
         }
         Role role = new Role(roleName, new Date(), new Date());
-        roleMapper.insertRole(role);
+        try {
+            roleMapper.insertRole(role);
+        } catch (DuplicateKeyException e) {
+            throw new DuplicateRoleException(String.format("%s already exist", roleName), e);
+        }
     }
 
     @Override

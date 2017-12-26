@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
     public void createUser(UserEntryVO userEntryVO) {
         User cacheUser = this.getUserSimply(userEntryVO.getUserName());
         if (cacheUser != null) {
-            throw new DuplicateUserException("User already exist");
+            throw new DuplicateUserException(String.format("%s already exist", userEntryVO.getUserName()));
         }
         User user = new User();
         BeanUtils.copyProperties(userEntryVO, user);
@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
         try {
             userMapper.insertUser(user);
         } catch (DuplicateKeyException e) {
-            throw new DuplicateUserException("User already exist", e);
+            throw new DuplicateUserException(String.format("%s already exist", userEntryVO.getUserName()), e);
         }
     }
 

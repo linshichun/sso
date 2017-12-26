@@ -28,11 +28,10 @@
         <pageHepler.version>1.2.3</pageHepler.version>
         <mysql.connector.version>5.1.45</mysql.connector.version>
         <druid.version>1.1.6</druid.version>
+        <shiro.version>1.4.0</shiro.version>
+        <jackson.version>2.9.2</jackson.version>
         <common.codec.version>1.11</common.codec.version>
         <commons.lang3.version>3.7</commons.lang3.version>
-        <jackson.version>2.9.2</jackson.version>
-        <validator.version>6.0.5.Final</validator.version>
-        <shiro.version>1.4.0</shiro.version>
     </properties>
 
     <dependencies>

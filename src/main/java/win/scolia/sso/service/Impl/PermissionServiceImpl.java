@@ -2,12 +2,16 @@ package win.scolia.sso.service.Impl;
 
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import win.scolia.sso.bean.entity.Permission;
 import win.scolia.sso.bean.entity.Role;
 import win.scolia.sso.bean.entity.RolePermission;
 import win.scolia.sso.dao.PermissionMapper;
+import win.scolia.sso.exception.DuplicatePermissionException;
+import win.scolia.sso.exception.MissPermissionException;
+import win.scolia.sso.exception.MissRoleException;
 import win.scolia.sso.service.PermissionService;
 import win.scolia.sso.service.RoleService;
 import win.scolia.sso.util.CacheUtils;
@@ -34,21 +38,29 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public void createPermission(String permission) {
-        Permission p = new Permission(permission, new Date(), new Date());
-        permissionMapper.insertPermission(p);
+        Permission cachePermission = this.getPermission(permission);
+        if (cachePermission != null) {
+            throw new DuplicatePermissionException(String.format("%s already exist", permission));
+        }
+        Permission p = new Permission(permission);
+        try {
+            permissionMapper.insertPermission(p);
+        } catch (DuplicateKeyException e) {
+            throw new DuplicatePermissionException(String.format("%s already exist", permission), e);
+        }
     }
 
     @Override
     public void addPermissionToRole(String roleName, String permission) {
         Role role = roleService.getRoleByRoleName(roleName);
         if (role == null) {
-            throw new IllegalArgumentException("Role not exist");
+            throw new MissRoleException(String.format("%s not exist", roleName));
         }
         Permission p = this.getPermission(permission);
         if (p == null) {
-            throw new IllegalArgumentException("Permission not exist");
+            throw new MissPermissionException(String.format("%s not exist", permission));
         }
-        RolePermission rolePermission = new RolePermission(role.getRoleId(), p.getPermissionId(), new Date(), new Date());
+        RolePermission rolePermission = new RolePermission(role.getRoleId(), p.getPermissionId());
         permissionMapper.insertRolePermission(rolePermission);
         cacheUtils.clearRolePermissions(roleName);
     }
@@ -71,11 +83,11 @@ public class PermissionServiceImpl implements PermissionService {
     public void removeRolePermission(String roleName, String permission) {
         Role role = roleService.getRoleByRoleName(roleName);
         if (role == null) {
-            throw new IllegalArgumentException("Role not exist");
+            throw new MissRoleException(String.format("%s not exist", roleName));
         }
         Permission p = this.getPermission(permission);
         if (p == null) {
-            throw new IllegalArgumentException("Permission not exist");
+            throw new MissPermissionException(String.format("%s not exist", permission));
         }
         permissionMapper.deleteRolePermissionMapByRoleIdAndPermissionId(role.getRoleId(), p.getPermissionId());
         cacheUtils.clearRolePermissions(roleName);
@@ -83,9 +95,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public void changePermission(String oldPermission, String newPermission) {
-        Permission permission = new Permission();
-        permission.setPermission(newPermission);
-        permission.setLastModified(new Date());
+        Permission permission = new Permission(newPermission, new Date());
         permissionMapper.updatePermission(oldPermission, permission);
         cacheUtils.clearPermission(oldPermission);
         cacheUtils.clearAllRolePermissions();

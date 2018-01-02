@@ -13,7 +13,7 @@ import java.util.UUID;
 @Component
 public class EncryptUtils {
 
-    @Value("${sso.encrypt.salt}")
+    @Value("${scolia.sso.encrypt.salt}")
     private String systemSalt;
 
     /**

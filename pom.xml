@@ -59,6 +59,12 @@
             <artifactId>spring-boot-starter-jdbc</artifactId>
             <version>${spring.boot.starter.version}</version>
         </dependency>
+        <!-- spring autoconfigure -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
         <!-- 数据校验 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

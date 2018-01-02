@@ -1,0 +1,136 @@
+package win.scolia.sso.autoconfigure;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@ConfigurationProperties(
+    prefix = "scolia.sso"
+)
+public class SSOProperties {
+    private Encrypt encrypt;
+    private Cache cache;
+    private Cookie cookie;
+    private Page page;
+
+    public Encrypt getEncrypt() {
+        return encrypt;
+    }
+
+    public void setEncrypt(Encrypt encrypt) {
+        this.encrypt = encrypt;
+    }
+
+    public Cache getCache() {
+        return cache;
+    }
+
+    public void setCache(Cache cache) {
+        this.cache = cache;
+    }
+
+    public Cookie getCookie() {
+        return cookie;
+    }
+
+    public void setCookie(Cookie cookie) {
+        this.cookie = cookie;
+    }
+
+    public Page getPage() {
+        return page;
+    }
+
+    public void setPage(Page page) {
+        this.page = page;
+    }
+
+    /**
+     * 加密配置
+     */
+    public static class Encrypt {
+        private String salt;
+
+        private Encrypt() {
+        }
+
+        public String getSalt() {
+            return salt;
+        }
+
+        public void setSalt(String salt) {
+            this.salt = salt;
+        }
+    }
+
+    /**
+     * 缓存配置
+     */
+    public static class Cache{
+        private String prefix = "SSO";
+        private int expire = 2592000;
+        private boolean flushExpire = true;
+
+        private Cache() {
+        }
+
+        public String getPrefix() {
+            return prefix;
+        }
+
+        public void setPrefix(String prefix) {
+            this.prefix = prefix;
+        }
+
+        public int getExpire() {
+            return expire;
+        }
+
+        public void setExpire(int expire) {
+            this.expire = expire;
+        }
+
+        public boolean isFlushExpire() {
+            return flushExpire;
+        }
+
+        public void setFlushExpire(boolean flushExpire) {
+            this.flushExpire = flushExpire;
+        }
+    }
+
+    /**
+     * cookie配置
+     */
+    public static class Cookie {
+        private int maxAge = 1209600;
+
+        private Cookie() {
+        }
+
+        public int getMaxAge() {
+            return maxAge;
+        }
+
+        public void setMaxAge(int maxAge) {
+            this.maxAge = maxAge;
+        }
+    }
+
+    /**
+     * 分页配置
+     */
+    public static class Page {
+        private int size = 10;
+
+        public Page() {
+        }
+
+        public int getSize() {
+            return size;
+        }
+
+        public void setSize(int size) {
+            this.size = size;
+        }
+    }
+}
+

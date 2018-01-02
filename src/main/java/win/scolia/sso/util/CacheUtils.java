@@ -18,13 +18,13 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class CacheUtils {
 
-    @Value("${sso.cache.prefix:SSO}")
+    @Value("${scolia.sso.cache.prefix}")
     private String prefix;
 
-    @Value("${sso.cache.expire:2592000}")
+    @Value("${scolia.sso.cache.expire}")
     private long expire;
 
-    @Value("${sso.cache.flushExpireWhenHit:true}")
+    @Value("${scolia.sso.cache.flush-expire}")
     private boolean isFlush;
 
     private static final String USER_PREFIX = "USER";

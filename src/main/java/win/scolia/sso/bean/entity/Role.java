@@ -1,29 +1,28 @@
 package win.scolia.sso.bean.entity;
 
-import java.util.Date;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-public class Role {
+public class Role extends BaseEntity {
+    private static final long serialVersionUID = 4222035554140798055L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roleId;
 
     private String roleName;
 
-    private Date createTime;
-
-    private Date lastModified;
-
     public Role() {
     }
 
-    public Role(String roleName, Date lastModified) {
+    public Role(String roleName) {
         this.roleName = roleName;
-        this.lastModified = lastModified;
     }
 
-    public Role(String roleName, Date createTime, Date lastModified) {
+    public Role(Long roleId, String roleName) {
+        this.roleId = roleId;
         this.roleName = roleName;
-        this.createTime = createTime;
-        this.lastModified = lastModified;
     }
 
     public Long getRoleId() {
@@ -42,30 +41,11 @@ public class Role {
         this.roleName = roleName;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(Date lastModified) {
-        this.lastModified = lastModified;
-    }
-
-
     @Override
     public String toString() {
         return "Role{" +
                 "roleId=" + roleId +
                 ", roleName='" + roleName + '\'' +
-                ", createTime=" + createTime +
-                ", lastModified=" + lastModified +
-                '}';
+                "} " + super.toString();
     }
 }

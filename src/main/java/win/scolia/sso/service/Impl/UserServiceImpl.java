@@ -8,10 +8,11 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import win.scolia.sso.bean.entity.User;
+import win.scolia.sso.bean.entity.UserRole;
 import win.scolia.sso.bean.entity.UserSafely;
-import win.scolia.sso.bean.vo.entry.UserEntryVO;
-import win.scolia.sso.dao.RoleMapper;
+import win.scolia.sso.bean.vo.entry.UserEntry;
 import win.scolia.sso.dao.UserMapper;
+import win.scolia.sso.dao.UserRoleMapper;
 import win.scolia.sso.exception.DuplicateUserException;
 import win.scolia.sso.exception.MissUserException;
 import win.scolia.sso.service.UserService;
@@ -19,7 +20,6 @@ import win.scolia.sso.util.CacheUtils;
 import win.scolia.sso.util.EncryptUtils;
 import win.scolia.sso.util.PageUtils;
 
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Autowired
-    private RoleMapper roleMapper;
+    private UserRoleMapper userRoleMapper;
 
     @Autowired
     private CacheUtils cacheUtils;
@@ -42,6 +42,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 获取用户对象, 并且获得到的用户对象不进行缓存
+     *
      * @param userName 用户名
      * @return 用户对象或null
      */
@@ -49,40 +50,45 @@ public class UserServiceImpl implements UserService {
         assert !StringUtils.isEmpty(userName) : "UserName can not be empty";
         User user = cacheUtils.getUser(userName);
         if (user == null) {
-            user = userMapper.selectUserByUserName(userName);
+            User query = new User(userName);
+            user = userMapper.selectOne(query);
         }
         return user;
     }
 
     @Override
-    public void createUser(UserEntryVO userEntryVO) {
-        User cacheUser = this.getUserSimply(userEntryVO.getUserName());
+    public void createUser(UserEntry vo) {
+        String userName = vo.getUserName();
+        User cacheUser = this.getUserSimply(userName);
         if (cacheUser != null) {
-            throw new DuplicateUserException(String.format("%s already exist", userEntryVO.getUserName()));
+            throw new DuplicateUserException(String.format("%s already exist", vo.getUserName()));
         }
-        User user = new User();
-        BeanUtils.copyProperties(userEntryVO, user);
-        user.setSalt(encryptUtils.getRandomSalt());
-        user.setPassword(encryptUtils.getEncryptedPassword(user.getPassword(), user.getSalt()));
-        user.setCreateTime(new Date());
-        user.setLastModified(new Date());
+        String salt = encryptUtils.getRandomSalt();
+        String password = encryptUtils.getEncryptedPassword(vo.getPassword(), salt);
+        User record = new User(userName, password, salt);
+        record.forCreate();
         try {
-            userMapper.insertUser(user);
+            userMapper.insert(record);
         } catch (DuplicateKeyException e) {
-            throw new DuplicateUserException(String.format("%s already exist", userEntryVO.getUserName()), e);
+            throw new DuplicateUserException(String.format("%s already exist", vo.getUserName()), e);
         }
     }
 
     @Transactional
     @Override
     public void removeUserByUserName(String userName) {
-        User user = this.getUserSimply(userName);
-        if (user == null) {
+        User record = this.getUserSimply(userName);
+        if (record == null) {
             throw new MissUserException(String.format("%s not exist", userName)); // 用户不存在
         }
-        userMapper.deleteUserByUserName(userName); // 删除角色表中的记录
-        roleMapper.deleteUserRoleMapByUserId(user.getUserId()); // 删除 用户-角色 表中的映射
-        cacheUtils.clearUser(userName); // 清除缓存
+        // 删除角色表中的记录
+        userMapper.deleteByPrimaryKey(record);
+        // 删除 用户-角色 表中的映射
+        UserRole userRoleRecord = new UserRole();
+        userRoleRecord.setUserId(record.getUserId());
+        userRoleMapper.delete(userRoleRecord);
+        // 清除缓存
+        cacheUtils.clearUser(userName);
     }
 
     @Override
@@ -94,9 +100,9 @@ public class UserServiceImpl implements UserService {
         String tempPassword = encryptUtils.getEncryptedPassword(oldPassword, user.getSalt());
         if (StringUtils.equals(tempPassword, user.getPassword())) {
             String password = encryptUtils.getEncryptedPassword(newPassword, user.getSalt());
-            user.setPassword(password);
-            user.setLastModified(new Date());
-            userMapper.updatePasswordByUserName(user);
+            User record = new User(user.getUserId(), password);
+            record.forUpdate();
+            userMapper.updateByPrimaryKeySelective(record);
             cacheUtils.clearUser(userName);
             return true;
         }
@@ -110,9 +116,9 @@ public class UserServiceImpl implements UserService {
             throw new MissUserException(String.format("%s not exist", userName)); // 用户不存在
         }
         String password = encryptUtils.getEncryptedPassword(newPassword, user.getSalt());
-        user.setPassword(password);
-        user.setLastModified(new Date());
-        userMapper.updatePasswordByUserName(user);
+        User record = new User(user.getUserId(), password);
+        record.forUpdate();
+        userMapper.updateByPrimaryKeySelective(record);
         cacheUtils.clearUser(userName);
     }
 
@@ -120,7 +126,8 @@ public class UserServiceImpl implements UserService {
     public User getUserByUserName(String userName) {
         User user = cacheUtils.getUser(userName);
         if (user == null) {
-            user = userMapper.selectUserByUserName(userName);
+            User query = new User(userName);
+            user = userMapper.selectOne(query);
             cacheUtils.cacheUser(user);
         }
         return user;
@@ -146,7 +153,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean checkUserNameUsable(String userName) {
-        User user = this.getUserSimply(userName);
-        return user == null;
+        return this.getUserSimply(userName) == null ;
     }
 }

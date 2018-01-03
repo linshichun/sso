@@ -3,42 +3,6 @@
 
 <mapper namespace="win.scolia.sso.dao.RoleMapper">
 
-    <insert id="insertRole">
-        INSERT INTO role (role_name, create_time, last_modified)
-        VALUES (#{roleName}, #{createTime}, #{lastModified})
-    </insert>
-
-    <insert id="insertUserRoleMap">
-        INSERT INTO user_role(user_id, role_id, create_time, last_modified)
-        VALUES (#{userId}, #{roleId}, #{createTime}, #{lastModified})
-    </insert>
-
-    <delete id="deleteRoleByName">
-        DELETE FROM role
-        WHERE role_name = #{roleName}
-    </delete>
-
-    <delete id="deleteUserRoleMapByRoleId">
-        DELETE FROM user_role
-        WHERE role_id = #{roleId}
-    </delete>
-
-    <delete id="deleteUserRoleMapByUserId">
-        DELETE FROM user_role
-        WHERE user_id = #{userId}
-    </delete>
-
-    <delete id="deleteUserRoleMapByUserIdAndRoleId">
-        DELETE FROM user_role
-        WHERE user_id = #{userId} AND role_id = #{roleId}
-    </delete>
-
-    <update id="updateRoleByName">
-        UPDATE role
-        SET role_name = #{role.roleName}, last_modified = #{role.lastModified}
-        WHERE role_name = #{oldRoleName}
-    </update>
-
     <select id="selectUserRolesByUserName" resultType="string">
         SELECT role_name
         FROM role
@@ -56,23 +20,5 @@
         <result column="last_modified" property="lastModified"/>
     </resultMap>
 
-    <select id="selectRoleByRoleName" resultMap="roleMap">
-        SELECT
-            role_id,
-            role_name,
-            create_time,
-            last_modified
-        FROM role
-        WHERE role_name = #{roleName}
-    </select>
-
-    <select id="selectAllRoles" resultMap="roleMap">
-        SELECT
-            role_id,
-            role_name,
-            create_time,
-            last_modified
-        FROM role
-    </select>
 </mapper>
 

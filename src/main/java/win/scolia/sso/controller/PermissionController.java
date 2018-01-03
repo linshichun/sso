@@ -133,6 +133,9 @@ public class PermissionController {
     @RequestMapping("list/{pageNum}")
     @RequiresPermissions("system:permission:list")
     public ResponseEntity<PageInfo> listPermissions(@PathVariable("pageNum") Integer pageNum) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("{} list permissions in page: {}", ShiroUtils.getCurrentUserName(), pageNum);
+        }
         return ResponseEntity.ok(permissionService.listAllPermission(pageNum));
     }
 }

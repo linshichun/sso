@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 /**
  * 用户信息的输入VO对象
  */
-public class UserEntryVO {
+public class UserEntry {
 
     // 注册组
     public interface Register {}

@@ -3,15 +3,15 @@ package win.scolia.sso.service;
 import com.github.pagehelper.PageInfo;
 import win.scolia.sso.bean.entity.User;
 import win.scolia.sso.bean.entity.UserSafely;
-import win.scolia.sso.bean.vo.entry.UserEntryVO;
+import win.scolia.sso.bean.vo.entry.UserEntry;
 
 public interface UserService {
 
     /**
      * 插入一个新的用户
-     * @param userEntryVO 插入的用户对象
+     * @param vo 插入的用户对象
      */
-    void createUser(UserEntryVO userEntryVO);
+    void createUser(UserEntry vo);
 
     /**
      * 根据用户名删除用户

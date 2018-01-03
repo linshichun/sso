@@ -1,28 +1,25 @@
 package win.scolia.sso.bean.entity;
 
-import java.util.Date;
+import javax.persistence.Id;
 
 /**
  * 用户和角色的映射关系
  */
-public class UserRole {
+public class UserRole extends BaseEntity {
+    private static final long serialVersionUID = 7108259844144855041L;
 
+    @Id
     private Long userId;
 
+    @Id
     private Long roleId;
-
-    private Date createTime;
-
-    private Date lastModified;
 
     public UserRole() {
     }
 
-    public UserRole(Long userId, Long roleId, Date createTime, Date lastModified) {
+    public UserRole(Long userId, Long roleId) {
         this.userId = userId;
         this.roleId = roleId;
-        this.createTime = createTime;
-        this.lastModified = lastModified;
     }
 
     public Long getUserId() {
@@ -41,29 +38,11 @@ public class UserRole {
         this.roleId = roleId;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(Date lastModified) {
-        this.lastModified = lastModified;
-    }
-
     @Override
     public String toString() {
         return "UserRole{" +
                 "userId=" + userId +
                 ", roleId=" + roleId +
-                ", createTime=" + createTime +
-                ", lastModified=" + lastModified +
-                '}';
+                "} " + super.toString();
     }
 }

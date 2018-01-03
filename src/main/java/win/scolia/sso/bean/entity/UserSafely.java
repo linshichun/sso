@@ -1,22 +1,21 @@
 package win.scolia.sso.bean.entity;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 用户信息, 不包含敏感信息
  */
-public class UserSafely implements Serializable{
-
+public class UserSafely extends BaseEntity implements Serializable{
     private static final long serialVersionUID = 5395248029913469424L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
     private String userName;
-
-    private Date createTime;
-
-    private Date lastModified;
 
     public Long getUserId() {
         return userId;
@@ -34,29 +33,11 @@ public class UserSafely implements Serializable{
         this.userName = userName;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(Date lastModified) {
-        this.lastModified = lastModified;
-    }
-
     @Override
     public String toString() {
         return "UserSafely{" +
                 "userId=" + userId +
                 ", userName='" + userName + '\'' +
-                ", createTime=" + createTime +
-                ", lastModified=" + lastModified +
-                '}';
+                "} " + super.toString();
     }
 }

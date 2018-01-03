@@ -9,6 +9,7 @@ import win.scolia.sso.bean.entity.Permission;
 import win.scolia.sso.bean.entity.Role;
 import win.scolia.sso.bean.entity.RolePermission;
 import win.scolia.sso.dao.PermissionMapper;
+import win.scolia.sso.dao.RolePermissionMapper;
 import win.scolia.sso.exception.DuplicatePermissionException;
 import win.scolia.sso.exception.MissPermissionException;
 import win.scolia.sso.exception.MissRoleException;
@@ -17,7 +18,6 @@ import win.scolia.sso.service.RoleService;
 import win.scolia.sso.util.CacheUtils;
 import win.scolia.sso.util.PageUtils;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -31,6 +31,9 @@ public class PermissionServiceImpl implements PermissionService {
     private RoleService roleService;
 
     @Autowired
+    private RolePermissionMapper rolePermissionMapper;
+
+    @Autowired
     private CacheUtils cacheUtils;
 
     @Autowired
@@ -42,9 +45,10 @@ public class PermissionServiceImpl implements PermissionService {
         if (cachePermission != null) {
             throw new DuplicatePermissionException(String.format("%s already exist", permission));
         }
-        Permission p = new Permission(permission, new Date(), new Date());
+        Permission record = new Permission(permission);
+        record.forCreate();
         try {
-            permissionMapper.insertPermission(p);
+            permissionMapper.insert(record);
         } catch (DuplicateKeyException e) {
             throw new DuplicatePermissionException(String.format("%s already exist", permission), e);
         }
@@ -60,9 +64,10 @@ public class PermissionServiceImpl implements PermissionService {
         if (p == null) {
             throw new MissPermissionException(String.format("%s not exist", permission));
         }
-        RolePermission rolePermission = new RolePermission(role.getRoleId(), p.getPermissionId(), new Date(), new Date());
+        RolePermission record = new RolePermission(role.getRoleId(), p.getPermissionId());
+        record.forCreate();
         try {
-            permissionMapper.insertRolePermission(rolePermission);
+            rolePermissionMapper.insert(record);
             cacheUtils.clearRolePermissions(roleName);
         } catch (DuplicateKeyException e) {
             throw new DuplicatePermissionException(e);
@@ -73,13 +78,15 @@ public class PermissionServiceImpl implements PermissionService {
     @Transactional
     @Override
     public void removePermission(String permission) {
-        Permission p = this.getPermission(permission);
-        if (p == null) {
+        Permission record = this.getPermission(permission);
+        if (record == null) {
             throw new MissPermissionException(String.format("%s not exist", permission));
         }
         // 删除权限的同时, 也删除其映射表中的相关记录
-        permissionMapper.deletePermission(permission);
-        permissionMapper.deleteRolePermissionMapByPermissionId(p.getPermissionId());
+        permissionMapper.delete(record);
+        RolePermission target = new RolePermission();
+        target.setPermissionId(record.getPermissionId());
+        rolePermissionMapper.delete(target);
         cacheUtils.clearPermission(permission);
         cacheUtils.clearAllRolePermissions();
     }
@@ -94,23 +101,24 @@ public class PermissionServiceImpl implements PermissionService {
         if (p == null) {
             throw new MissPermissionException(String.format("%s not exist", permission));
         }
-        permissionMapper.deleteRolePermissionMapByRoleIdAndPermissionId(role.getRoleId(), p.getPermissionId());
+        RolePermission target = new RolePermission(role.getRoleId(), p.getPermissionId());
+        rolePermissionMapper.delete(target);
         cacheUtils.clearRolePermissions(roleName);
     }
 
     @Override
     public void changePermission(String oldPermission, String newPermission) {
-        Permission cachePermission = this.getPermission(oldPermission);
-        if (cachePermission == null) {
+        Permission op = this.getPermission(oldPermission);
+        if (op == null) {
             throw new MissPermissionException(String.format("%s not exist", oldPermission));
         }
-        Permission np= this.getPermission(newPermission);
+        Permission np = this.getPermission(newPermission);
         if (np != null) {
             throw new DuplicatePermissionException(String.format("%s already exist", newPermission));
         }
-        cachePermission.setPermission(newPermission);
-        cachePermission.setLastModified(new Date());
-        permissionMapper.updatePermission(oldPermission, cachePermission);
+        Permission record = new Permission(op.getPermissionId(), newPermission);
+        record.forUpdate();
+        permissionMapper.updateByPrimaryKeySelective(record);
         cacheUtils.clearPermission(oldPermission);
         cacheUtils.clearAllRolePermissions();
     }
@@ -129,7 +137,8 @@ public class PermissionServiceImpl implements PermissionService {
     public Permission getPermission(String permission) {
         Permission p = cacheUtils.getPermission(permission);
         if (p == null) {
-            p = permissionMapper.selectPermission(permission);
+            Permission query = new Permission(permission);
+            p = permissionMapper.selectOne(query);
             cacheUtils.cachePermission(p);
         }
         return p;
@@ -138,7 +147,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public PageInfo<Permission> listAllPermission(Integer pageNum) {
         pageUtils.startPage(pageNum);
-        List<Permission> permissions = permissionMapper.selectAllPermissions();
+        List<Permission> permissions = permissionMapper.selectAll();
         return pageUtils.getPageInfo(permissions);
     }
 }

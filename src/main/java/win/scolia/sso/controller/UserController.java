@@ -14,9 +14,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import win.scolia.sso.bean.entity.UserSafely;
-import win.scolia.sso.bean.vo.entry.UserEntryVO;
-import win.scolia.sso.bean.vo.export.MessageExportVO;
-import win.scolia.sso.bean.vo.export.UserExportVO;
+import win.scolia.sso.bean.vo.entry.UserEntry;
+import win.scolia.sso.bean.vo.export.MessageExport;
+import win.scolia.sso.bean.vo.export.UserExport;
 import win.scolia.sso.exception.DuplicateRoleException;
 import win.scolia.sso.exception.DuplicateUserException;
 import win.scolia.sso.exception.MissRoleException;
@@ -52,27 +52,27 @@ public class UserController {
     /**
      * 新增用户
      *
-     * @param userEntryVO   用户信息
+     * @param userEntry   用户信息
      * @param bindingResult 验证信息
      * @return 201 成功, 400 参数错误 409 该用户已存在
      */
     @PostMapping
     @RequiresPermissions("system:user:add")
-    public ResponseEntity<MessageExportVO> addUser(@Validated(UserEntryVO.Register.class) UserEntryVO userEntryVO,
-                                                   BindingResult bindingResult) {
+    public ResponseEntity<MessageExport> addUser(@Validated(UserEntry.Register.class) UserEntry userEntry,
+                                                 BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            MessageExportVO messageExportVO = MessageUtils.makeValidMessage(bindingResult);
-            return ResponseEntity.badRequest().body(messageExportVO);
+            MessageExport messageExport = MessageUtils.makeValidMessage(bindingResult);
+            return ResponseEntity.badRequest().body(messageExport);
         }
         try {
-            userService.createUser(userEntryVO);
+            userService.createUser(userEntry);
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("{} add user: {}", ShiroUtils.getCurrentUserName(), userEntryVO.getUserName());
+                LOGGER.info("{} add user: {}", ShiroUtils.getCurrentUserName(), userEntry.getUserName());
             }
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (DuplicateUserException e) {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("{} add duplicate user: {}", ShiroUtils.getCurrentUserName(), userEntryVO.getUserName());
+                LOGGER.info("{} add duplicate user: {}", ShiroUtils.getCurrentUserName(), userEntry.getUserName());
             }
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
@@ -133,7 +133,7 @@ public class UserController {
      */
     @GetMapping("{userName}")
     @RequiresPermissions("system:user:get")
-    public ResponseEntity<UserExportVO> getUser(@PathVariable("userName") String userName) {
+    public ResponseEntity<UserExport> getUser(@PathVariable("userName") String userName) {
         UserSafely userSafely = userService.getUserSafelyByUserName(userName);
         if (userSafely == null) {
             if (LOGGER.isInfoEnabled()) {
@@ -146,7 +146,7 @@ public class UserController {
         for (String roleName : roles) {
             permissions.addAll(permissionService.getPermissionsByRoleName(roleName));
         }
-        UserExportVO vo = new UserExportVO(userSafely, roles, permissions);
+        UserExport vo = new UserExport(userSafely, roles, permissions);
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("{} get user info: {}", ShiroUtils.getCurrentUserName(), userName);
         }

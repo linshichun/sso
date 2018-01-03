@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import win.scolia.sso.bean.entity.Role;
+import win.scolia.sso.bean.vo.export.RoleExport;
 import win.scolia.sso.exception.DuplicatePermissionException;
 import win.scolia.sso.exception.DuplicateRoleException;
 import win.scolia.sso.exception.MissPermissionException;
@@ -19,6 +20,8 @@ import win.scolia.sso.exception.MissRoleException;
 import win.scolia.sso.service.PermissionService;
 import win.scolia.sso.service.RoleService;
 import win.scolia.sso.util.ShiroUtils;
+
+import java.util.Set;
 
 @Controller
 @RequestMapping(value = "account/roles")
@@ -50,7 +53,7 @@ public class RoleController {
             return ResponseEntity.ok().build();
         } catch (DuplicateRoleException e) {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("{} add role: {}", ShiroUtils.getCurrentUserName(), roleName);
+                LOGGER.info("{} add duplicate role: {}", ShiroUtils.getCurrentUserName(), roleName);
             }
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
@@ -119,7 +122,7 @@ public class RoleController {
      */
     @GetMapping("{roleName}")
     @RequiresPermissions("system:role:get")
-    public ResponseEntity<Role> getRole(@PathVariable("roleName") String roleName) {
+    public ResponseEntity<RoleExport> getRole(@PathVariable("roleName") String roleName) {
         Role role = roleService.getRoleByRoleName(roleName);
         if (role == null) {
             if (LOGGER.isInfoEnabled()) {
@@ -130,7 +133,9 @@ public class RoleController {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("{} get role info: {}", ShiroUtils.getCurrentUserName(), roleName);
         }
-        return ResponseEntity.ok().body(role);
+        Set<String> permissions = permissionService.getPermissionsByRoleName(role.getRoleName());
+        RoleExport roleExport = new RoleExport(role, permissions);
+        return ResponseEntity.ok().body(roleExport);
     }
 
     /**

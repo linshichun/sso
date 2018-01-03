@@ -6,15 +6,15 @@ import java.util.Map;
 /**
  * 信息输出VO对象
  */
-public class MessageExportVO {
+public class MessageExport {
 
     private Map<String, Object> messages;
 
-    public MessageExportVO() {
+    public MessageExport() {
         this.messages = new HashMap<>();
     }
 
-    public MessageExportVO(Map<String, Object> messages) {
+    public MessageExport(Map<String, Object> messages) {
         this.messages = messages;
     }
 

@@ -1,28 +1,25 @@
 package win.scolia.sso.bean.entity;
 
-import java.util.Date;
+import javax.persistence.Id;
 
 /**
  * 角色和权限的映射关系
  */
-public class RolePermission {
+public class RolePermission extends BaseEntity {
+    private static final long serialVersionUID = -4885042955282179774L;
 
+    @Id
     private Long roleId;
 
+    @Id
     private Long permissionId;
-
-    private Date createTime;
-
-    private Date lastModified;
 
     public RolePermission() {
     }
 
-    public RolePermission(Long roleId, Long permissionId, Date createTime, Date lastModified) {
+    public RolePermission(Long roleId, Long permissionId) {
         this.roleId = roleId;
         this.permissionId = permissionId;
-        this.createTime = createTime;
-        this.lastModified = lastModified;
     }
 
     public Long getRoleId() {
@@ -41,19 +38,11 @@ public class RolePermission {
         this.permissionId = permissionId;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(Date lastModified) {
-        this.lastModified = lastModified;
+    @Override
+    public String toString() {
+        return "RolePermission{" +
+                "roleId=" + roleId +
+                ", permissionId=" + permissionId +
+                "} " + super.toString();
     }
 }

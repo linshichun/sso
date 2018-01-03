@@ -7,7 +7,7 @@ import java.util.Set;
 /**
  * 用户当前信息
  */
-public class UserExportVO {
+public class UserExport {
 
     private UserSafely user;
 
@@ -15,10 +15,10 @@ public class UserExportVO {
 
     private Set<String> permissions;
 
-    public UserExportVO() {
+    public UserExport() {
     }
 
-    public UserExportVO(UserSafely user, Set<String> roles, Set<String> permissions) {
+    public UserExport(UserSafely user, Set<String> roles, Set<String> permissions) {
         this.user = user;
         this.roles = roles;
         this.permissions = permissions;

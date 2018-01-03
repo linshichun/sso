@@ -1,29 +1,28 @@
 package win.scolia.sso.bean.entity;
 
-import java.util.Date;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-public class Permission {
+public class Permission extends BaseEntity {
+    private static final long serialVersionUID = 6544068627532597615L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long permissionId;
 
     private String permission;
 
-    private Date createTime;
-
-    private Date lastModified;
-
     public Permission() {
     }
 
-    public Permission(String permission, Date lastModified) {
+    public Permission(String permission) {
         this.permission = permission;
-        this.lastModified = lastModified;
     }
 
-    public Permission(String permission, Date createTime, Date lastModified) {
+    public Permission(Long permissionId, String permission) {
+        this.permissionId = permissionId;
         this.permission = permission;
-        this.createTime = createTime;
-        this.lastModified = lastModified;
     }
 
     public Long getPermissionId() {
@@ -42,29 +41,11 @@ public class Permission {
         this.permission = permission;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(Date lastModified) {
-        this.lastModified = lastModified;
-    }
-
     @Override
     public String toString() {
         return "Permission{" +
                 "permissionId=" + permissionId +
                 ", permission='" + permission + '\'' +
-                ", createTime=" + createTime +
-                ", lastModified=" + lastModified +
-                '}';
+                "} " + super.toString();
     }
 }

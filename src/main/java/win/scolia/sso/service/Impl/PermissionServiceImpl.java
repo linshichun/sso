@@ -15,8 +15,9 @@ import win.scolia.sso.exception.MissPermissionException;
 import win.scolia.sso.exception.MissRoleException;
 import win.scolia.sso.service.PermissionService;
 import win.scolia.sso.service.RoleService;
-import win.scolia.sso.util.CacheUtils;
 import win.scolia.sso.util.PageUtils;
+import win.scolia.sso.util.cache.PermissionCacheUtils;
+import win.scolia.sso.util.cache.RolePermissionCacheUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -34,7 +35,10 @@ public class PermissionServiceImpl implements PermissionService {
     private RolePermissionMapper rolePermissionMapper;
 
     @Autowired
-    private CacheUtils cacheUtils;
+    private PermissionCacheUtils permissionCacheUtils;
+
+    @Autowired
+    private RolePermissionCacheUtils rolePermissionCacheUtils;
 
     @Autowired
     private PageUtils pageUtils;
@@ -68,7 +72,7 @@ public class PermissionServiceImpl implements PermissionService {
         record.forCreate();
         try {
             rolePermissionMapper.insert(record);
-            cacheUtils.clearRolePermissions(roleName);
+            rolePermissionCacheUtils.delete(roleName);
         } catch (DuplicateKeyException e) {
             throw new DuplicatePermissionException(e);
         }
@@ -87,8 +91,8 @@ public class PermissionServiceImpl implements PermissionService {
         RolePermission target = new RolePermission();
         target.setPermissionId(record.getPermissionId());
         rolePermissionMapper.delete(target);
-        cacheUtils.clearPermission(permission);
-        cacheUtils.clearAllRolePermissions();
+        permissionCacheUtils.delete(permission);
+        rolePermissionCacheUtils.deleteAll();
     }
 
     @Override
@@ -103,7 +107,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
         RolePermission target = new RolePermission(role.getRoleId(), p.getPermissionId());
         rolePermissionMapper.delete(target);
-        cacheUtils.clearRolePermissions(roleName);
+        rolePermissionCacheUtils.delete(roleName);
     }
 
     @Override
@@ -119,27 +123,27 @@ public class PermissionServiceImpl implements PermissionService {
         Permission record = new Permission(op.getPermissionId(), newPermission);
         record.forUpdate();
         permissionMapper.updateByPrimaryKeySelective(record);
-        cacheUtils.clearPermission(oldPermission);
-        cacheUtils.clearAllRolePermissions();
+        permissionCacheUtils.delete(oldPermission);
+        rolePermissionCacheUtils.deleteAll();
     }
 
     @Override
     public Set<String> getPermissionsByRoleName(String roleName) {
-        Set<String> permissions = cacheUtils.getRolePermissions(roleName);
+        Set<String> permissions = rolePermissionCacheUtils.get(roleName);
         if (permissions == null) {
             permissions = permissionMapper.selectPermissionsByRoleName(roleName);
-            cacheUtils.cacheRolePermissions(roleName, permissions);
+            rolePermissionCacheUtils.cache(roleName, permissions);
         }
         return permissions;
     }
 
     @Override
     public Permission getPermission(String permission) {
-        Permission p = cacheUtils.getPermission(permission);
+        Permission p = permissionCacheUtils.get(permission);
         if (p == null) {
             Permission query = new Permission(permission);
             p = permissionMapper.selectOne(query);
-            cacheUtils.cachePermission(p);
+            permissionCacheUtils.cache(permission, p);
         }
         return p;
     }

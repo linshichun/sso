@@ -16,9 +16,9 @@ import win.scolia.sso.dao.UserRoleMapper;
 import win.scolia.sso.exception.DuplicateUserException;
 import win.scolia.sso.exception.MissUserException;
 import win.scolia.sso.service.UserService;
-import win.scolia.sso.util.CacheUtils;
 import win.scolia.sso.util.EncryptUtils;
 import win.scolia.sso.util.PageUtils;
+import win.scolia.sso.util.cache.UserCacheUtils;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     private UserRoleMapper userRoleMapper;
 
     @Autowired
-    private CacheUtils cacheUtils;
+    private UserCacheUtils userCacheUtils;
 
     @Autowired
     private EncryptUtils encryptUtils;
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
      */
     private User getUserSimply(String userName) {
         assert !StringUtils.isEmpty(userName) : "UserName can not be empty";
-        User user = cacheUtils.getUser(userName);
+        User user = userCacheUtils.get(userName);
         if (user == null) {
             User query = new User(userName);
             user = userMapper.selectOne(query);
@@ -88,7 +88,7 @@ public class UserServiceImpl implements UserService {
         userRoleRecord.setUserId(record.getUserId());
         userRoleMapper.delete(userRoleRecord);
         // 清除缓存
-        cacheUtils.clearUser(userName);
+        userCacheUtils.delete(userName);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
             User record = new User(user.getUserId(), password);
             record.forUpdate();
             userMapper.updateByPrimaryKeySelective(record);
-            cacheUtils.clearUser(userName);
+            userCacheUtils.delete(userName);
             return true;
         }
         return false;
@@ -119,16 +119,16 @@ public class UserServiceImpl implements UserService {
         User record = new User(user.getUserId(), password);
         record.forUpdate();
         userMapper.updateByPrimaryKeySelective(record);
-        cacheUtils.clearUser(userName);
+        userCacheUtils.delete(userName);
     }
 
     @Override
     public User getUserByUserName(String userName) {
-        User user = cacheUtils.getUser(userName);
+        User user = userCacheUtils.get(userName);
         if (user == null) {
             User query = new User(userName);
             user = userMapper.selectOne(query);
-            cacheUtils.cacheUser(user);
+            userCacheUtils.cache(userName, user);
         }
         return user;
     }

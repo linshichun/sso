@@ -9,7 +9,6 @@ import win.scolia.sso.bean.entity.Role;
 import win.scolia.sso.bean.entity.RolePermission;
 import win.scolia.sso.bean.entity.UserRole;
 import win.scolia.sso.bean.entity.UserSafely;
-import win.scolia.sso.dao.PermissionMapper;
 import win.scolia.sso.dao.RoleMapper;
 import win.scolia.sso.dao.RolePermissionMapper;
 import win.scolia.sso.dao.UserRoleMapper;
@@ -18,8 +17,10 @@ import win.scolia.sso.exception.MissRoleException;
 import win.scolia.sso.exception.MissUserException;
 import win.scolia.sso.service.RoleService;
 import win.scolia.sso.service.UserService;
-import win.scolia.sso.util.CacheUtils;
 import win.scolia.sso.util.PageUtils;
+import win.scolia.sso.util.cache.RoleCacheUtils;
+import win.scolia.sso.util.cache.RolePermissionCacheUtils;
+import win.scolia.sso.util.cache.UserRoleCacheUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -38,13 +39,16 @@ public class RoleServiceImpl implements RoleService {
     private UserRoleMapper userRoleMapper;
 
     @Autowired
-    private PermissionMapper permissionMapper;
-
-    @Autowired
     private RolePermissionMapper rolePermissionMapper;
 
     @Autowired
-    private CacheUtils cacheUtils;
+    private RoleCacheUtils roleCacheUtils;
+
+    @Autowired
+    private UserRoleCacheUtils userRoleCacheUtils;
+
+    @Autowired
+    private RolePermissionCacheUtils rolePermissionCacheUtils;
 
     @Autowired
     private PageUtils pageUtils;
@@ -78,7 +82,7 @@ public class RoleServiceImpl implements RoleService {
         record.forCreate();
         try {
             userRoleMapper.insert(record);
-            cacheUtils.clearUserRoles(userName);
+            userRoleCacheUtils.delete(userName);
         } catch (DuplicateKeyException e) {
             throw new DuplicateRoleException(e);
         }
@@ -102,9 +106,9 @@ public class RoleServiceImpl implements RoleService {
         target.setRoleId(record.getRoleId());
         rolePermissionMapper.delete(target);
         // 清除缓存
-        cacheUtils.clearRole(roleName); // 清除 角色 缓存
-        cacheUtils.clearAllUserRoles(); // 清除所有的 用户-角色 缓存
-        cacheUtils.clearRolePermissions(roleName); // 清除对应的 角色-权限 缓存
+        roleCacheUtils.delete(roleName); // 清除 角色 缓存
+        userRoleCacheUtils.deleteAll(); // 清除所有的 用户-角色 缓存
+        rolePermissionCacheUtils.delete(roleName); // 清除对应的 角色-权限 缓存
     }
 
     @Override
@@ -120,7 +124,7 @@ public class RoleServiceImpl implements RoleService {
         // 删除 用户-角色 的映射
         UserRole record = new UserRole(user.getUserId(), role.getRoleId());
         userRoleMapper.delete(record);
-        cacheUtils.clearUserRoles(userName); // 清除对应的 用户-角色 缓存
+        userRoleCacheUtils.delete(userName); // 清除对应的 用户-角色 缓存
     }
 
     @Override
@@ -136,29 +140,29 @@ public class RoleServiceImpl implements RoleService {
         Role record = new Role(role.getRoleId(), newRoleName);
         record.forUpdate();
         roleMapper.updateByPrimaryKeySelective(record);
-
-        cacheUtils.clearRole(oldRoleName);
-        cacheUtils.clearAllUserRoles(); // 清除所有的 用户-角色 缓存
-        cacheUtils.clearRolePermissions(oldRoleName); // 清除对应的 角色-权限 缓存
+        // 清除缓存
+        roleCacheUtils.delete(oldRoleName);
+        userRoleCacheUtils.deleteAll(); // 清除所有的 用户-角色 缓存
+        rolePermissionCacheUtils.delete(oldRoleName); // 清除对应的 角色-权限 缓存
     }
 
     @Override
     public Set<String> getUserRolesByUserName(String userName) {
-        Set<String> roles = cacheUtils.getUserRoles(userName);
+        Set<String> roles = userRoleCacheUtils.get(userName);
         if (roles == null) {
             roles = roleMapper.selectUserRolesByUserName(userName);
-            cacheUtils.cacheUserRoles(userName, roles);
+            userRoleCacheUtils.cache(userName, roles);
         }
         return roles;
     }
 
     @Override
     public Role getRoleByRoleName(String roleName) {
-        Role role = cacheUtils.getRole(roleName);
+        Role role = roleCacheUtils.get(roleName);
         if (role == null) {
             Role query = new Role(roleName);
             role = roleMapper.selectOne(query);
-            cacheUtils.cacheRole(role);
+            roleCacheUtils.cache(roleName, role);
         }
         return role;
     }

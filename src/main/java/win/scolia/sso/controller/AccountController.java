@@ -61,7 +61,7 @@ public class AccountController {
     /**
      * 用户注册
      *
-     * @param userEntry   用户的信息
+     * @param userEntry     用户的信息
      * @param bindingResult 数据校验的结果
      * @return 201 表示注册成功, 400 参数错误, 409 用户名已被占用
      */
@@ -109,6 +109,7 @@ public class AccountController {
 
     /**
      * 获取登录的验证码
+     *
      * @param session session
      * @return base64编码的验证码图片
      */
@@ -121,12 +122,12 @@ public class AccountController {
     /**
      * 使用用户名和密码登录
      *
-     * @param entry   用户信息
+     * @param entry         用户信息
      * @param bindingResult 数据校验的结果
      * @return 200 登录成功, 400 参数错误/登录失败
      */
     @PostMapping("login")
-    public ResponseEntity<MessageExport> login(@Valid LoginEntry entry, BindingResult bindingResult) {
+    public ResponseEntity<MessageExport> login(@RequestBody @Valid LoginEntry entry, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             MessageExport messageExport = MessageUtils.makeValidMessage(bindingResult);
             return ResponseEntity.badRequest().body(messageExport);
@@ -192,7 +193,7 @@ public class AccountController {
     /**
      * 修改密码
      *
-     * @param userEntry   用户信息
+     * @param userEntry     用户信息
      * @param bindingResult 数据校验的结果
      * @return 200 表示成功, 400 参数错误/旧密码错误 401 未登录
      */

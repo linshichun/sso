@@ -10,16 +10,13 @@ public class UserEntry {
     // 注册组
     public interface Register {}
 
-    // 密码登录组
-    public interface LoginByPassword {}
-
     // 修改密码组
     public interface ChangePassword{}
 
-    @NotNull(message = "用户名不能为空", groups = {Register.class, LoginByPassword.class, ChangePassword.class})
+    @NotNull(message = "用户名不能为空", groups = {Register.class, ChangePassword.class})
     private String userName;
 
-    @NotNull(message = "密码不能为空", groups = {Register.class, LoginByPassword.class})
+    @NotNull(message = "密码不能为空", groups = {Register.class})
     private String password;
 
     @NotNull(message = "旧密码不能为空", groups = {ChangePassword.class})

@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import win.scolia.sso.bean.entity.User;
 import win.scolia.sso.bean.entity.UserSafely;
+import win.scolia.sso.bean.vo.entry.LoginEntry;
 import win.scolia.sso.bean.vo.entry.UserEntry;
 import win.scolia.sso.bean.vo.export.Base64ImageCaptchaExport;
 import win.scolia.sso.bean.vo.export.CaptchaExport;
@@ -32,6 +33,7 @@ import win.scolia.sso.util.MessageUtils;
 import win.scolia.sso.util.ShiroUtils;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -119,28 +121,27 @@ public class AccountController {
     /**
      * 使用用户名和密码登录
      *
-     * @param userEntry   用户信息
+     * @param entry   用户信息
      * @param bindingResult 数据校验的结果
      * @return 200 登录成功, 400 参数错误/登录失败
      */
     @PostMapping("login")
-    public ResponseEntity<MessageExport> login(@Validated(UserEntry.LoginByPassword.class) UserEntry userEntry,
-                                               @RequestParam boolean rememberMe, BindingResult bindingResult) {
+    public ResponseEntity<MessageExport> login(@Valid LoginEntry entry, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             MessageExport messageExport = MessageUtils.makeValidMessage(bindingResult);
             return ResponseEntity.badRequest().body(messageExport);
         }
         try {
             Subject subject = SecurityUtils.getSubject();
-            AuthenticationToken token = new UsernamePasswordToken(userEntry.getUserName(), userEntry.getPassword(), rememberMe);
+            AuthenticationToken token = new UsernamePasswordToken(entry.getUserName(), entry.getPassword(), entry.getRememberMe());
             subject.login(token);
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Login user: {}", userEntry.getUserName());
+                LOGGER.info("Login user: {}", entry.getUserName());
             }
             return ResponseEntity.ok().build();
         } catch (AuthenticationException e) {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Login user fail: {}", userEntry.getUserName());
+                LOGGER.info("Login user fail: {}", entry.getUserName());
             }
             MessageExport vo = new MessageExport();
             MessageUtils.putMessage(vo, "authentication", "用户名或密码错误");

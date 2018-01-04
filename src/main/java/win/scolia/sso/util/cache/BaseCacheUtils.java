@@ -11,13 +11,13 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class BaseCacheUtils<T> implements CacheUtils<T> {
 
-    @Value("${scolia.sso.cache.prefix}")
+    @Value("${sso.cache.prefix}")
     private String prefix;
 
-    @Value("${scolia.sso.cache.expire}")
+    @Value("${sso.cache.expire}")
     private long expire;
 
-    @Value("${scolia.sso.cache.flush-expire}")
+    @Value("${sso.cache.flush-expire}")
     private boolean isFlush;
 
     protected String getCacheKey(String prefix, String key) {

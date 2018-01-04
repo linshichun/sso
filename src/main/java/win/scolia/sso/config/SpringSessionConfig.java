@@ -14,7 +14,7 @@ import org.springframework.session.web.http.DefaultCookieSerializer;
 @EnableRedisHttpSession(maxInactiveIntervalInSeconds = 60 * 60 * 24 * 14)
 public class SpringSessionConfig {
 
-    @Value("${scolia.sso.cookie.max-age}")
+    @Value("${sso.cookie.max-age}")
     private Integer maxAge;
 
 

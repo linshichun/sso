@@ -10,7 +10,7 @@ import java.util.List;
 @Component
 public class PageUtils {
 
-    @Value("${scolia.sso.page.size}")
+    @Value("${sso.page.size}")
     private Integer pageSize;
 
     public void startPage(int pageNum) {

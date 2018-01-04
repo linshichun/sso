@@ -2,14 +2,21 @@ package win.scolia.sso.autoconfigure;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(
-    prefix = "scolia.sso"
-)
+@ConfigurationProperties(prefix = "sso")
 public class SSOProperties {
+    private Register register;
     private Encrypt encrypt;
     private Cache cache;
     private Cookie cookie;
     private Page page;
+
+    public Register getRegister() {
+        return register;
+    }
+
+    public void setRegister(Register register) {
+        this.register = register;
+    }
 
     public Encrypt getEncrypt() {
         return encrypt;
@@ -41,6 +48,25 @@ public class SSOProperties {
 
     public void setPage(Page page) {
         this.page = page;
+    }
+
+
+    /**
+     * 注册相关设置
+     */
+    public static class Register {
+        private boolean enable = true;
+
+        private Register() {
+        }
+
+        public boolean isEnable() {
+            return enable;
+        }
+
+        public void setEnable(boolean enable) {
+            this.enable = enable;
+        }
     }
 
     /**

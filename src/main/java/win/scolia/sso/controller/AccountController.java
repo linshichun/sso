@@ -19,15 +19,19 @@ import org.springframework.web.bind.annotation.*;
 import win.scolia.sso.bean.entity.User;
 import win.scolia.sso.bean.entity.UserSafely;
 import win.scolia.sso.bean.vo.entry.UserEntry;
-import win.scolia.sso.bean.vo.export.UserExport;
+import win.scolia.sso.bean.vo.export.Base64ImageCaptchaExport;
+import win.scolia.sso.bean.vo.export.CaptchaExport;
 import win.scolia.sso.bean.vo.export.MessageExport;
+import win.scolia.sso.bean.vo.export.UserExport;
 import win.scolia.sso.exception.DuplicateUserException;
 import win.scolia.sso.service.PermissionService;
 import win.scolia.sso.service.RoleService;
 import win.scolia.sso.service.UserService;
+import win.scolia.sso.util.CaptchaUtils;
 import win.scolia.sso.util.MessageUtils;
 import win.scolia.sso.util.ShiroUtils;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,6 +52,9 @@ public class AccountController {
 
     @Autowired
     private PermissionService permissionService;
+
+    @Autowired
+    private CaptchaUtils captchaUtils;
 
     /**
      * 用户注册
@@ -96,6 +103,17 @@ public class AccountController {
             }
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
+    }
+
+    /**
+     * 获取登录的验证码
+     * @param session session
+     * @return base64编码的验证码图片
+     */
+    @GetMapping("login")
+    public ResponseEntity<CaptchaExport> login(HttpSession session) throws Exception {
+        Base64ImageCaptchaExport export = new Base64ImageCaptchaExport(captchaUtils.setBase64Image(session));
+        return ResponseEntity.ok(export);
     }
 
     /**

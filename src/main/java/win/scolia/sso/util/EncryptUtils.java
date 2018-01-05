@@ -1,8 +1,9 @@
 package win.scolia.sso.util;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import win.scolia.sso.autoconfigure.SSOProperties;
 
 import java.util.UUID;
 
@@ -13,8 +14,8 @@ import java.util.UUID;
 @Component
 public class EncryptUtils {
 
-    @Value("${sso.encrypt.salt}")
-    private String systemSalt;
+    @Autowired
+    private SSOProperties properties;
 
     /**
      * 生成私有盐
@@ -31,7 +32,7 @@ public class EncryptUtils {
      * @return 加密后的密码
      */
     public String getEncryptedPassword(String rowPassword, String selfSalt) {
-        String temp = DigestUtils.md5Hex(rowPassword + systemSalt);
+        String temp = DigestUtils.md5Hex(rowPassword + properties.getEncrypt().getSalt());
         return  DigestUtils.sha256Hex(temp + selfSalt);
     }
 

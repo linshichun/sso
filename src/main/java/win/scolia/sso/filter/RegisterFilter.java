@@ -2,7 +2,8 @@ package win.scolia.sso.filter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import win.scolia.sso.autoconfigure.SSOProperties;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -12,8 +13,8 @@ import java.io.IOException;
 @WebFilter(urlPatterns = "/account/register")
 public class RegisterFilter implements Filter {
 
-    @Value("${sso.register.enable}")
-    private boolean enableRegister;
+    @Autowired
+    private SSOProperties properties;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisterFilter.class);
 
@@ -26,7 +27,7 @@ public class RegisterFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if (!enableRegister) {
+        if (!properties.getRegister().isEnable()) {
             HttpServletResponse httpServletResponse = (HttpServletResponse) response;
             httpServletResponse.sendError(501, "Register service close");
             return;

@@ -2,38 +2,34 @@ package win.scolia.sso.util.cache;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import win.scolia.sso.autoconfigure.SSOProperties;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public abstract class BaseCacheUtils<T> implements CacheUtils<T> {
 
-    @Value("${sso.cache.prefix}")
-    private String prefix;
+    @Autowired
+    private SSOProperties properties;
 
-    @Value("${sso.cache.expire}")
-    private long expire;
-
-    @Value("${sso.cache.flush-expire}")
-    private boolean isFlush;
 
     protected String getCacheKey(String prefix, String key) {
-        return String.format("%s:%s:%s", this.prefix.toUpperCase(), prefix.toUpperCase(), key.toUpperCase());
+        return String.format("%s:%s:%s", this.getPrefix().toUpperCase(), prefix.toUpperCase(), key.toUpperCase());
     }
 
     protected String getPrefix() {
-        return prefix;
+        return properties.getCache().getPrefix();
     }
 
     protected long getExpire() {
-        return expire;
+        return properties.getCache().getExpire();
     }
 
     protected boolean isFlush() {
-        return isFlush;
+        return properties.getCache().isFlushExpire();
     }
 
     protected abstract String getSelfPrefix();

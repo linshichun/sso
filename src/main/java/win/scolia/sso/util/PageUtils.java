@@ -2,19 +2,20 @@ package win.scolia.sso.util;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import win.scolia.sso.autoconfigure.SSOProperties;
 
 import java.util.List;
 
 @Component
 public class PageUtils {
 
-    @Value("${sso.page.size}")
-    private Integer pageSize;
+    @Autowired
+    private SSOProperties properties;
 
     public void startPage(int pageNum) {
-        PageHelper.startPage(pageNum, pageSize);
+        PageHelper.startPage(pageNum, properties.getPage().getSize());
     }
 
     public <T> PageInfo<T> getPageInfo(List<T> content) {

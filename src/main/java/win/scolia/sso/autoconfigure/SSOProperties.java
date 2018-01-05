@@ -63,9 +63,6 @@ public class SSOProperties {
     public static class Register {
         private boolean enable = true;
 
-        private Register() {
-        }
-
         public boolean isEnable() {
             return enable;
         }
@@ -80,9 +77,6 @@ public class SSOProperties {
      */
     public static class Encrypt {
         private String salt;
-
-        private Encrypt() {
-        }
 
         public String getSalt() {
             return salt;
@@ -100,9 +94,6 @@ public class SSOProperties {
         private String prefix = "SSO";
         private int expire = 2592000;
         private boolean flushExpire = true;
-
-        private Cache() {
-        }
 
         public String getPrefix() {
             return prefix;
@@ -135,9 +126,6 @@ public class SSOProperties {
     public static class Cookie {
         private int maxAge = 1209600;
 
-        private Cookie() {
-        }
-
         public int getMaxAge() {
             return maxAge;
         }
@@ -152,9 +140,6 @@ public class SSOProperties {
      */
     public static class Page {
         private int size = 10;
-
-        public Page() {
-        }
 
         public int getSize() {
             return size;

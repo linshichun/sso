@@ -92,14 +92,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean changePasswordByOldPassword(String userName, String oldPassword, String newPassword) {
+    public boolean changePasswordByOldPassword(String userName, String current, String target) {
         User user = this.getUserByUserName(userName);
         if (user == null) {
             throw new MissUserException(String.format("%s not exist", userName)); // 用户不存在
         }
-        String tempPassword = encryptUtils.getEncryptedPassword(oldPassword, user.getSalt());
+        String tempPassword = encryptUtils.getEncryptedPassword(current, user.getSalt());
         if (StringUtils.equals(tempPassword, user.getPassword())) {
-            String password = encryptUtils.getEncryptedPassword(newPassword, user.getSalt());
+            String password = encryptUtils.getEncryptedPassword(target, user.getSalt());
             User record = new User(user.getUserId(), password);
             record.forUpdate();
             userMapper.updateByPrimaryKeySelective(record);
@@ -110,12 +110,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changePasswordDirectly(String userName, String newPassword) {
+    public void changePasswordDirectly(String userName, String target) {
         User user = this.getUserByUserName(userName);
         if (user == null) {
             throw new MissUserException(String.format("%s not exist", userName)); // 用户不存在
         }
-        String password = encryptUtils.getEncryptedPassword(newPassword, user.getSalt());
+        String password = encryptUtils.getEncryptedPassword(target, user.getSalt());
         User record = new User(user.getUserId(), password);
         record.forUpdate();
         userMapper.updateByPrimaryKeySelective(record);

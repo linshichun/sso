@@ -36,10 +36,10 @@ public interface PermissionService {
 
     /**
      * 修改一个权限
-     * @param oldPermission 旧权限
-     * @param newPermission 新权限
+     * @param current 旧权限
+     * @param target 新权限
      */
-    void changePermission(String oldPermission, String newPermission);
+    void changePermission(String current, String target);
 
     /**
      * 根据角色名获取角色的权限

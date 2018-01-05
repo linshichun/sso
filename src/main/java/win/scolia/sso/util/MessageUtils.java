@@ -2,10 +2,10 @@ package win.scolia.sso.util;
 
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import win.scolia.sso.bean.vo.export.MessageExport;
+import win.scolia.sso.bean.vo.export.AuthenticationExport;
+import win.scolia.sso.bean.vo.export.VerificationExport;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class MessageUtils {
@@ -16,48 +16,18 @@ public class MessageUtils {
      * @param bindingResult 校验信息
      * @return 返回消息对象
      */
-    public static MessageExport makeValidMessage(BindingResult bindingResult) {
-        MessageExport messageExport = new MessageExport();
+    public static VerificationExport makeVerificationMessage(BindingResult bindingResult) {
+        VerificationExport export = new VerificationExport();
         List<String> errorList = new ArrayList<>();
         for (ObjectError error : bindingResult.getAllErrors()) {
             errorList.add(error.getDefaultMessage());
         }
-        messageExport.getMessages().put("error", errorList);
-        return messageExport;
+        export.setVerification(errorList);
+        return export;
     }
 
-    /**
-     * 向消息对象中添加信息
-     *
-     * @param messageExport 消息对象
-     * @param key 消息键
-     * @param message   消息
-     */
-    @SuppressWarnings("unchecked")
-    public static void addMessage(MessageExport messageExport, String key, String message) {
-        Object entity = messageExport.getMessages().get(key);
-        if (entity == null) {
-            List<String> errorList = new ArrayList<>();
-            errorList.add(message);
-            messageExport.getMessages().put(key, errorList);
-        } else {
-            if (entity instanceof Collection) {
-                ((Collection) entity).add(message);
-            } else {
-                messageExport.getMessages().put(key, message);
-            }
-        }
-    }
-
-    /**
-     * 向消息对象中添加信息
-     *
-     * @param messageExport 消息对象
-     * @param key 消息键
-     * @param message   消息
-     */
-    public static void putMessage(MessageExport messageExport, String key, String message) {
-        messageExport.getMessages().put(key, message);
+    public static AuthenticationExport makeAuthenticationMessage(String message) {
+        return new AuthenticationExport(message);
     }
 
 }

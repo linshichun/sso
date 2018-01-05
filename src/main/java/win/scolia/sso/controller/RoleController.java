@@ -10,8 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import win.scolia.sso.bean.entity.Role;
+import win.scolia.sso.bean.vo.entry.PermissionEntry;
+import win.scolia.sso.bean.vo.entry.RoleEntry;
 import win.scolia.sso.bean.vo.export.RoleExport;
 import win.scolia.sso.exception.DuplicatePermissionException;
 import win.scolia.sso.exception.DuplicateRoleException;
@@ -19,8 +22,10 @@ import win.scolia.sso.exception.MissPermissionException;
 import win.scolia.sso.exception.MissRoleException;
 import win.scolia.sso.service.PermissionService;
 import win.scolia.sso.service.RoleService;
+import win.scolia.sso.util.MessageUtils;
 import win.scolia.sso.util.ShiroUtils;
 
+import javax.validation.Valid;
 import java.util.Set;
 
 @Controller
@@ -39,18 +44,22 @@ public class RoleController {
     /**
      * 新增一个角色
      *
-     * @param roleName 角色名
-     * @return 200 成功 409 该角色已存在
+     * @param entry 角色名
+     * @return 201 成功 409 该角色已存在
      */
     @PostMapping
     @RequiresPermissions("system:role:add")
-    public ResponseEntity<Void> addRole(@RequestParam String roleName) {
+    public ResponseEntity<Object> addRole(@RequestBody @Valid RoleEntry entry, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
+        }
+        String roleName = entry.getRoleName();
         try {
             roleService.createRole(roleName);
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("{} add role: {}", ShiroUtils.getCurrentUserName(), roleName);
             }
-            return ResponseEntity.ok().build();
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (DuplicateRoleException e) {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("{} add duplicate role: {}", ShiroUtils.getCurrentUserName(), roleName);
@@ -86,31 +95,36 @@ public class RoleController {
     /**
      * 修改一个角色名
      *
-     * @param oldRoleName 旧角色名
-     * @param newRoleName 新角色名
-     * @return 200 成功 404 旧角色不存在 400 新角色已存在
+     * @param current 旧角色名
+     * @param entry   新角色名
+     * @return 200 成功 404 旧角色不存在 409 新角色已存在
      */
-    @PutMapping("{oldRoleName}")
+    @PutMapping("{roleName}")
     @RequiresPermissions("system:role:update")
-    public ResponseEntity<Void> updateRole(@PathVariable("oldRoleName") String oldRoleName, @RequestParam String newRoleName) {
+    public ResponseEntity<Object> updateRole(@PathVariable("roleName") String current,
+                                             @RequestBody @Valid RoleEntry entry, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
+        }
+        String roleName = entry.getRoleName();
         try {
-            roleService.changeRoleName(oldRoleName, newRoleName);
+            roleService.changeRoleName(current, roleName);
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("{} update role's name: {} to {}", ShiroUtils.getCurrentUserName(), oldRoleName, newRoleName);
+                LOGGER.info("{} update role's name: {} to {}", ShiroUtils.getCurrentUserName(), current, roleName);
             }
             return ResponseEntity.ok().build();
         } catch (MissRoleException e) {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("{} update role's name: {} to {}, but miss role", ShiroUtils.getCurrentUserName(), oldRoleName,
-                        newRoleName);
+                LOGGER.info("{} update role's name: {} to {}, but miss role", ShiroUtils.getCurrentUserName(), current,
+                        roleName);
             }
             return ResponseEntity.notFound().build();
         } catch (DuplicateRoleException e) {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("{} update role's name: {} to {}, but new role already exist", ShiroUtils.getCurrentUserName(),
-                        oldRoleName, newRoleName);
+                        current, roleName);
             }
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 
@@ -141,12 +155,12 @@ public class RoleController {
     /**
      * 列出所有的角色信息
      *
-     * @param pageNum 页面
+     * @param pageNum 页码, 默认为1
      * @return 200 分页对象
      */
-    @GetMapping("list/{pageNum}")
+    @GetMapping
     @RequiresPermissions("system:role:list")
-    public ResponseEntity<PageInfo> listRoles(@PathVariable("pageNum") Integer pageNum) {
+    public ResponseEntity<PageInfo> listRoles(@RequestParam(defaultValue = "1") Integer pageNum) {
         PageInfo pageInfo = roleService.listRoles(pageNum);
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("{} list roles in page: {}", ShiroUtils.getCurrentUserName(), pageNum);
@@ -157,13 +171,18 @@ public class RoleController {
     /**
      * 为角色添加权限
      *
-     * @param roleName   角色名
-     * @param permission 权限
+     * @param roleName 角色名
+     * @param entry    权限
      * @return 200 成功 404 角色不存在 400 权限不存在 409 权限已添加
      */
     @PostMapping("{roleName}/permissions")
     @RequiresPermissions("system:role:edit")
-    public ResponseEntity<Void> addPermissionToRole(@PathVariable("roleName") String roleName, @RequestParam String permission) {
+    public ResponseEntity<Object> addPermissionToRole(@PathVariable("roleName") String roleName,
+                                                      @RequestBody @Valid PermissionEntry entry, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
+        }
+        String permission = entry.getPermission();
         try {
             permissionService.addPermissionToRole(roleName, permission);
             if (LOGGER.isInfoEnabled()) {
@@ -186,7 +205,6 @@ public class RoleController {
             }
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-
     }
 
     /**
@@ -217,7 +235,5 @@ public class RoleController {
             }
             return ResponseEntity.badRequest().build();
         }
-
     }
-
 }

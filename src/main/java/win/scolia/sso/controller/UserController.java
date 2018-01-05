@@ -14,9 +14,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import win.scolia.sso.bean.entity.UserSafely;
+import win.scolia.sso.bean.vo.entry.RoleEntry;
 import win.scolia.sso.bean.vo.entry.UserEntry;
-import win.scolia.sso.bean.vo.export.MessageExport;
 import win.scolia.sso.bean.vo.export.UserExport;
+import win.scolia.sso.bean.vo.export.VerificationExport;
 import win.scolia.sso.exception.DuplicateRoleException;
 import win.scolia.sso.exception.DuplicateUserException;
 import win.scolia.sso.exception.MissRoleException;
@@ -27,6 +28,7 @@ import win.scolia.sso.service.UserService;
 import win.scolia.sso.util.MessageUtils;
 import win.scolia.sso.util.ShiroUtils;
 
+import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,7 +37,7 @@ import java.util.Set;
  */
 @Controller
 @RequestMapping(value = "account/users")
-@RequiresAuthentication
+@RequiresAuthentication // 要求不能是rememberMe登录的
 public class UserController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
@@ -52,27 +54,26 @@ public class UserController {
     /**
      * 新增用户
      *
-     * @param userEntry   用户信息
+     * @param entry         用户信息
      * @param bindingResult 验证信息
-     * @return 201 成功, 400 参数错误 409 该用户已存在
+     * @return 201 成功, 409 该用户已存在
      */
     @PostMapping
     @RequiresPermissions("system:user:add")
-    public ResponseEntity<MessageExport> addUser(@Validated(UserEntry.Register.class) UserEntry userEntry,
-                                                 BindingResult bindingResult) {
+    public ResponseEntity<VerificationExport> addUser(@RequestBody @Validated(UserEntry.Register.class) UserEntry entry,
+                                                      BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            MessageExport messageExport = MessageUtils.makeValidMessage(bindingResult);
-            return ResponseEntity.badRequest().body(messageExport);
+            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
         }
         try {
-            userService.createUser(userEntry);
+            userService.createUser(entry);
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("{} add user: {}", ShiroUtils.getCurrentUserName(), userEntry.getUserName());
+                LOGGER.info("{} add user: {}", ShiroUtils.getCurrentUserName(), entry.getUserName());
             }
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (DuplicateUserException e) {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("{} add duplicate user: {}", ShiroUtils.getCurrentUserName(), userEntry.getUserName());
+                LOGGER.info("{} add duplicate user: {}", ShiroUtils.getCurrentUserName(), entry.getUserName());
             }
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
@@ -82,7 +83,7 @@ public class UserController {
      * 删除某个用户
      *
      * @param userName 用户名
-     * @return 200 成功, 403 权限不足, 404 要删除的用户不存在
+     * @return 200 成功, 404 要删除的用户不存在
      */
     @DeleteMapping("{userName}")
     @RequiresPermissions("system:user:delete")
@@ -105,14 +106,19 @@ public class UserController {
      * 修改用户密码
      *
      * @param userName 用户名
-     * @param password 密码
-     * @return 200 成功, 404 要修改密码的用户不存在
+     * @param entry    密码
+     * @return 200 成功, 404 用户不存在
      */
     @PutMapping("{userName}/password")
     @RequiresPermissions("system:user:update")
-    public ResponseEntity<Void> changePassword(@PathVariable("userName") String userName, @RequestParam String password) {
+    public ResponseEntity<Object> changePassword(@PathVariable("userName") String userName,
+                                                 @RequestBody @Validated(UserEntry.UpdatePassword.class) UserEntry entry,
+                                                 BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
+        }
         try {
-            userService.changePasswordDirectly(userName, password);
+            userService.changePasswordDirectly(userName, entry.getPassword());
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("{} change user password: {}", ShiroUtils.getCurrentUserName(), userName);
             }
@@ -156,12 +162,12 @@ public class UserController {
     /**
      * 列出所有的用户
      *
-     * @param pageNum 页码
+     * @param pageNum 页码, 默认第一页
      * @return 200 成功
      */
-    @GetMapping("list/{pageNum}")
+    @GetMapping
     @RequiresPermissions("system:user:list")
-    public ResponseEntity<PageInfo> listUsers(@PathVariable("pageNum") Integer pageNum) {
+    public ResponseEntity<PageInfo> listUsers(@RequestParam(defaultValue = "1") Integer pageNum) {
         PageInfo pageInfo = userService.listUsersSafely(pageNum);
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("{} list users in page: {}", ShiroUtils.getCurrentUserName(), pageNum);
@@ -173,13 +179,17 @@ public class UserController {
      * 为用户添加一个角色
      *
      * @param userName 用户名
-     * @param roleName 角色名
+     * @param entry    角色名
      * @return 200 成功 404 用户不存在 400 角色不存在 409 角色已添加
      */
     @PostMapping("{userName}/roles")
     @RequiresPermissions("system:user:edit")
-    public ResponseEntity<Void> addRoleToUser(@PathVariable("userName") String userName,
-                                              @RequestParam String roleName) {
+    public ResponseEntity<Object> addRoleToUser(@PathVariable("userName") String userName,
+                                                @RequestBody @Valid RoleEntry entry, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
+        }
+        String roleName = entry.getRoleName();
         try {
             roleService.addRoleToUser(userName, roleName);
             if (LOGGER.isInfoEnabled()) {

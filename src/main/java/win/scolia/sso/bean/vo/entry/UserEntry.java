@@ -7,23 +7,21 @@ import javax.validation.constraints.NotNull;
  */
 public class UserEntry {
 
-    // 注册组
     public interface Register {}
 
-    // 修改密码组
-    public interface ChangePassword{}
+    public interface UserName {}
 
-    @NotNull(message = "用户名不能为空", groups = {Register.class, ChangePassword.class})
+    public interface Login {}
+
+    public interface UpdatePassword {}
+
+    @NotNull(message = "用户名不能为空", groups = {Register.class, Login.class, UserName.class})
     private String userName;
 
-    @NotNull(message = "密码不能为空", groups = {Register.class})
+    @NotNull(message = "密码不能为空", groups = {Register.class, Login.class, UpdatePassword.class})
     private String password;
 
-    @NotNull(message = "旧密码不能为空", groups = {ChangePassword.class})
-    private String oldPassword;
-
-    @NotNull(message = "新密码不能为空", groups = {ChangePassword.class})
-    private String newPassword;
+    private Boolean rememberMe = false;
 
     public String getUserName() {
         return userName;
@@ -41,30 +39,12 @@ public class UserEntry {
         this.password = password;
     }
 
-    public String getOldPassword() {
-        return oldPassword;
+    public Boolean getRememberMe() {
+        return rememberMe;
     }
 
-    public void setOldPassword(String oldPassword) {
-        this.oldPassword = oldPassword;
-    }
-
-    public String getNewPassword() {
-        return newPassword;
-    }
-
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
-    }
-
-    @Override
-    public String toString() {
-        return "UserEntryVO{" +
-                "userName='" + userName + '\'' +
-                ", password='" + password + '\'' +
-                ", oldPassword='" + oldPassword + '\'' +
-                ", newPassword='" + newPassword + '\'' +
-                '}';
+    public void setRememberMe(Boolean rememberMe) {
+        this.rememberMe = rememberMe;
     }
 }
 

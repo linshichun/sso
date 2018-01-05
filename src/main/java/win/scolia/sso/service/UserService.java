@@ -22,18 +22,18 @@ public interface UserService {
     /**
      * 根据旧密码修改新密码
      * @param userName 用户名
-     * @param oldPassword 旧密码, 明文
-     * @param newPassword 新密码, 明文
+     * @param current 旧密码, 明文
+     * @param target 新密码, 明文
      * @return 返回true表示修改成功, false表示修改失败(密码或用户名不对)
      */
-    boolean changePasswordByOldPassword(String userName, String oldPassword, String newPassword);
+    boolean changePasswordByOldPassword(String userName, String current, String target);
 
     /**
      * 直接修改密码, 仅作为后台管理使用
      * @param userName 用户名
-     * @param newPassword 新密码
+     * @param target 新密码
      */
-    void changePasswordDirectly(String userName, String newPassword);
+    void changePasswordDirectly(String userName, String target);
 
     /**
      * 根据用户名获得用户信息

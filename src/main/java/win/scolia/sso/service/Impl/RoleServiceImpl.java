@@ -128,22 +128,22 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public void changeRoleName(String oldRoleName, String newRoleName) {
-        Role role = this.getRoleByRoleName(oldRoleName);
+    public void changeRoleName(String current, String target) {
+        Role role = this.getRoleByRoleName(current);
         if (role == null) {
-            throw new MissRoleException(String.format("%s not exist", oldRoleName));
+            throw new MissRoleException(String.format("%s not exist", current));
         }
-        Role newRole = this.getRoleByRoleName(newRoleName);
+        Role newRole = this.getRoleByRoleName(target);
         if (newRole != null) {
-            throw new DuplicateRoleException(String.format("%s already exist", newRoleName));
+            throw new DuplicateRoleException(String.format("%s already exist", target));
         }
-        Role record = new Role(role.getRoleId(), newRoleName);
+        Role record = new Role(role.getRoleId(), target);
         record.forUpdate();
         roleMapper.updateByPrimaryKeySelective(record);
         // 清除缓存
-        roleCacheUtils.delete(oldRoleName);
+        roleCacheUtils.delete(current);
         userRoleCacheUtils.deleteAll(); // 清除所有的 用户-角色 缓存
-        rolePermissionCacheUtils.delete(oldRoleName); // 清除对应的 角色-权限 缓存
+        rolePermissionCacheUtils.delete(current); // 清除对应的 角色-权限 缓存
     }
 
     @Override

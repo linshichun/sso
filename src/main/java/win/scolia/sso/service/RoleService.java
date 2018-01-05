@@ -35,10 +35,10 @@ public interface RoleService {
 
     /**
      * 更新角色名称
-     * @param oldRoleName 旧角色名
-     * @param newRoleName 新角色名
+     * @param current 旧角色名
+     * @param target 新角色名
      */
-    void changeRoleName(String oldRoleName, String newRoleName);
+    void changeRoleName(String current, String target);
 
     /**
      * 根据用户名获取用户的角色

@@ -9,12 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import win.scolia.sso.bean.entity.Permission;
+import win.scolia.sso.bean.vo.entry.PermissionEntry;
 import win.scolia.sso.exception.DuplicatePermissionException;
 import win.scolia.sso.exception.MissPermissionException;
 import win.scolia.sso.service.PermissionService;
+import win.scolia.sso.util.MessageUtils;
 import win.scolia.sso.util.ShiroUtils;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping(value = "account/permissions")
@@ -29,18 +34,22 @@ public class PermissionController {
     /**
      * 新增权限
      *
-     * @param permission 权限
-     * @return 200 成功, 409 权限已存在
+     * @param entry 权限
+     * @return 201 成功, 409 权限已存在
      */
     @PostMapping
     @RequiresPermissions("system:permission:add")
-    public ResponseEntity<Void> addPermission(@RequestParam String permission) {
+    public ResponseEntity<Object> addPermission(@RequestBody @Valid PermissionEntry entry, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
+        }
+        String permission = entry.getPermission();
         try {
             permissionService.createPermission(permission);
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("{} add permission: {}", ShiroUtils.getCurrentUserName(), permission);
             }
-            return ResponseEntity.ok().build();
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (DuplicatePermissionException e) {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("{} add duplicate permission: {}", ShiroUtils.getCurrentUserName(), permission);
@@ -75,28 +84,32 @@ public class PermissionController {
     /**
      * 更新权限
      *
-     * @param oldPermission 旧权限
-     * @param newPermission 新权限
+     * @param current 旧权限
+     * @param entry  新权限
      * @return 200 成功 404 旧权限不存在 409 新权限已存在
      */
-    @PutMapping("{oldPermission}")
+    @PutMapping("{permission}")
     @RequiresPermissions("system:permission:update")
-    public ResponseEntity<Void> updatePermission(@PathVariable("oldPermission") String oldPermission,
-                                                 @RequestParam String newPermission) {
+    public ResponseEntity<Object> updatePermission(@PathVariable("permission") String current,
+                                                 @RequestBody @Valid PermissionEntry entry, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
+        }
+        String target = entry.getPermission();
         try {
-            permissionService.changePermission(oldPermission, newPermission);
+            permissionService.changePermission(current, target);
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("{} update permission: {} to {}", ShiroUtils.getCurrentUserName(), oldPermission, newPermission);
+                LOGGER.info("{} update permission: {} to {}", ShiroUtils.getCurrentUserName(), current, target);
             }
             return ResponseEntity.ok().build();
         } catch (MissPermissionException e) {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("{} update miss permission: {} to {}", ShiroUtils.getCurrentUserName(), oldPermission, newPermission);
+                LOGGER.info("{} update miss permission: {} to {}", ShiroUtils.getCurrentUserName(), current, target);
             }
             return ResponseEntity.notFound().build();
         } catch (DuplicatePermissionException e) {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("{} update duplicate miss permission: {} to {}", ShiroUtils.getCurrentUserName(), oldPermission, newPermission);
+                LOGGER.info("{} update duplicate miss permission: {} to {}", ShiroUtils.getCurrentUserName(), current, target);
             }
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
@@ -127,12 +140,12 @@ public class PermissionController {
     /**
      * 获取权限列表
      *
-     * @param pageNum 页面
+     * @param pageNum 页码
      * @return 200 成功
      */
-    @RequestMapping("list/{pageNum}")
+    @GetMapping
     @RequiresPermissions("system:permission:list")
-    public ResponseEntity<PageInfo> listPermissions(@PathVariable("pageNum") Integer pageNum) {
+    public ResponseEntity<PageInfo> listPermissions(@RequestParam(defaultValue = "1") Integer pageNum) {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("{} list permissions in page: {}", ShiroUtils.getCurrentUserName(), pageNum);
         }

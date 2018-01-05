@@ -18,21 +18,16 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import win.scolia.sso.bean.entity.User;
 import win.scolia.sso.bean.entity.UserSafely;
-import win.scolia.sso.bean.vo.entry.LoginEntry;
+import win.scolia.sso.bean.vo.entry.ChangePasswordEntry;
 import win.scolia.sso.bean.vo.entry.UserEntry;
-import win.scolia.sso.bean.vo.export.Base64ImageCaptchaExport;
-import win.scolia.sso.bean.vo.export.CaptchaExport;
-import win.scolia.sso.bean.vo.export.MessageExport;
 import win.scolia.sso.bean.vo.export.UserExport;
 import win.scolia.sso.exception.DuplicateUserException;
 import win.scolia.sso.service.PermissionService;
 import win.scolia.sso.service.RoleService;
 import win.scolia.sso.service.UserService;
-import win.scolia.sso.util.CaptchaUtils;
 import win.scolia.sso.util.MessageUtils;
 import win.scolia.sso.util.ShiroUtils;
 
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Set;
@@ -55,32 +50,28 @@ public class AccountController {
     @Autowired
     private PermissionService permissionService;
 
-    @Autowired
-    private CaptchaUtils captchaUtils;
-
     /**
      * 用户注册
      *
-     * @param userEntry     用户的信息
+     * @param entry         用户的信息
      * @param bindingResult 数据校验的结果
-     * @return 201 表示注册成功, 400 参数错误, 409 用户名已被占用
+     * @return 201 成功 409 用户名已被占用
      */
     @PostMapping("register")
-    public ResponseEntity<MessageExport> register(@Validated(UserEntry.Register.class) UserEntry userEntry,
-                                                  BindingResult bindingResult) {
+    public ResponseEntity<Object> register(@RequestBody @Validated(UserEntry.Register.class) UserEntry entry,
+                                           BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            MessageExport messageExport = MessageUtils.makeValidMessage(bindingResult);
-            return ResponseEntity.badRequest().body(messageExport);
+            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
         }
         try {
-            userService.createUser(userEntry);
+            userService.createUser(entry);
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Register user: {}", userEntry.getUserName());
+                LOGGER.info("Register user: {}", entry.getUserName());
             }
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (DuplicateUserException e) {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Register duplicate user: {}", userEntry.getUserName());
+                LOGGER.info("Register duplicate user: {}", entry.getUserName());
             }
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
@@ -89,11 +80,16 @@ public class AccountController {
     /**
      * 注册时, 检查用户名是否可用
      *
-     * @param userName 用户名
+     * @param entry 用户名
      * @return 200 可用, 409 不可用, 400 参数错误
      */
     @PostMapping("register/check")
-    public ResponseEntity<Void> checkRepeatUserName(@RequestParam String userName) {
+    public ResponseEntity<Object> checkRepeatUserName(@RequestBody @Validated(UserEntry.UserName.class) UserEntry entry,
+                                                      BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
+        }
+        String userName = entry.getUserName();
         if (userService.checkUserNameUsable(userName)) {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Check Repeat user: {}, can use", userName);
@@ -108,18 +104,6 @@ public class AccountController {
     }
 
     /**
-     * 获取登录的验证码
-     *
-     * @param session session
-     * @return base64编码的验证码图片
-     */
-    @GetMapping("login")
-    public ResponseEntity<CaptchaExport> login(HttpSession session) throws Exception {
-        Base64ImageCaptchaExport export = new Base64ImageCaptchaExport(captchaUtils.setBase64Image(session));
-        return ResponseEntity.ok(export);
-    }
-
-    /**
      * 使用用户名和密码登录
      *
      * @param entry         用户信息
@@ -127,10 +111,10 @@ public class AccountController {
      * @return 200 登录成功, 400 参数错误/登录失败
      */
     @PostMapping("login")
-    public ResponseEntity<MessageExport> login(@RequestBody @Valid LoginEntry entry, BindingResult bindingResult) {
+    public ResponseEntity<Object> login(@RequestBody @Validated(UserEntry.Login.class) UserEntry entry,
+                                        BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            MessageExport messageExport = MessageUtils.makeValidMessage(bindingResult);
-            return ResponseEntity.badRequest().body(messageExport);
+            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
         }
         try {
             Subject subject = SecurityUtils.getSubject();
@@ -144,9 +128,7 @@ public class AccountController {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Login user fail: {}", entry.getUserName());
             }
-            MessageExport vo = new MessageExport();
-            MessageUtils.putMessage(vo, "authentication", "用户名或密码错误");
-            return ResponseEntity.badRequest().body(vo);
+            return ResponseEntity.badRequest().body(MessageUtils.makeAuthenticationMessage("UserName or password error"));
         }
     }
 
@@ -193,33 +175,29 @@ public class AccountController {
     /**
      * 修改密码
      *
-     * @param userEntry     用户信息
+     * @param entry         用户信息
      * @param bindingResult 数据校验的结果
      * @return 200 表示成功, 400 参数错误/旧密码错误 401 未登录
      */
     @PutMapping("current/password")
     @RequiresUser
-    public ResponseEntity<MessageExport> changePassword(@Validated(UserEntry.ChangePassword.class) UserEntry userEntry,
-                                                        BindingResult bindingResult) {
+    public ResponseEntity<Object> changePassword(@RequestBody @Valid ChangePasswordEntry entry, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            MessageExport messageExport = MessageUtils.makeValidMessage(bindingResult);
-            return ResponseEntity.badRequest().body(messageExport);
+            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
         }
-        boolean success = userService.changePasswordByOldPassword(userEntry.getUserName(), userEntry.getOldPassword(),
-                userEntry.getNewPassword());
+        User user = ShiroUtils.getCurrentUser();
+        boolean success = userService.changePasswordByOldPassword(user.getUserName(), entry.getCurrent(), entry.getTarget());
         if (success) {
             this.logout();
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Change user password: {}", userEntry.getUserName());
+                LOGGER.info("Change user password: {}", user.getUserName());
             }
             return ResponseEntity.ok().build();
         } else {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Change user password fail: {}", userEntry.getUserName());
+                LOGGER.info("Change user password fail: {}", user.getUserName());
             }
-            MessageExport vo = new MessageExport();
-            MessageUtils.putMessage(vo, "authentication", "密码错误");
-            return ResponseEntity.badRequest().body(vo);
+            return ResponseEntity.badRequest().body(MessageUtils.makeAuthenticationMessage("password error"));
         }
     }
 }

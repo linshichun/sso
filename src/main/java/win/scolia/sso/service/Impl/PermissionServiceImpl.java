@@ -111,19 +111,19 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public void changePermission(String oldPermission, String newPermission) {
-        Permission op = this.getPermission(oldPermission);
+    public void changePermission(String current, String target) {
+        Permission op = this.getPermission(current);
         if (op == null) {
-            throw new MissPermissionException(String.format("%s not exist", oldPermission));
+            throw new MissPermissionException(String.format("%s not exist", current));
         }
-        Permission np = this.getPermission(newPermission);
+        Permission np = this.getPermission(target);
         if (np != null) {
-            throw new DuplicatePermissionException(String.format("%s already exist", newPermission));
+            throw new DuplicatePermissionException(String.format("%s already exist", target));
         }
-        Permission record = new Permission(op.getPermissionId(), newPermission);
+        Permission record = new Permission(op.getPermissionId(), target);
         record.forUpdate();
         permissionMapper.updateByPrimaryKeySelective(record);
-        permissionCacheUtils.delete(oldPermission);
+        permissionCacheUtils.delete(current);
         rolePermissionCacheUtils.deleteAll();
     }
 

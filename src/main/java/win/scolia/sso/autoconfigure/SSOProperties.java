@@ -4,10 +4,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "sso")
 public class SSOProperties {
+
     private Register register;
+
     private Encrypt encrypt;
+
     private Cache cache;
+
     private Cookie cookie;
+
     private Page page;
 
     public Register getRegister() {
@@ -49,6 +54,7 @@ public class SSOProperties {
     public void setPage(Page page) {
         this.page = page;
     }
+
 
 
     /**

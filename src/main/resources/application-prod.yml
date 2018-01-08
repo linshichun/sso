@@ -8,6 +8,7 @@ server:
 logging:
   level:
     root: warn
+  file: /run/log/cloud/sso/sso.log
 
 spring:
   datasource:

@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import win.scolia.sso.autoconfigure.SSOProperties;
 
@@ -21,6 +22,7 @@ import win.scolia.sso.autoconfigure.SSOProperties;
 @EnableTransactionManagement
 @ServletComponentScan
 @EnableConfigurationProperties(SSOProperties.class)
+@EnableDiscoveryClient
 public class SSOApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SSOApplication.class);

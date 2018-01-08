@@ -1,67 +1,47 @@
-# \u5F00\u53D1\u73AF\u5883\u7684\u914D\u7F6E
-
 # Tomcat
 server:
-  port: 80
+  port: 8081
 
-# \u65E5\u5FD7
 logging:
   level:
     win.scolia.sso: debug
 
 spring:
+  application:
+    name: sso-provider
 
-  # \u6570\u636E\u6E90
   datasource:
     name: sso
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://192.168.1.106:3306/sso?useUnicode:true&characterEncoding:utf8&useSSL:false
     username: scolia
     password: 123456
-    # \u8FDE\u63A5\u6C60
     druid:
-      # \u521D\u59CB\u8FDE\u63A5\u6570
       initial-size: 2
-      # \u6700\u5927\u6D3B\u8DC3\u8FDE\u63A5\u6570
       max-active: 20
-      # \u6700\u5C0F\u7A7A\u95F2\u8FDE\u63A5\u6570
       min-idle: 5
-      # \u83B7\u53D6\u8FDE\u63A5\u7B49\u5F85\u8D85\u65F6\u7684\u65F6\u95F4
       max-wait: 60000
-      # \u914D\u7F6E\u95F4\u9694\u591A\u4E45\u624D\u8FDB\u884C\u4E00\u6B21\u68C0\u6D4B\uFF0C\u68C0\u6D4B\u9700\u8981\u5173\u95ED\u7684\u7A7A\u95F2\u8FDE\u63A5\uFF0C\u5355\u4F4D\u662F\u6BEB\u79D2
       time-between-eviction-runs-millis: 60000
-      # \u914D\u7F6E\u4E00\u4E2A\u8FDE\u63A5\u5728\u6C60\u4E2D\u6700\u5C0F\u751F\u5B58\u7684\u65F6\u95F4\uFF0C\u5355\u4F4D\u662F\u6BEB\u79D2
       min-evictable-idle-time-millis: 300000
       validation-query: SELECT 1 FROM DUAL
       test-while-idle: true
-      test-on-borrow: false # \u5728\u501F\u51FA\u8FDE\u63A5\u65F6, \u6D4B\u8BD5\u662F\u5426\u6709\u6548
-      # \u5728\u8FD4\u56DE\u8FDE\u63A5\u65F6, \u6D4B\u8BD5\u662F\u5426\u6709\u6548
+      test-on-borrow: false
       test-on-return: false
-      # \u914D\u7F6E\u76D1\u63A7\u60C5\u51B5
       web-stat-filter:
         enabled: false
       stat-view-servlet:
         enabled: false
 
-  # redis
   redis:
     database: 0
-  # Redis\u670D\u52A1\u5668\u5730\u5740
     host: 192.168.1.106
-  # Redis\u670D\u52A1\u5668\u8FDE\u63A5\u7AEF\u53E3
     port: 6379
-  # Redis\u670D\u52A1\u5668\u8FDE\u63A5\u5BC6\u7801\uFF08\u9ED8\u8BA4\u4E3A\u7A7A\uFF09
     password:
-  # \u8FDE\u63A5\u6C60\u6700\u5927\u8FDE\u63A5\u6570\uFF08\u4F7F\u7528\u8D1F\u503C\u8868\u793A\u6CA1\u6709\u9650\u5236\uFF09
     pool:
       max-active: 8
-      # \u8FDE\u63A5\u6C60\u6700\u5927\u963B\u585E\u7B49\u5F85\u65F6\u95F4\uFF08\u4F7F\u7528\u8D1F\u503C\u8868\u793A\u6CA1\u6709\u9650\u5236\uFF09
       max-wait: -1
-      # \u8FDE\u63A5\u6C60\u4E2D\u7684\u6700\u5927\u7A7A\u95F2\u8FDE\u63A5
       max-idle: 8
-      # \u8FDE\u63A5\u6C60\u4E2D\u7684\u6700\u5C0F\u7A7A\u95F2\u8FDE\u63A5
       min-idle: 2
-      # \u8FDE\u63A5\u8D85\u65F6\u65F6\u95F4\uFF08\u6BEB\u79D2\uFF09
     timeout: 0
 
 # mybatis
@@ -73,24 +53,24 @@ pagehelper:
   helper-dialect: mysql
   reasonable: true
 
-# sso \u9879\u76EE\u914D\u7F6E
+# sso
 sso:
   register:
-    # \u662F\u5426\u5F00\u653E\u6CE8\u518C
     enable: false
   encrypt:
-    # \u52A0\u5BC6\u4F7F\u7528\u7684\u5168\u5C40\u76D0
     salt: 00202df8-3e9b-463a-8c23-8ad5463cbb14
   cache:
-    # \u7F13\u5B58key\u7684\u524D\u7F00
     prefix: SSO
-    # \u7F13\u5B58\u7684\u751F\u5B58\u65F6\u95F4, \u5355\u4F4D\u662F\u79D2. \u8FD9\u91CC\u914D\u7F6E\u7684\u662F30\u5929
     expire: 2592000
-    # \u5F53\u7F13\u5B58\u88AB\u547D\u4E2D\u7684\u65F6\u5019\u662F\u5426\u5237\u65B0\u5176\u751F\u5B58\u65F6\u95F4
     flush-expire: true
   cookie:
-    # cookie\u7684\u6700\u5927\u751F\u5B58\u65F6\u95F4
     max-age: 1209600
   page:
-    # \u5206\u9875\u65F6, \u5355\u9875\u7684\u5185\u5BB9\u7684\u6570\u76EE\u662F\u591A\u5C11
     size: 10
+
+# eureka
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://scolia:manager2euk@eureka.scolia.win/eureka

@@ -31,6 +31,14 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- spring cloud-->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <!-- mybatis相关 -->
             <dependency>
                 <groupId>org.mybatis.spring.boot</groupId>

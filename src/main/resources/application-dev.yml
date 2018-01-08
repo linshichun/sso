@@ -1,6 +1,6 @@
 # Tomcat
 server:
-  port: 8081
+  port: 8001
 
 logging:
   level:
@@ -69,7 +69,6 @@ sso:
     size: 10
 
 # eureka
-
 eureka:
   client:
     service-url:

@@ -18,7 +18,7 @@ import win.scolia.cloud.sso.autoconfigure.SSOProperties;
  */
 
 @SpringBootApplication
-@MapperScan("win.scolia.sso.dao")
+@MapperScan("win.scolia.cloud.sso.dao")
 @EnableTransactionManagement
 @ServletComponentScan
 @EnableConfigurationProperties(SSOProperties.class)

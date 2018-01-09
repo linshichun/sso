@@ -112,8 +112,8 @@ API采用的是http状态码, 如不作特殊说明时, 出现下面的状态码
 ##### 为用户删除角色
     DELETE account/users/{userName}/roles/{roleName}
     PathVariable:
-        userName: scolia(要操作的用户名)
-        roleName: admin(要删除的角色名)
+        userName: 要操作的用户名
+        roleName: 要删除的角色名
     返回:
         460 要添加的角色不存在
     需求权限:
@@ -140,7 +140,7 @@ API采用的是http状态码, 如不作特殊说明时, 出现下面的状态码
 ##### 修改角色名
     PUT account/roles/{roleName}
     PathVariable:
-        roleName: admin(原先的角色名)
+        roleName: 原先的角色名
     json:
         {"roleName": "新的角色名"}
     需求权限:
@@ -165,7 +165,7 @@ API采用的是http状态码, 如不作特殊说明时, 出现下面的状态码
     PathVariable:
         roleName: 角色名
     json:
-        {"permission": "system:user:add"}
+        {"permission": "要增加的权限"}
     返回:
         461 权限不存在
     需求权限:
@@ -175,7 +175,7 @@ API采用的是http状态码, 如不作特殊说明时, 出现下面的状态码
     DELETE account/roles/{roleName}/permissions/{permission}
     PathVariable:
         roleName: 要操作的角色名
-        permission: system:user:add(要删除的权限)
+        permission: 要删除的权限
     返回:
         461 权限不存在
     需求权限:
@@ -188,7 +188,7 @@ API采用的是http状态码, 如不作特殊说明时, 出现下面的状态码
 ##### 添加权限
     POST account/permissions
     json:
-        {"permission": "system:user:add"}
+        {"permission": "要增加的权限"}
     需求权限:
         system:permission:add
     
@@ -202,9 +202,9 @@ API采用的是http状态码, 如不作特殊说明时, 出现下面的状态码
 ##### 修改权限
     PUT account/permissions/{permission}
     PathVariable:
-        permission: system:user:add(旧权限)
+        permission: 旧权限
     json:
-        {"permission": "system:user:delete(新权限)"}
+        {"permission": "新权限"}
     需求权限:
         system:permission:update
 

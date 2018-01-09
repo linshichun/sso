@@ -13,11 +13,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import win.scolia.cloud.sso.annotation.CheckEntry;
 import win.scolia.cloud.sso.bean.entity.UserSafely;
 import win.scolia.cloud.sso.bean.vo.entry.RoleEntry;
 import win.scolia.cloud.sso.bean.vo.entry.UserEntry;
 import win.scolia.cloud.sso.bean.vo.export.UserExport;
-import win.scolia.cloud.sso.bean.vo.export.VerificationExport;
 import win.scolia.cloud.sso.exception.DuplicateRoleException;
 import win.scolia.cloud.sso.exception.DuplicateUserException;
 import win.scolia.cloud.sso.exception.MissRoleException;
@@ -25,7 +25,6 @@ import win.scolia.cloud.sso.exception.MissUserException;
 import win.scolia.cloud.sso.service.PermissionService;
 import win.scolia.cloud.sso.service.RoleService;
 import win.scolia.cloud.sso.service.UserService;
-import win.scolia.cloud.sso.util.MessageUtils;
 import win.scolia.cloud.sso.util.ShiroUtils;
 
 import javax.validation.Valid;
@@ -41,6 +40,8 @@ import java.util.Set;
 public class UserController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+
+    private static final int ROLE_NOT_FOUND_STATUS = 460;
 
     @Autowired
     private UserService userService;
@@ -60,11 +61,8 @@ public class UserController {
      */
     @PostMapping
     @RequiresPermissions("system:user:add")
-    public ResponseEntity<VerificationExport> addUser(@RequestBody @Validated(UserEntry.Register.class) UserEntry entry,
-                                                      BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
-        }
+    @CheckEntry
+    public ResponseEntity addUser(@RequestBody @Validated(UserEntry.Register.class) UserEntry entry, BindingResult bindingResult) {
         try {
             userService.createUser(entry);
             if (LOGGER.isInfoEnabled()) {
@@ -111,12 +109,9 @@ public class UserController {
      */
     @PutMapping("{userName}/password")
     @RequiresPermissions("system:user:update")
+    @CheckEntry
     public ResponseEntity<Object> changePassword(@PathVariable("userName") String userName,
-                                                 @RequestBody @Validated(UserEntry.UpdatePassword.class) UserEntry entry,
-                                                 BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
-        }
+                                                 @RequestBody @Validated(UserEntry.UpdatePassword.class) UserEntry entry, BindingResult bindingResult) {
         try {
             userService.changePasswordDirectly(userName, entry.getPassword());
             if (LOGGER.isInfoEnabled()) {
@@ -135,7 +130,7 @@ public class UserController {
      * 获取某个用户的信息
      *
      * @param userName 用户名
-     * @return 200 成功, 404 没有此用户
+     * @return 200 成功, 404 用户不存在
      */
     @GetMapping("{userName}")
     @RequiresPermissions("system:user:get")
@@ -180,15 +175,12 @@ public class UserController {
      *
      * @param userName 用户名
      * @param entry    角色名
-     * @return 200 成功 404 用户不存在 400 角色不存在 409 角色已添加
+     * @return 200 成功 404 用户不存在 409 用户角色重复 460 角色不存在
      */
     @PostMapping("{userName}/roles")
     @RequiresPermissions("system:user:edit")
-    public ResponseEntity<Object> addRoleToUser(@PathVariable("userName") String userName,
-                                                @RequestBody @Valid RoleEntry entry, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
-        }
+    @CheckEntry
+    public ResponseEntity<Object> addRoleToUser(@PathVariable("userName") String userName, @RequestBody @Valid RoleEntry entry, BindingResult bindingResult) {
         String roleName = entry.getRoleName();
         try {
             roleService.addRoleToUser(userName, roleName);
@@ -205,7 +197,7 @@ public class UserController {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("{} add user's role: {}:{}, but miss role", ShiroUtils.getCurrentUserName(), userName, roleName);
             }
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(ROLE_NOT_FOUND_STATUS).build();
         } catch (DuplicateRoleException e) {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("{} add duplicate user's role: {}:{}", ShiroUtils.getCurrentUserName(), userName, roleName);
@@ -219,12 +211,11 @@ public class UserController {
      *
      * @param userName 用户名
      * @param roleName 角色名
-     * @return 200 成功 400 角色不存在 404 用户不存在
+     * @return 200 成功 404 用户不存在 460 角色不存在
      */
     @DeleteMapping("{userName}/roles/{roleName}")
     @RequiresPermissions("system:user:edit")
-    public ResponseEntity<Void> deleteUserRole(@PathVariable("userName") String userName,
-                                               @PathVariable("roleName") String roleName) {
+    public ResponseEntity<Void> deleteUserRole(@PathVariable("userName") String userName, @PathVariable("roleName") String roleName) {
         try {
             roleService.romeUserRole(userName, roleName);
             if (LOGGER.isInfoEnabled()) {
@@ -240,7 +231,7 @@ public class UserController {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("{} delete user's role: {}:{}, but miss role", ShiroUtils.getCurrentUserName(), userName, roleName);
             }
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(ROLE_NOT_FOUND_STATUS).build();
         }
     }
 }

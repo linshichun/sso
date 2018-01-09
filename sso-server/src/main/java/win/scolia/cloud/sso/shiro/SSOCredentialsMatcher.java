@@ -15,7 +15,7 @@ import win.scolia.cloud.sso.util.EncryptUtils;
  * Created by scolia on 2017/9/29
  */
 @Component
-public class MyCredentialsMatcher implements CredentialsMatcher {
+public class SSOCredentialsMatcher implements CredentialsMatcher {
 
     @Autowired
     private EncryptUtils encryptUtils;

@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import win.scolia.cloud.sso.annotation.CheckEntry;
 import win.scolia.cloud.sso.bean.entity.Role;
 import win.scolia.cloud.sso.bean.vo.entry.PermissionEntry;
 import win.scolia.cloud.sso.bean.vo.entry.RoleEntry;
@@ -22,7 +23,6 @@ import win.scolia.cloud.sso.exception.MissPermissionException;
 import win.scolia.cloud.sso.exception.MissRoleException;
 import win.scolia.cloud.sso.service.PermissionService;
 import win.scolia.cloud.sso.service.RoleService;
-import win.scolia.cloud.sso.util.MessageUtils;
 import win.scolia.cloud.sso.util.ShiroUtils;
 
 import javax.validation.Valid;
@@ -34,6 +34,8 @@ import java.util.Set;
 public class RoleController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RoleController.class);
+
+    private static final int PERMISSION_NOT_FOUND = 461;
 
     @Autowired
     private RoleService roleService;
@@ -49,10 +51,8 @@ public class RoleController {
      */
     @PostMapping
     @RequiresPermissions("system:role:add")
+    @CheckEntry
     public ResponseEntity<Object> addRole(@RequestBody @Valid RoleEntry entry, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
-        }
         String roleName = entry.getRoleName();
         try {
             roleService.createRole(roleName);
@@ -101,11 +101,9 @@ public class RoleController {
      */
     @PutMapping("{roleName}")
     @RequiresPermissions("system:role:update")
+    @CheckEntry
     public ResponseEntity<Object> updateRole(@PathVariable("roleName") String current,
                                              @RequestBody @Valid RoleEntry entry, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
-        }
         String roleName = entry.getRoleName();
         try {
             roleService.changeRoleName(current, roleName);
@@ -173,15 +171,13 @@ public class RoleController {
      *
      * @param roleName 角色名
      * @param entry    权限
-     * @return 200 成功 404 角色不存在 400 权限不存在 409 权限已添加
+     * @return 200 成功 404 角色不存在 409 权限已添加 461 权限不存在
      */
     @PostMapping("{roleName}/permissions")
     @RequiresPermissions("system:role:edit")
+    @CheckEntry
     public ResponseEntity<Object> addPermissionToRole(@PathVariable("roleName") String roleName,
                                                       @RequestBody @Valid PermissionEntry entry, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
-        }
         String permission = entry.getPermission();
         try {
             permissionService.addPermissionToRole(roleName, permission);
@@ -198,7 +194,7 @@ public class RoleController {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("{} add role's permission: {}:{}, but miss permission", ShiroUtils.getCurrentUserName(), roleName, permission);
             }
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(PERMISSION_NOT_FOUND).build();
         } catch (DuplicatePermissionException e) {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("{} add duplicate role's permission: {}:{}", ShiroUtils.getCurrentUserName(), roleName, permission);
@@ -212,7 +208,7 @@ public class RoleController {
      *
      * @param roleName   角色名
      * @param permission 权限名
-     * @return 200 成功 404 角色不存在 400 权限不存在
+     * @return 200 成功 404 角色不存在 461 权限不存在
      */
     @DeleteMapping("{roleName}/permissions/{permission}")
     @RequiresPermissions("system:role:edit")
@@ -233,7 +229,7 @@ public class RoleController {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("{} delete role's permission: {}:{}, but miss permission", ShiroUtils.getCurrentUserName(), roleName, permission);
             }
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(PERMISSION_NOT_FOUND).build();
         }
     }
 }

@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
-public class MybatisRealm extends AuthorizingRealm {
+public class SSORealm extends AuthorizingRealm {
 
     @Autowired
     private UserService userService;

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * spring mvc 的全局异常处理器
+ * 全局异常处理器
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -29,10 +30,10 @@ public class GlobalExceptionHandler {
 
     /**
      * 参数错误
+     *
      * @return 400
      */
-    @ExceptionHandler(value = {MissingServletRequestParameterException.class, IllegalArgumentException.class,
-            HttpMessageNotReadableException.class})
+    @ExceptionHandler(value = {MissingServletRequestParameterException.class, HttpMessageNotReadableException.class})
     public ResponseEntity<String> bedRequestHandler(HttpServletRequest request) {
         if (LOGGER.isWarnEnabled()) {
             String param;
@@ -48,11 +49,21 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 不支持的媒体类型
+     * @return 415
+     */
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<Void> mediaType() {
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build();
+    }
+
+    /**
      * 未认证
+     *
      * @return 401
      */
     @ExceptionHandler(UnauthenticatedException.class)
-    public ResponseEntity<Void> unauthorizedHandler(HttpServletRequest request){
+    public ResponseEntity<Void> unauthorizedHandler(HttpServletRequest request) {
         if (LOGGER.isWarnEnabled()) {
             LOGGER.warn("{} try to access {}, but not signin", request.getRemoteHost(), request.getRequestURI());
         }
@@ -61,10 +72,11 @@ public class GlobalExceptionHandler {
 
     /**
      * 权限不足时的异常处理
+     *
      * @return 403
      */
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<Void> forbiddenHandler(HttpServletRequest request){
+    public ResponseEntity<Void> forbiddenHandler(HttpServletRequest request) {
         if (LOGGER.isWarnEnabled()) {
             LOGGER.warn("{} try to access {}, but miss permission", request.getRemoteHost(), request.getRequestURI());
         }
@@ -73,6 +85,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 请求方法不允许
+     *
      * @return 405
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -85,10 +98,11 @@ public class GlobalExceptionHandler {
 
     /**
      * 通用异常处理
+     *
      * @return 500
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Void> exceptionHandler(HttpServletRequest request, Exception e){
+    public ResponseEntity<Void> exceptionHandler(HttpServletRequest request, Exception e) {
         LOGGER.error("Error happen in: {}", request.getRequestURI(), e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }

@@ -11,8 +11,8 @@ import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import win.scolia.cloud.sso.shiro.MyCredentialsMatcher;
-import win.scolia.cloud.sso.shiro.MybatisRealm;
+import win.scolia.cloud.sso.shiro.SSOCredentialsMatcher;
+import win.scolia.cloud.sso.shiro.SSORealm;
 
 @Configuration
 public class ShiroConfig {
@@ -32,7 +32,7 @@ public class ShiroConfig {
      * @param matcher 密码匹配器
      */
     @Bean
-    public SecurityManager securityManager(SessionManager sessionManager, MybatisRealm realm, MyCredentialsMatcher matcher) {
+    public SecurityManager securityManager(SessionManager sessionManager, SSORealm realm, SSOCredentialsMatcher matcher) {
         DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
         realm.setCredentialsMatcher(matcher);
         manager.setRealm(realm);

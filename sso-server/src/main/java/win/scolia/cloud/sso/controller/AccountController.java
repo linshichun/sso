@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import win.scolia.cloud.sso.annotation.CheckEntry;
 import win.scolia.cloud.sso.bean.entity.User;
 import win.scolia.cloud.sso.bean.entity.UserSafely;
 import win.scolia.cloud.sso.bean.vo.entry.ChangePasswordEntry;
@@ -25,7 +26,7 @@ import win.scolia.cloud.sso.exception.DuplicateUserException;
 import win.scolia.cloud.sso.service.PermissionService;
 import win.scolia.cloud.sso.service.RoleService;
 import win.scolia.cloud.sso.service.UserService;
-import win.scolia.cloud.sso.util.MessageUtils;
+import win.scolia.cloud.sso.util.ResponseUtils;
 import win.scolia.cloud.sso.util.ShiroUtils;
 
 import javax.validation.Valid;
@@ -36,7 +37,7 @@ import java.util.Set;
  * 主要负责登录注册等功能
  */
 @Controller
-@RequestMapping(value = "account")
+@RequestMapping("account")
 public class AccountController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountController.class);
@@ -58,11 +59,8 @@ public class AccountController {
      * @return 201 成功 409 用户名已被占用
      */
     @PostMapping("register")
-    public ResponseEntity<Object> register(@RequestBody @Validated(UserEntry.Register.class) UserEntry entry,
-                                           BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
-        }
+    @CheckEntry
+    public ResponseEntity register(@RequestBody @Validated(UserEntry.Register.class) UserEntry entry, BindingResult bindingResult) {
         try {
             userService.createUser(entry);
             if (LOGGER.isInfoEnabled()) {
@@ -81,14 +79,11 @@ public class AccountController {
      * 注册时, 检查用户名是否可用
      *
      * @param entry 用户名
-     * @return 200 可用, 409 不可用, 400 参数错误
+     * @return 200 可用, 409 不可用
      */
-    @PostMapping("register/check")
-    public ResponseEntity<Object> checkRepeatUserName(@RequestBody @Validated(UserEntry.UserName.class) UserEntry entry,
-                                                      BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
-        }
+    @GetMapping("register/userName")
+    @CheckEntry
+    public ResponseEntity checkRepeatUserName(@RequestBody @Validated(UserEntry.UserName.class) UserEntry entry, BindingResult bindingResult) {
         String userName = entry.getUserName();
         if (userService.checkUserNameUsable(userName)) {
             if (LOGGER.isInfoEnabled()) {
@@ -108,14 +103,11 @@ public class AccountController {
      *
      * @param entry         用户信息
      * @param bindingResult 数据校验的结果
-     * @return 200 登录成功, 400 参数错误/登录失败
+     * @return 200 登录成功, 401登录失败
      */
     @PostMapping("login")
-    public ResponseEntity<Object> login(@RequestBody @Validated(UserEntry.Login.class) UserEntry entry,
-                                        BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
-        }
+    @CheckEntry
+    public ResponseEntity login(@RequestBody @Validated(UserEntry.Login.class) UserEntry entry, BindingResult bindingResult) {
         try {
             Subject subject = SecurityUtils.getSubject();
             AuthenticationToken token = new UsernamePasswordToken(entry.getUserName(), entry.getPassword(), entry.getRememberMe());
@@ -128,7 +120,7 @@ public class AccountController {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Login user fail: {}", entry.getUserName());
             }
-            return ResponseEntity.badRequest().body(MessageUtils.makeAuthenticationMessage("UserName or password error"));
+            return ResponseUtils.makeAuthenticationResponseEntity("UserName or password error");
         }
     }
 
@@ -139,7 +131,7 @@ public class AccountController {
      */
     @GetMapping("logout")
     @RequiresUser
-    public ResponseEntity<Void> logout() {
+    public ResponseEntity logout() {
         Subject subject = SecurityUtils.getSubject();
         if (LOGGER.isInfoEnabled()) {
             User user = (User) subject.getPrincipal();
@@ -156,7 +148,7 @@ public class AccountController {
      */
     @GetMapping("current")
     @RequiresUser
-    public ResponseEntity<UserExport> current() {
+    public ResponseEntity current() {
         User user = ShiroUtils.getCurrentUser();
         UserSafely userSafely = new UserSafely();
         BeanUtils.copyProperties(user, userSafely);
@@ -177,14 +169,12 @@ public class AccountController {
      *
      * @param entry         用户信息
      * @param bindingResult 数据校验的结果
-     * @return 200 表示成功, 400 参数错误/旧密码错误 401 未登录
+     * @return 200 表示成功, 401 未登录/密码错误
      */
     @PutMapping("current/password")
     @RequiresUser
-    public ResponseEntity<Object> changePassword(@RequestBody @Valid ChangePasswordEntry entry, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
-        }
+    @CheckEntry
+    public ResponseEntity changePassword(@RequestBody @Valid ChangePasswordEntry entry, BindingResult bindingResult) {
         User user = ShiroUtils.getCurrentUser();
         boolean success = userService.changePasswordByOldPassword(user.getUserName(), entry.getCurrent(), entry.getTarget());
         if (success) {
@@ -197,7 +187,7 @@ public class AccountController {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Change user password fail: {}", user.getUserName());
             }
-            return ResponseEntity.badRequest().body(MessageUtils.makeAuthenticationMessage("password error"));
+            return ResponseUtils.makeAuthenticationResponseEntity("password error");
         }
     }
 }

@@ -11,12 +11,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import win.scolia.cloud.sso.annotation.CheckEntry;
 import win.scolia.cloud.sso.bean.entity.Permission;
 import win.scolia.cloud.sso.bean.vo.entry.PermissionEntry;
 import win.scolia.cloud.sso.exception.DuplicatePermissionException;
 import win.scolia.cloud.sso.exception.MissPermissionException;
 import win.scolia.cloud.sso.service.PermissionService;
-import win.scolia.cloud.sso.util.MessageUtils;
 import win.scolia.cloud.sso.util.ShiroUtils;
 
 import javax.validation.Valid;
@@ -39,10 +39,8 @@ public class PermissionController {
      */
     @PostMapping
     @RequiresPermissions("system:permission:add")
+    @CheckEntry
     public ResponseEntity<Object> addPermission(@RequestBody @Valid PermissionEntry entry, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
-        }
         String permission = entry.getPermission();
         try {
             permissionService.createPermission(permission);
@@ -90,11 +88,9 @@ public class PermissionController {
      */
     @PutMapping("{permission}")
     @RequiresPermissions("system:permission:update")
+    @CheckEntry
     public ResponseEntity<Object> updatePermission(@PathVariable("permission") String current,
                                                  @RequestBody @Valid PermissionEntry entry, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(MessageUtils.makeVerificationMessage(bindingResult));
-        }
         String target = entry.getPermission();
         try {
             permissionService.changePermission(current, target);

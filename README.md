@@ -1,12 +1,10 @@
 ## SSO 单点登录系统
 
-    使用spring boot, spring session, mybatis, redis, mysql等搭建, 采用RESTFul风格.
+    使用spring boot, spring session, mybatis, redis, mysql等搭建, 使用spring cloud相关技术.
 
 ## 简介
 
-由于spring session天然支持session跨服务器共享, 使得在各子系统中共享同一登录状态的需求变得无比简单.
-
-只需要所有子系统都集成spring session, 连接同一个redis集群. 就能实现session共享.
+使用spring cloud搭建的登录系统微服务.
 
 ## API:
 

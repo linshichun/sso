@@ -12,10 +12,10 @@
     <artifactId>sso-server</artifactId>
 
     <dependencies>
-        <!-- api -->
+        <!-- srv -->
         <dependency>
             <groupId>win.scolia.cloud</groupId>
-            <artifactId>sso-api</artifactId>
+            <artifactId>sso-srv</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <!-- eureka -->
@@ -94,15 +94,6 @@
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
         </dependency>
-        <!-- shiro -->
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-spring</artifactId>
-        </dependency>
         <!-- Jackson -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -115,6 +106,11 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <!-- lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
         <!-- common -->
         <dependency>
